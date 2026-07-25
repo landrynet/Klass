@@ -1,8 +1,76 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Configuration des matricules{% endblock %}
+
 {% block content %}
-<div class="container-fluid" style="max-width:760px"><div class="d-flex align-items-center gap-3 mb-4"><a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a><div><h1 class="h4 fw-bold mb-0">Configuration des matricules</h1><p class="text-muted mb-0 small">Les modifications s'appliquent uniquement aux futurs élèves.</p></div></div>
-  <div class="alert alert-info"><i class="bi bi-eye me-2"></i>Prochain exemple : <strong>{{ preview }}</strong></div>
-  <div class="card"><div class="card-body p-4"><form method="post">{% csrf_token %}<div class="row g-3">{% for field in form %}<div class="col-md-6">{% if field.field.widget.input_type == "checkbox" %}<div class="form-check mt-2">{{ field }}<label class="form-check-label">{{ field.label }}</label>{% else %}<label class="form-label fw-semibold">{{ field.label }}</label>{{ field }}{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}</div><button class="btn btn-primary mt-4">Enregistrer la configuration</button></form></div></div>
+<div class="container-fluid" style="max-width:640px;">
+
+  <div class="klass-breadcrumb">
+    <a href="{% url 'students:list' %}">Élèves</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">Matricules</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">Configuration des matricules</h1>
+        <p class="page-header-sub">Définissez le format des identifiants élèves.</p>
+      </div>
+    </div>
+  </div>
+
+  {% if config.preview_example %}
+  <div class="alert d-flex gap-3 align-items-center mb-4" style="background:rgba(var(--klass-primary-rgb),.06);border:1.5px solid rgba(var(--klass-primary-rgb),.2);border-radius:10px;">
+    <i class="bi bi-qr-code text-primary" style="font-size:1.4rem;flex-shrink:0;"></i>
+    <div>
+      <div class="text-muted mb-1" style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Aperçu du prochain matricule</div>
+      <code style="font-size:1.1rem;font-weight:700;color:var(--klass-primary);">{{ config.preview_example }}</code>
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate data-submit-once>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger d-flex gap-2 mb-4">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+      <div>{{ form.non_field_errors|join:", " }}</div>
+    </div>
+    {% endif %}
+
+    <div class="card mb-3">
+      <div class="card-body p-4">
+        <div class="row g-3">
+          {% for field in form %}
+          <div class="col-md-{% if field.name in 'prefix,separator' %}6{% else %}6{% endif %}">
+            <label class="form-label" for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.field.required %}<span class="required-mark">*</span>{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for e in field.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-warning d-flex gap-2 mb-4" style="border-radius:10px;">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+      <div>
+        <strong>Attention :</strong> modifier le format des matricules n'affecte pas les matricules déjà attribués. 
+        Seuls les nouveaux élèves utiliseront le nouveau format.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary fw-semibold w-100" style="height:46px;border-radius:10px;">
+      <i class="bi bi-check2 me-2"></i>Enregistrer la configuration
+    </button>
+  </form>
 </div>
 {% endblock %}

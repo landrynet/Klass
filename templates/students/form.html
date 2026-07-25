@@ -1,15 +1,156 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<div class="container-fluid" style="max-width:820px">
-  <div class="d-flex align-items-center gap-3 mb-4"><a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a><div><h1 class="h4 fw-bold mb-0">{{ title }}</h1><p class="text-muted mb-0 small">Le matricule est attribué automatiquement et ne peut pas être saisi.</p></div></div>
-  <div class="card"><div class="card-body p-4"><form method="post" novalidate>{% csrf_token %}
-    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-    <div class="row g-3">{% for field in form %}
-      {% if field.name == "primary_parent" %}<div class="col-12"><div class="d-flex justify-content-between align-items-center"><label class="form-label fw-semibold">{{ field.label }}</label><a href="{% url 'students:parent_create' %}" class="small">Créer un parent</a></div>{{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
-      {% else %}<div class="{% if field.name == 'first_name' or field.name == 'last_name' or field.name == 'date_of_birth' or field.name == 'gender' or field.name == 'status' %}col-md-6{% else %}col-12{% endif %}">{% if field.field.widget.input_type == "checkbox" %}<div class="form-check mt-2">{{ field }}<label class="form-check-label">{{ field.label }}</label></div>{% else %}<label class="form-label fw-semibold">{{ field.label }}</label>{{ field }}{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endif %}
-    {% endfor %}</div>
-    <div class="d-flex gap-2 mt-4"><button class="btn btn-primary flex-grow-1">Enregistrer</button><a href="{% url 'students:list' %}" class="btn btn-outline-secondary">Annuler</a></div>
-  </form></div></div>
+<div class="container-fluid" style="max-width:860px;">
+
+  <!-- Breadcrumb + retour -->
+  <div class="klass-breadcrumb">
+    <a href="{% url 'students:list' %}">Élèves</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">{{ title }}</span>
+  </div>
+
+  <!-- En-tête -->
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">{{ title }}</h1>
+        <p class="page-header-sub">Le matricule est attribué automatiquement.</p>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" novalidate data-submit-once enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger d-flex gap-2 mb-4">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+      <div>{{ form.non_field_errors|join:", " }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Identité -->
+    <div class="card mb-3">
+      <div class="card-header py-3 px-4">
+        <p class="form-section-title mb-0"><i class="bi bi-person me-1"></i>Identité</p>
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.last_name.id_for_label }}">
+              Nom <span class="required-mark">*</span>
+            </label>
+            {{ form.last_name }}
+            {% for e in form.last_name.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.first_name.id_for_label }}">
+              Prénom <span class="required-mark">*</span>
+            </label>
+            {{ form.first_name }}
+            {% for e in form.first_name.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.date_of_birth.id_for_label }}">
+              Date de naissance <span class="required-mark">*</span>
+            </label>
+            {{ form.date_of_birth }}
+            {% for e in form.date_of_birth.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.gender.id_for_label }}">
+              Genre <span class="required-mark">*</span>
+            </label>
+            {{ form.gender }}
+            {% for e in form.gender.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.nationality.id_for_label }}">Nationalité</label>
+            {{ form.nationality }}
+            {% for e in form.nationality.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% if form.place_of_birth %}
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.place_of_birth.id_for_label }}">Lieu de naissance</label>
+            {{ form.place_of_birth }}
+            {% for e in form.place_of_birth.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Situation scolaire -->
+    <div class="card mb-3">
+      <div class="card-header py-3 px-4">
+        <p class="form-section-title mb-0"><i class="bi bi-mortarboard me-1"></i>Situation & contacts</p>
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.status.id_for_label }}">Statut</label>
+            {{ form.status }}
+            {% for e in form.status.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between align-items-center" for="{{ form.primary_parent.id_for_label }}">
+              <span>Parent / tuteur principal</span>
+              <a href="{% url 'students:parent_create' %}" class="small" style="font-size:.78rem;">
+                <i class="bi bi-plus me-1"></i>Créer un parent
+              </a>
+            </label>
+            {{ form.primary_parent }}
+            {% if form.primary_parent.help_text %}
+            <div class="form-text">{{ form.primary_parent.help_text }}</div>
+            {% endif %}
+            {% for e in form.primary_parent.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% if form.blood_type %}
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.blood_type.id_for_label }}">Groupe sanguin</label>
+            {{ form.blood_type }}
+            {% for e in form.blood_type.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endif %}
+          {% if form.emergency_contact %}
+          <div class="col-md-5">
+            <label class="form-label" for="{{ form.emergency_contact.id_for_label }}">Contact d'urgence</label>
+            {{ form.emergency_contact }}
+            {% for e in form.emergency_contact.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="{{ form.emergency_phone.id_for_label }}">Tél. urgence</label>
+            {{ form.emergency_phone }}
+            {% for e in form.emergency_phone.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endif %}
+          {% if form.medical_notes %}
+          <div class="col-12">
+            <label class="form-label" for="{{ form.medical_notes.id_for_label }}">Notes médicales</label>
+            {{ form.medical_notes }}
+            {% for e in form.medical_notes.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 mb-4">
+      <button type="submit" class="btn btn-primary fw-semibold flex-grow-1" style="height:46px;border-radius:10px;">
+        <i class="bi bi-check2 me-2"></i>{{ title }}
+      </button>
+      <a href="{% url 'students:list' %}" class="btn btn-outline-secondary px-4" style="height:46px;border-radius:10px;display:flex;align-items:center;">
+        Annuler
+      </a>
+    </div>
+
+  </form>
 </div>
 {% endblock %}

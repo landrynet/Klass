@@ -1,0 +1,168 @@
+# PROMPT — PHASE 3.5 : REFONTE UI/UX, STABILISATION ET DONNÉES DE TEST
+
+## CONTEXTE
+Phases déjà livrées : 1 (Fondations), 2.0 (Années scolaires/niveaux/options), 2.1 (Classes/salles), 3.0 (Élèves/parents/matricules), 3.1 (Inscriptions), 3.2 (Enseignants/personnel) — toutes ✅.
+
+Avant la Phase 4, il faut stabiliser le système et harmoniser toute l'interface.
+
+---
+
+## A — DESIGN DE RÉFÉRENCE
+```
+LIEN FIGMA : https://www.figma.com/design/jEBHrroHgcMQjr6rxwqn5s/Educational-Dashbord--School-Management---Community-?node-id=0-1&m=dev&t=dh9FPAg50Q2uJpLF-1
+```
+Le design actuel de l'application n'est **pas** une référence à conserver. Analyser le Figma fourni et l'adapter à KLASS. Objectif : remplacer entièrement l'ancien système visuel par une interface cohérente, moderne et professionnelle.
+
+## B — REFONTE COMPLÈTE (pas de retouches ponctuelles)
+Appliquer le design de référence à : layout, sidebar, header, navigation, cartes, tableaux, formulaires, boutons, badges, modals, dropdowns, pagination, filtres, recherche, pages de détail, états vides, messages/notifications, loaders, responsive.
+→ Le résultat doit ressembler à **une seule app**, un seul système de design.
+
+## C — SUPPRESSION DE L'ANCIEN DESIGN
+Supprimer/remplacer proprement : anciens layouts, navigation, composants visuels, styles contradictoires, CSS mort, templates obsolètes, doublons, anciens boutons/formulaires. Aucun système de design concurrent ne doit subsister.
+
+⚠️ **Ne pas toucher** : modèles, migrations, services, permissions, logique métier, URLs, fonctionnalités. Seuls templates, composants UI, styles, layouts et JS frontend sont concernés.
+
+## D — DESIGN SYSTEM KLASS
+Définir une base commune : couleurs, typographie, tailles, espacements, bordures, rayons, ombres, boutons, inputs, select, badges, tables, cards, modals, alertes, loaders. Tous les modules (Élèves, Classes, Enseignants, Inscriptions, Parents, Années scolaires...) doivent utiliser exactement les mêmes composants.
+
+## E — PAGES À REFONDRE
+Pour **chaque** module ci-dessous, refondre : liste, création, détail, modification, statut, recherche, filtres (selon pertinence) :
+- **Super Admin** : connexion, dashboard, écoles (liste/création/détail), gestion Admin École, états vides, erreurs
+- **Admin École** : connexion, première connexion, changement mot de passe, assistant de configuration, dashboard, navigation
+- **Années scolaires, Niveaux, Options/Filières, Classes, Salles, Élèves, Parents, Inscriptions, Enseignants, Personnel**
+- **Matricules** : configuration, génération, affichage, règles
+
+## F — DASHBOARDS
+Clairs, lisibles, responsives, hiérarchisés, utiles. **Statistiques issues des vraies données** — jamais de chiffres fictifs.
+
+## G — TABLEAUX
+Harmoniser : en-têtes, colonnes, actions, statut, recherche, filtres, pagination, état vide, chargement, erreurs. Doivent rester utilisables sur mobile.
+
+## H — FORMULAIRES
+Chaque formulaire : labels clairs, alignement correct, aide contextuelle si besoin, validation, messages d'erreur, état de chargement, boutons Enregistrer/Annuler, **protection anti double-soumission** :
+```
+Clic → bouton désactivé → loader → traitement → succès/erreur
+```
+
+## I — LOADING
+- **Skeleton** : dashboards, listes, tableaux, cartes
+- **Spinner** : enregistrement, modification, suppression, changement de statut
+- **Progress bar** : import/export, opérations longues
+Pas de loader plein écran inutile.
+
+## J — ÉTATS VIDES ET ERREURS
+États vides explicites avec explication + CTA, ex. :
+```
+Aucun élève trouvé
+Commencez par ajouter votre premier élève.
+[Ajouter un élève]
+```
+Erreurs : messages compréhensibles, jamais de traceback/SQL/infos sensibles exposées.
+
+## K — RESPONSIVE
+Tester desktop / tablette / mobile, en particulier sidebar, header, tableaux, formulaires, modals, boutons, cartes, filtres. Doit être réellement utilisable sur mobile.
+
+## L — AUDIT FONCTIONNEL COMPLET
+La refonte visuelle ne doit rien casser. Pour chaque module (Super Admin → Personnel) : vérifier liste, création, détail, modification, archivage/suppression, recherche, filtres, pagination, permissions, **isolation multi-tenant**. Chaque bouton/lien doit fonctionner réellement — aucune page purement décorative.
+
+## M — AUDIT DES URLS
+Pour chaque route : existence, nom, vue fonctionnelle, template existant, permissions, accès sécurisé, liens internes valides. Tester aussi les accès directs par URL et vérifier qu'un utilisateur ne peut pas accéder aux données d'un autre tenant en modifiant un identifiant dans l'URL.
+
+## N — SCRIPT DE RÉINITIALISATION DES DONNÉES DE TEST
+Créer/mettre à jour une commande officielle, documentée :
+```bash
+python manage.py reset_test_data
+```
+Le script doit : supprimer proprement les données de test, préserver structure/migrations, recréer une école de test complète avec toutes les données liées.
+⚠️ Réservé au dev/test — ne jamais toucher la production. Prévoir confirmation ou vérification d'environnement avant exécution.
+
+## O — ÉCOLE DE TEST COMPLÈTE
+Après reset, créer automatiquement « École de démonstration KLASS » avec : admin école, année scolaire, niveaux, options/filières, classes, salles, élèves, parents, inscriptions, enseignants, personnel — données réalistes et cohérentes, respectant les règles métier.
+
+## P — VOLUME DE DONNÉES
+Créer assez de données pour tester pagination, recherche, filtres, tableaux, dashboard, statistiques, relations (ex. : plusieurs dizaines d'élèves, plusieurs parents/classes/enseignants). Pas un seul enregistrement isolé par module.
+
+## Q — IDEMPOTENCE
+Le script doit pouvoir être exécuté plusieurs fois sans créer de doublons incohérents (tester exécution 1 puis 2).
+
+## R — TESTS AUTOMATISÉS
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+# ou : pytest
+```
+Vérifier modèles, migrations, URLs, vues, templates, formulaires, permissions, isolation, données de test. En cas d'échec : identifier la cause, corriger, relancer — ne jamais désactiver un test qui échoue.
+
+## S — DOCUMENTATION
+Lire/respecter `docs/Klass_Document_Projet.docx`. Créer/mettre à jour :
+```
+docs/ui/design-system.md
+docs/testing/test-data.md
+docs/testing/reset-test-data.md
+```
+La doc doit refléter le code réel.
+
+## T — README.md
+Mettre à jour avec : design de référence + design system + responsive + loaders ; commande de reset + école de test ; statut réel des phases :
+```
+Phase 1    ✅
+Phase 2.0  ✅
+Phase 2.1  ✅
+Phase 3.0  ✅
+Phase 3.1  ✅
+Phase 3.2  ✅
+Phase 3.5  ⏳
+```
+Ne pas marquer terminé si quelque chose est cassé.
+
+## U — GIT / GITHUB (obligatoire)
+```bash
+git status
+git diff
+git add .
+git commit -m "Complete Phase 3.5 - UI redesign and system stabilization"
+git push origin main
+git status
+```
+Résultat attendu : `up to date with 'origin/main'`, `working tree clean`. Si le push échoue : diagnostiquer, corriger, réessayer. La phase n'est pas terminée tant que le push n'a pas réussi.
+
+## V — RAPPORT FINAL OBLIGATOIRE
+1. **Design** : Figma analysé, éléments adaptés, composants supprimés/créés
+2. **Templates** refondus (liste)
+3. **Fonctionnalités** : confirmation que les modules existants marchent
+4. **Tests** : résultats
+5. **Données de test** : commande, école créée, volumes générés
+6. **Documentation** : fichiers créés/modifiés
+7. **GitHub** :
+```
+Commit : [message]
+Push GitHub : ✅ RÉUSSI
+Branche : main
+Working tree : clean
+```
+
+---
+
+## STATUT FINAL
+```
+PHASE 3.5 — REFONTE UI/UX ET STABILISATION
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+ou, si incomplet :
+```
+PHASE 3.5 — NON VALIDÉE
+[liste précise des problèmes restants]
+```
+
+---
+
+## RÈGLE FINALE
+Le design Figma doit être adapté de façon cohérente à **toutes** les pages/modules — pas une seule page témoin. Chaîne attendue :
+```
+Ancien design → suppression des incohérences → nouveau design de référence
+→ Design System KLASS → templates harmonisés → fonctionnalités conservées
+→ tests validés → données de test réinitialisables → GitHub synchronisé
+```
+Ne pas démarrer la Phase 4 avant la fin complète de cette stabilisation.

@@ -170,6 +170,14 @@ if [ "$SKIP_GIT" = false ] && git rev-parse --git-dir &>/dev/null; then
 fi
 
 # =============================================================================
+# DÉTECTION REPLIT
+# =============================================================================
+ON_REPLIT=false
+if [ -n "${REPL_ID:-}" ]; then
+    ON_REPLIT=true
+fi
+
+# =============================================================================
 # ÉTAPE 2 — ENVIRONNEMENT PYTHON
 # =============================================================================
 section "Environnement Python"
@@ -189,50 +197,64 @@ fi
 ok "Python $PY_VERSION ($PYTHON_BIN)"
 STATUS["Python"]="✅"
 
-# Environnement virtuel
-VENV_DIR=".venv"
-if [ ! -d "$VENV_DIR" ]; then
-    "$PYTHON_BIN" -m venv "$VENV_DIR"
-    ok "Environnement virtuel créé"
-else
-    ok "Environnement virtuel déjà présent"
-fi
-STATUS["Venv"]="✅"
-
-# Activation selon l'OS
-if [ "$OS" = "windows" ] && [ -f "$VENV_DIR/Scripts/activate" ]; then
-    # shellcheck disable=SC1091
-    source "$VENV_DIR/Scripts/activate"
-elif [ -f "$VENV_DIR/bin/activate" ]; then
-    # shellcheck disable=SC1091
-    source "$VENV_DIR/bin/activate"
-else
-    fail "Impossible d'activer l'environnement virtuel"
-fi
-
-# =============================================================================
-# ÉTAPE 3 — DÉPENDANCES
-# =============================================================================
-section "Dépendances Python"
-
-REQ_FILE=""
-if [ -f "requirements/development.txt" ]; then
-    REQ_FILE="requirements/development.txt"
-elif [ -f "requirements/local.txt" ]; then
-    REQ_FILE="requirements/local.txt"
-elif [ -f "requirements.txt" ]; then
-    REQ_FILE="requirements.txt"
-else
-    fail "Fichier requirements introuvable."
-fi
-
-python -m pip install --quiet --upgrade pip --no-user
-if python -m pip install --quiet --no-user -r "$REQ_FILE"; then
-    ok "Dépendances installées ($REQ_FILE)"
+if [ "$ON_REPLIT" = true ]; then
+    # Sur Replit, les paquets sont installés globalement via le gestionnaire de paquets Replit.
+    # Pas besoin de virtualenv.
+    info "Environnement Replit détecté — virtualenv ignoré."
+    STATUS["Venv"]="✅"
     STATUS["Dépendances"]="✅"
+
+    # S'assurer que la commande 'python' est disponible
+    if ! command -v python &>/dev/null; then
+        python() { command python3 "$@"; }
+        export -f python
+    fi
 else
-    STATUS["Dépendances"]="❌"
-    fail "Erreur lors de l'installation des dépendances."
+    # Environnement virtuel
+    VENV_DIR=".venv"
+    if [ ! -d "$VENV_DIR" ]; then
+        "$PYTHON_BIN" -m venv "$VENV_DIR"
+        ok "Environnement virtuel créé"
+    else
+        ok "Environnement virtuel déjà présent"
+    fi
+    STATUS["Venv"]="✅"
+
+    # Activation selon l'OS
+    if [ "$OS" = "windows" ] && [ -f "$VENV_DIR/Scripts/activate" ]; then
+        # shellcheck disable=SC1091
+        source "$VENV_DIR/Scripts/activate"
+    elif [ -f "$VENV_DIR/bin/activate" ]; then
+        # shellcheck disable=SC1091
+        source "$VENV_DIR/bin/activate"
+    else
+        fail "Impossible d'activer l'environnement virtuel"
+    fi
+
+    # =============================================================================
+    # ÉTAPE 3 — DÉPENDANCES
+    # =============================================================================
+    section "Dépendances Python"
+
+    REQ_FILE=""
+    if [ -f "requirements/development.txt" ]; then
+        REQ_FILE="requirements/development.txt"
+    elif [ -f "requirements/local.txt" ]; then
+        REQ_FILE="requirements/local.txt"
+    elif [ -f "requirements.txt" ]; then
+        REQ_FILE="requirements.txt"
+    else
+        fail "Fichier requirements introuvable."
+    fi
+
+    python -m pip install --quiet --upgrade pip --no-user
+    if python -m pip install --quiet --no-user -r "$REQ_FILE"; then
+        ok "Dépendances installées ($REQ_FILE)"
+        STATUS["Dépendances"]="✅"
+    else
+        STATUS["Dépendances"]="❌"
+        fail "Erreur lors de l'installation des dépendances."
+    fi
 fi
 
 # =============================================================================

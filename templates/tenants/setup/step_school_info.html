@@ -1,122 +1,100 @@
-{% extends "base_wizard.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Configuration de l'école — KLASS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/klass.css"/>
+  <link rel="stylesheet" href="/static/css/wizard.css"/>
+</head>
+<body style="background:var(--klass-bg);">
 
-{% block title %}Configuration — Informations de l'école{% endblock %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:2rem 1.25rem;">
+  <div style="width:100%;max-width:560px;">
 
-{% block wizard_content %}
-<div class="container" style="max-width: 640px; padding: 0 1.25rem;">
-
-  <!-- Stepper -->
-  <div class="wz-stepper">
-    <div class="wz-step active">
-      <span class="wz-step-dot">1</span>
-      <span class="d-none d-sm-inline">Informations</span>
-    </div>
-    <div class="wz-step-line"></div>
-    <div class="wz-step">
-      <span class="wz-step-dot">2</span>
-      <span class="d-none d-sm-inline">Année scolaire</span>
-    </div>
-    <div class="wz-step-line"></div>
-    <div class="wz-step">
-      <span class="wz-step-dot">3</span>
-      <span class="d-none d-sm-inline">Confirmation</span>
-    </div>
-  </div>
-
-  <!-- Progress -->
-  <div class="wz-progress-wrap">
-    <div class="wz-progress-meta">
-      <span class="wz-progress-label">Étape 1 sur 3</span>
-      <span class="wz-progress-pct">33%</span>
-    </div>
-    <div class="wz-progress-bar"><div class="wz-progress-fill" style="width:33%;"></div></div>
-  </div>
-
-  <!-- Card -->
-  <div class="wz-card">
-    <!-- Header -->
-    <div class="wz-card-header">
-      <div class="wz-card-icon blue"><i class="bi bi-building"></i></div>
-      <p class="wz-card-title">Informations de votre école</p>
-      <p class="wz-card-subtitle">Ces données apparaîtront sur les documents générés</p>
+    <!-- Logo -->
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center gap-2">
+        <div style="width:40px;height:40px;border-radius:12px;background:var(--klass-primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span style="font-weight:700;font-size:1.2rem;color:var(--klass-text-primary);">KLASS</span>
+      </div>
     </div>
 
-    <!-- Body -->
-    <div class="wz-card-body">
-      <form method="post" enctype="multipart/form-data" novalidate>
-        {% csrf_token %}
+    <!-- Étapes -->
+    <div class="wizard-steps mb-4">
+      <div class="wizard-step active">
+        <div class="wizard-step-circle">1</div>
+        <div class="wizard-step-label">Infos école</div>
+      </div>
+      <div class="wizard-step-connector"></div>
+      <div class="wizard-step">
+        <div class="wizard-step-circle">2</div>
+        <div class="wizard-step-label">Année scolaire</div>
+      </div>
+      <div class="wizard-step-connector"></div>
+      <div class="wizard-step">
+        <div class="wizard-step-circle">3</div>
+        <div class="wizard-step-label">Confirmation</div>
+      </div>
+    </div>
 
-        <div class="wz-field">
-          <label class="wz-label">{{ form.name.label }} <span class="req">*</span></label>
-          {{ form.name }}
-          {% if form.name.errors %}<div class="wz-field-error">{{ form.name.errors|join:", " }}</div>{% endif %}
+    <!-- Card principale -->
+    <div class="card">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="stat-card-icon blue mx-auto mb-3" style="width:56px;height:56px;border-radius:14px;font-size:1.4rem;">
+            <i class="bi bi-building"></i>
+          </div>
+          <h1 class="fw-bold mb-1" style="font-size:1.3rem;letter-spacing:-.02em;">Informations de l'école</h1>
+          <p class="text-muted mb-0" style="font-size:.875rem;">
+            Commencez par les informations de base de votre établissement.
+          </p>
         </div>
 
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="wz-field">
-              <label class="wz-label">{{ form.email.label }}</label>
-              {{ form.email }}
-              {% if form.email.errors %}<div class="wz-field-error">{{ form.email.errors|join:", " }}</div>{% endif %}
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="wz-field">
-              <label class="wz-label">{{ form.phone.label }}</label>
-              {{ form.phone }}
-              {% if form.phone.errors %}<div class="wz-field-error">{{ form.phone.errors|join:", " }}</div>{% endif %}
-            </div>
-          </div>
-        </div>
+        <form method="post" novalidate data-submit-once>
+          {% csrf_token %}
 
-        <div class="wz-field">
-          <label class="wz-label">{{ form.address.label }}</label>
-          {{ form.address }}
-          {% if form.address.errors %}<div class="wz-field-error">{{ form.address.errors|join:", " }}</div>{% endif %}
-        </div>
-
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="wz-field">
-              <label class="wz-label">{{ form.city.label }}</label>
-              {{ form.city }}
-              {% if form.city.errors %}<div class="wz-field-error">{{ form.city.errors|join:", " }}</div>{% endif %}
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="wz-field">
-              <label class="wz-label">{{ form.country.label }}</label>
-              {{ form.country }}
-              {% if form.country.errors %}<div class="wz-field-error">{{ form.country.errors|join:", " }}</div>{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="wz-field">
-          <label class="wz-label">{{ form.logo.label }}</label>
-          {% if school.logo %}
-          <div class="mb-2">
-            <img src="{{ school.logo.url }}" alt="Logo actuel" class="rounded-2 border" style="height:50px;">
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger d-flex gap-2 mb-4" style="border-radius:10px;">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div>{{ form.non_field_errors|join:", " }}</div>
           </div>
           {% endif %}
-          {{ form.logo }}
-          <div class="wz-field-hint">JPG, PNG ou SVG · Recommandé : 200×200 px</div>
-          {% if form.logo.errors %}<div class="wz-field-error">{{ form.logo.errors|join:", " }}</div>{% endif %}
-        </div>
 
-        <div class="mt-4">
-          <button type="submit" class="wz-btn-primary">
-            <i class="bi bi-arrow-right-circle"></i>Continuer — Année scolaire
-          </button>
-        </div>
-      </form>
+          <div class="row g-3">
+            {% for field in form %}
+            <div class="col-12">
+              <label class="form-label" for="{{ field.id_for_label }}">
+                {{ field.label }}
+                {% if field.field.required %}<span class="required-mark">*</span>{% endif %}
+              </label>
+              {{ field }}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              {% for e in field.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary fw-semibold w-100" style="height:48px;border-radius:12px;">
+              Suivant <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+
+    <p class="text-center text-muted mt-3" style="font-size:.78rem;">Étape 1 sur 3</p>
   </div>
-
-  <p class="text-center mt-3" style="font-size:0.78rem;color:#94A3B8;">
-    <i class="bi bi-shield-check me-1"></i>Données isolées dans votre espace sécurisé
-  </p>
-
 </div>
-{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/klass.js"></script>
+</body>
+</html>

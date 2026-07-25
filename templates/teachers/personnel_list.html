@@ -1,36 +1,158 @@
 {% extends "base.html" %}
-{% block title %}Personnel{% endblock %}
+{% load static %}
+{% block title %}Personnel scolaire{% endblock %}
+
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-  <div>
-    <h1 class="h3 mb-1">Personnel scolaire</h1>
-    <p class="text-muted mb-0">Tous les membres de l'établissement, enseignants compris.</p>
+<div class="container-fluid">
+
+  <!-- En-tête -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-header-title"><i class="bi bi-person-lines-fill me-2 text-primary" style="font-size:1.1rem;"></i>Personnel scolaire</h1>
+      <p class="page-header-sub">Tous les membres du personnel de votre établissement.</p>
+    </div>
+    <div class="page-header-actions">
+      <a href="{% url 'teachers:list' %}" class="btn btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-person-badge-fill me-1"></i>Enseignants
+      </a>
+      {% if user.is_school_admin %}
+      <a href="{% url 'teachers:personnel_create' %}" class="btn btn-primary fw-semibold" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-1"></i>Ajouter
+      </a>
+      {% endif %}
+    </div>
   </div>
-  {% if user.is_school_admin %}
-  <a class="btn btn-primary" href="{% url 'teachers:personnel_create' %}"><i class="bi bi-plus-lg"></i> Nouveau membre</a>
-  {% endif %}
+
+  <!-- Filtres -->
+  <div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Recherche</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;">
+            <i class="bi bi-search text-muted" style="font-size:.85rem;"></i>
+          </span>
+          <input name="q" value="{{ q }}" class="form-control border-start-0"
+                 placeholder="Nom, matricule, téléphone…" style="border-radius:0 8px 8px 0;">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Type</label>
+        <select name="staff_type" class="form-select">
+          <option value="">Tous les types</option>
+          <option value="teacher" {% if type_filter == "teacher" %}selected{% endif %}>Enseignant</option>
+          <option value="administrative" {% if type_filter == "administrative" %}selected{% endif %}>Administratif</option>
+          <option value="management" {% if type_filter == "management" %}selected{% endif %}>Direction</option>
+          <option value="technical" {% if type_filter == "technical" %}selected{% endif %}>Technique</option>
+          <option value="other" {% if type_filter == "other" %}selected{% endif %}>Autre</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Statut</label>
+        <select name="status" class="form-select">
+          <option value="">Tous les statuts</option>
+          <option value="active" {% if status_filter == "active" %}selected{% endif %}>Actif</option>
+          <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>Inactif</option>
+          <option value="on_leave" {% if status_filter == "on_leave" %}selected{% endif %}>En congé</option>
+          <option value="suspended" {% if status_filter == "suspended" %}selected{% endif %}>Suspendu</option>
+          <option value="archived" {% if status_filter == "archived" %}selected{% endif %}>Archivé</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" style="border-radius:8px;">
+          <i class="bi bi-funnel me-1"></i>Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card">
+    {% if personnel %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr style="background:#FAFBFD;">
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Matricule</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Membre du personnel</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Type</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Téléphone</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Statut</th>
+            <th style="padding:.9rem 1.25rem;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for person in personnel %}
+          <tr style="{% if person.is_archived %}opacity:.55;{% endif %}">
+            <td style="padding:.85rem 1.25rem;">
+              <code style="font-size:.8rem;background:var(--klass-bg-secondary);padding:3px 8px;border-radius:6px;color:var(--klass-purple);">
+                {{ person.employee_id }}
+              </code>
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar purple">
+                  {{ person.first_name|first|upper }}{{ person.last_name|first|upper }}
+                </span>
+                <div>
+                  <a class="fw-semibold text-decoration-none d-block"
+                     href="{% url 'teachers:personnel_detail' person.pk %}"
+                     style="color:var(--klass-text-primary);">{{ person.full_name }}</a>
+                  {% if person.specialization %}
+                  <span class="text-muted" style="font-size:.78rem;">{{ person.specialization }}</span>
+                  {% elif person.email %}
+                  <span class="text-muted" style="font-size:.78rem;">{{ person.email }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size:.75rem;">
+                {{ person.get_staff_type_display }}
+              </span>
+            </td>
+            <td style="padding:.85rem 1.25rem;font-size:.875rem;color:var(--klass-text-secondary);">
+              {{ person.phone|default:"—" }}
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <span class="badge {{ person.status_badge_class }} rounded-pill">{{ person.get_status_display }}</span>
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="table-actions">
+                <a href="{% url 'teachers:personnel_detail' person.pk %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if user.is_school_admin and not person.is_archived %}
+                <a href="{% url 'teachers:personnel_edit' person.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-transparent py-3 px-4" style="border-top:1px solid var(--klass-border);">
+      <p class="text-muted mb-0" style="font-size:.82rem;">{{ personnel|length }} membre{{ personnel|length|pluralize }} du personnel</p>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-person-lines-fill"></i></div>
+      <h5 class="empty-state-title">{% if q %}Aucun résultat{% else %}Aucun personnel enregistré{% endif %}</h5>
+      <p class="empty-state-desc">
+        {% if q %}Aucun résultat pour « {{ q }} ».
+        {% else %}Ajoutez les membres du personnel de votre établissement.{% endif %}
+      </p>
+      {% if user.is_school_admin and not q %}
+      <a href="{% url 'teachers:personnel_create' %}" class="btn btn-primary" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-1"></i>Ajouter du personnel
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
 </div>
-<form class="card card-body mb-4" method="get">
-  <div class="row g-2">
-    <div class="col-md-5"><label class="form-label">Recherche</label><input class="form-control" name="q" value="{{ q }}" placeholder="Nom, prénom, matricule ou téléphone"></div>
-    <div class="col-md-3"><label class="form-label">Type</label><select class="form-select" name="type"><option value="">Tous</option>{% for value,label in StaffType.CHOICES %}<option value="{{ value }}" {% if staff_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
-    <div class="col-md-3"><label class="form-label">Statut</label><select class="form-select" name="status"><option value="">Tous</option>{% for value,label in StaffStatus.CHOICES %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
-    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-outline-primary w-100" title="Filtrer"><i class="bi bi-search"></i></button></div>
-  </div>
-</form>
-<div class="card shadow-sm"><div class="table-responsive">
-<table class="table table-hover align-middle mb-0">
-  <thead><tr><th>Matricule</th><th>Nom complet</th><th>Type</th><th>Téléphone</th><th>Statut</th><th></th></tr></thead>
-  <tbody>
-  {% for person in personnel %}
-  <tr>
-    <td><code>{{ person.employee_id }}</code></td>
-    <td><a class="fw-semibold text-decoration-none" href="{% url 'teachers:personnel_detail' person.pk %}">{{ person.full_name }}</a><br><small class="text-muted">{{ person.email|default:"Email non renseigné" }}</small></td>
-    <td>{{ person.get_staff_type_display }}</td><td>{{ person.phone|default:"—" }}</td>
-    <td><span class="badge {{ person.status_badge_class }}">{{ person.get_status_display }}</span></td>
-    <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{% url 'teachers:personnel_detail' person.pk %}">Voir</a></td>
-  </tr>
-  {% empty %}<tr><td colspan="6" class="text-center py-5 text-muted">Aucun membre du personnel trouvé.</td></tr>{% endfor %}
-  </tbody>
-</table></div></div>
 {% endblock %}

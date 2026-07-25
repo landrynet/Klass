@@ -1,1 +1,130 @@
-{% extends "teachers/personnel_detail.html" %}
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ teacher.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="max-width:900px;">
+
+  <div class="klass-breadcrumb">
+    <a href="{% url 'teachers:list' %}">Enseignants</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">{{ teacher.full_name }}</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'teachers:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">{{ teacher.full_name }}</h1>
+        <p class="page-header-sub">
+          <code style="font-size:.8rem;color:var(--klass-primary);">{{ teacher.employee_id }}</code>
+          {% if teacher.specialization %} · {{ teacher.specialization }}{% endif %}
+        </p>
+      </div>
+    </div>
+    {% if user.is_school_admin %}
+    <div class="page-header-actions">
+      <a href="{% url 'teachers:personnel_edit' teacher.pk %}" class="btn btn-outline-primary" style="border-radius:8px;">
+        <i class="bi bi-pencil me-1"></i>Modifier
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-3">
+    <!-- Profil -->
+    <div class="col-md-5">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="row-avatar green" style="width:56px;height:56px;font-size:1.05rem;">
+              {{ teacher.first_name|first|upper }}{{ teacher.last_name|first|upper }}
+            </span>
+            <div>
+              <div class="fw-bold" style="font-size:1.05rem;">{{ teacher.full_name }}</div>
+              <span class="badge {{ teacher.status_badge_class }} rounded-pill mt-1">{{ teacher.get_status_display }}</span>
+            </div>
+          </div>
+
+          {% if teacher.email %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-envelope me-1"></i>Email</div>
+            <div class="info-value">{{ teacher.email }}</div>
+          </div>
+          {% endif %}
+          {% if teacher.phone %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-telephone me-1"></i>Téléphone</div>
+            <div class="info-value">{{ teacher.phone }}</div>
+          </div>
+          {% endif %}
+          <div class="info-item">
+            <div class="info-label">Type de contrat</div>
+            <div class="info-value">{{ teacher.get_contract_type_display }}</div>
+          </div>
+          {% if teacher.specialization %}
+          <div class="info-item">
+            <div class="info-label">Spécialité</div>
+            <div class="info-value">{{ teacher.specialization }}</div>
+          </div>
+          {% endif %}
+          {% if teacher.hire_date %}
+          <div class="info-item">
+            <div class="info-label">Date d'embauche</div>
+            <div class="info-value">{{ teacher.hire_date|date:"d/m/Y" }}</div>
+          </div>
+          {% endif %}
+          {% if teacher.notes %}
+          <div class="info-item">
+            <div class="info-label">Notes</div>
+            <div class="info-value" style="white-space:pre-line;">{{ teacher.notes }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Enseignements / attributions -->
+    <div class="col-md-7">
+      <div class="card h-100">
+        <div class="card-header py-3 px-4">
+          <p class="form-section-title mb-0">
+            <i class="bi bi-book me-1"></i>Enseignements assignés
+          </p>
+        </div>
+        {% if teaching_assignments %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead>
+              <tr style="background:#FAFBFD;">
+                <th style="padding:.75rem 1rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);font-weight:600;">Classe</th>
+                <th style="padding:.75rem 1rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);font-weight:600;">Matière</th>
+                <th style="padding:.75rem 1rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);font-weight:600;">Année</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assignment in teaching_assignments %}
+              <tr>
+                <td style="padding:.75rem 1rem;font-size:.875rem;font-weight:500;">{{ assignment.classroom.name }}</td>
+                <td style="padding:.75rem 1rem;font-size:.875rem;">{{ assignment.subject|default:"—" }}</td>
+                <td style="padding:.75rem 1rem;font-size:.82rem;color:var(--klass-text-secondary);">{{ assignment.school_year.name }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body empty-state" style="padding:2.5rem 1rem;">
+          <div class="empty-state-icon" style="width:48px;height:48px;font-size:1.4rem;"><i class="bi bi-book"></i></div>
+          <p class="empty-state-title" style="font-size:.9rem;">Aucun enseignement assigné</p>
+          <p class="empty-state-desc" style="font-size:.82rem;">Les attributions de classes apparaîtront ici.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

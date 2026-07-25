@@ -1,10 +1,126 @@
 {% extends "base.html" %}
-{% block title %}{{ personnel.full_name }}{% endblock %}
+{% load static %}
+{% block title %}{{ person.full_name }}{% endblock %}
+
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4"><div><div class="text-muted small"><code>{{ personnel.employee_id }}</code></div><h1 class="h3 mb-1">{{ personnel.full_name }}</h1><span class="badge {{ personnel.status_badge_class }}">{{ personnel.get_status_display }}</span> <span class="badge text-bg-light">{{ personnel.get_staff_type_display }}</span></div><div class="d-flex gap-2"><a href="{% url 'teachers:personnel_list' %}" class="btn btn-outline-secondary">Retour</a>{% if user.is_school_admin %}<a href="{% url 'teachers:personnel_edit' personnel.pk %}" class="btn btn-primary">Modifier</a>{% endif %}</div></div>
-<div class="row g-4">
-<div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header fw-semibold">Informations personnelles</div><div class="card-body"><dl class="row mb-0"><dt class="col-sm-5">Téléphone</dt><dd class="col-sm-7">{{ personnel.phone|default:"—" }}</dd><dt class="col-sm-5">Email</dt><dd class="col-sm-7">{{ personnel.email|default:"—" }}</dd><dt class="col-sm-5">Genre</dt><dd class="col-sm-7">{{ personnel.get_gender_display|default:"—" }}</dd><dt class="col-sm-5">Naissance</dt><dd class="col-sm-7">{{ personnel.date_of_birth|date:"d/m/Y"|default:"—" }}</dd><dt class="col-sm-5">Adresse</dt><dd class="col-sm-7">{{ personnel.address|default:"—"|linebreaksbr }}</dd></dl></div></div></div>
-<div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header fw-semibold">Informations professionnelles</div><div class="card-body"><dl class="row mb-0"><dt class="col-sm-5">Spécialité</dt><dd class="col-sm-7">{{ personnel.specialization|default:"—" }}</dd><dt class="col-sm-5">Niveau d'étude</dt><dd class="col-sm-7">{{ personnel.education_level|default:"—" }}</dd><dt class="col-sm-5">Diplôme</dt><dd class="col-sm-7">{{ personnel.diploma|default:"—" }}</dd><dt class="col-sm-5">Expérience</dt><dd class="col-sm-7">{{ personnel.experience_years }} an(s)</dd><dt class="col-sm-5">Embauche</dt><dd class="col-sm-7">{{ personnel.hire_date|date:"d/m/Y"|default:"—" }}</dd><dt class="col-sm-5">Contrat</dt><dd class="col-sm-7">{{ personnel.get_contract_type_display }}</dd></dl></div></div></div>
+<div class="container-fluid" style="max-width:860px;">
+
+  <div class="klass-breadcrumb">
+    <a href="{% url 'teachers:personnel_list' %}">Personnel</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">{{ person.full_name }}</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'teachers:personnel_list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">{{ person.full_name }}</h1>
+        <p class="page-header-sub">
+          <code style="font-size:.8rem;color:var(--klass-primary);">{{ person.employee_id }}</code>
+          · {{ person.get_staff_type_display }}
+        </p>
+      </div>
+    </div>
+    {% if user.is_school_admin and not person.is_archived %}
+    <div class="page-header-actions">
+      <a href="{% url 'teachers:personnel_edit' person.pk %}" class="btn btn-outline-primary" style="border-radius:8px;">
+        <i class="bi bi-pencil me-1"></i>Modifier
+      </a>
+      <form method="post" action="{% url 'teachers:personnel_archive' person.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger" style="border-radius:8px;"
+                onclick="return confirm('Archiver {{ person.full_name|escapejs }} ?');">
+          <i class="bi bi-archive me-1"></i>Archiver
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="row-avatar purple" style="width:52px;height:52px;font-size:1rem;">
+              {{ person.first_name|first|upper }}{{ person.last_name|first|upper }}
+            </span>
+            <div>
+              <div class="fw-bold" style="font-size:1.05rem;">{{ person.full_name }}</div>
+              <span class="badge {{ person.status_badge_class }} rounded-pill mt-1">{{ person.get_status_display }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">Type de personnel</div>
+            <div class="info-value">{{ person.get_staff_type_display }}</div>
+          </div>
+          {% if person.contract_type %}
+          <div class="info-item">
+            <div class="info-label">Contrat</div>
+            <div class="info-value">{{ person.get_contract_type_display }}</div>
+          </div>
+          {% endif %}
+          {% if person.specialization %}
+          <div class="info-item">
+            <div class="info-label">Spécialité</div>
+            <div class="info-value">{{ person.specialization }}</div>
+          </div>
+          {% endif %}
+          {% if person.hire_date %}
+          <div class="info-item">
+            <div class="info-label">Date d'embauche</div>
+            <div class="info-value">{{ person.hire_date|date:"d/m/Y" }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card h-100">
+        <div class="card-header py-3 px-4">
+          <p class="form-section-title mb-0"><i class="bi bi-telephone me-1"></i>Coordonnées</p>
+        </div>
+        <div class="card-body p-4">
+          {% if person.email %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-envelope me-1"></i>Email</div>
+            <div class="info-value">
+              <a href="mailto:{{ person.email }}" class="text-decoration-none">{{ person.email }}</a>
+            </div>
+          </div>
+          {% endif %}
+          {% if person.phone %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-telephone me-1"></i>Téléphone</div>
+            <div class="info-value">{{ person.phone }}</div>
+          </div>
+          {% endif %}
+          {% if person.address %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-geo-alt me-1"></i>Adresse</div>
+            <div class="info-value">{{ person.address }}</div>
+          </div>
+          {% endif %}
+          {% if person.notes %}
+          <div class="info-item">
+            <div class="info-label">Notes</div>
+            <div class="info-value" style="white-space:pre-line;">{{ person.notes }}</div>
+          </div>
+          {% endif %}
+          {% if not person.email and not person.phone and not person.address %}
+          <p class="text-muted" style="font-size:.875rem;">
+            <i class="bi bi-info-circle me-1"></i>Aucune coordonnée renseignée.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
-{% if user.is_school_admin %}<div class="card shadow-sm mt-4"><div class="card-header fw-semibold">Changer le statut</div><div class="card-body"><form method="post" action="{% url 'teachers:personnel_status' personnel.pk %}" class="row g-2 align-items-end">{% csrf_token %}<div class="col-md-5"><label class="form-label">Statut</label><select name="status" class="form-select">{% for value,label in StaffStatus.CHOICES %}<option value="{{ value }}" {% if personnel.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-md-3"><button class="btn btn-outline-primary">Mettre à jour</button></div></form></div></div>{% endif %}
 {% endblock %}

@@ -1,83 +1,66 @@
 {% extends "base.html" %}
-{% block title %}Changement de classe{% endblock %}
+{% load static %}
+{% block title %}Changer de classe{% endblock %}
+
 {% block content %}
-<div class="container-fluid" style="max-width:680px">
+<div class="container-fluid" style="max-width:620px;">
 
-  <div class="mb-4">
-    <a href="{% url 'students:enrollment_detail' enrollment.pk %}"
-       class="small text-decoration-none text-muted">
-      <i class="bi bi-arrow-left me-1"></i>Retour à l'inscription
-    </a>
-    <h1 class="h4 fw-bold mt-2 mb-0">Changement de classe</h1>
+  <div class="klass-breadcrumb">
+    <a href="{% url 'students:enrollment_list' %}">Inscriptions</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <a href="{% url 'students:enrollment_detail' enrollment.pk %}">Inscription</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">Changer de classe</span>
   </div>
 
-  <!-- Alerte informative -->
-  <div class="alert alert-info d-flex gap-2 align-items-start mb-4">
-    <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
-    <div>
-      <strong>Comment fonctionne le changement de classe ?</strong><br>
-      L'inscription actuelle sera marquée comme <em>Terminée</em> et une nouvelle inscription
-      sera créée dans la nouvelle classe. L'historique est conservé.
-    </div>
-  </div>
-
-  <!-- Inscription actuelle -->
-  <div class="card mb-3">
-    <div class="card-body py-2">
-      <div class="small text-muted mb-1">Inscription actuelle</div>
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <span class="fw-semibold">{{ enrollment.student.last_name }} {{ enrollment.student.first_name }}</span>
-          <code class="text-muted ms-2 small">{{ enrollment.student.matricule }}</code>
-        </div>
-        <div class="text-end">
-          <div class="fw-semibold">{{ enrollment.classroom.full_name }}</div>
-          <div class="text-muted small">{{ enrollment.school_year.name }}</div>
-        </div>
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'students:enrollment_detail' enrollment.pk %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">Changer de classe</h1>
+        <p class="page-header-sub">{{ enrollment.student.get_full_name }} — {{ enrollment.school_year.name }}</p>
       </div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-center mb-3">
-    <i class="bi bi-arrow-down fs-4 text-muted"></i>
-  </div>
-
-  <!-- Formulaire -->
-  <div class="card">
-    <div class="card-body">
-      <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-        <div class="mb-3">
-          <label class="form-label fw-semibold">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-          <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
-          {% endif %}
-          {% if field.help_text %}
-          <div class="form-text">{{ field.help_text }}</div>
-          {% endif %}
-        </div>
-        {% endfor %}
-
-        {% if form.errors %}
-        <div class="alert alert-danger">
-          {% for error in form.non_field_errors %}
-          <p class="mb-0">{{ error }}</p>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-warning fw-semibold">
-            <i class="bi bi-arrow-left-right me-1"></i>Confirmer le changement
-          </button>
-          <a href="{% url 'students:enrollment_detail' enrollment.pk %}"
-             class="btn btn-outline-secondary">Annuler</a>
-        </div>
-      </form>
+  <!-- Info actuelle -->
+  <div class="alert alert-info d-flex gap-2 mb-4" style="border-radius:10px;">
+    <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
+    <div>
+      Classe actuelle : <strong>{{ enrollment.classroom.name }}</strong>
+      ({{ enrollment.classroom.option.level.name }} · {{ enrollment.classroom.option.name }})
     </div>
   </div>
 
+  <form method="post" novalidate data-submit-once>
+    {% csrf_token %}
+    <div class="card mb-3">
+      <div class="card-body p-4">
+        <div class="row g-3">
+          {% for field in form %}
+          <div class="col-12">
+            <label class="form-label" for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.field.required %}<span class="required-mark">*</span>{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for e in field.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+      <button type="submit" class="btn btn-warning fw-semibold flex-grow-1" style="height:46px;border-radius:10px;">
+        <i class="bi bi-arrow-left-right me-2"></i>Valider le changement de classe
+      </button>
+      <a href="{% url 'students:enrollment_detail' enrollment.pk %}" class="btn btn-outline-secondary px-4"
+         style="height:46px;border-radius:10px;display:flex;align-items:center;">Annuler</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

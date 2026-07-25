@@ -1,83 +1,69 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}Modifier {{ year.name }}{% endblock %}
+{% block title %}Modifier — {{ year.name }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid" style="max-width:640px;">
 
-  <!-- En-tête -->
-  <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'school_years:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
-      <i class="bi bi-arrow-left"></i>
-    </a>
-    <div>
-      <h1 class="h4 fw-bold mb-0">Modifier — {{ year.name }}</h1>
-      <div class="d-flex align-items-center gap-2 mt-1">
-        <span class="badge {{ year.status_badge_class }} rounded-pill">{{ year.status_display }}</span>
+  <div class="klass-breadcrumb">
+    <a href="{% url 'school_years:list' %}">Années scolaires</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">Modifier {{ year.name }}</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'school_years:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">Modifier {{ year.name }}</h1>
+        <p class="page-header-sub">Modifiez les paramètres de cette année scolaire.</p>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-body p-4">
-      <form method="post" novalidate>
-        {% csrf_token %}
+  {% if year.is_active %}
+  <div class="alert alert-info d-flex gap-2 mb-4" style="border-radius:10px;">
+    <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
+    <div>Cette année scolaire est <strong>active</strong>. Modifiez avec précaution.</div>
+  </div>
+  {% endif %}
 
-        <!-- Nom -->
-        <div class="mb-4">
-          <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
-            {{ form.name.label }} <span class="text-danger">*</span>
-          </label>
-          {{ form.name }}
-          {% if form.name.help_text %}
-          <div class="form-text">{{ form.name.help_text }}</div>
-          {% endif %}
-          {% for error in form.name.errors %}
-          <div class="invalid-feedback d-block">{{ error }}</div>
+  <form method="post" novalidate data-submit-once>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger d-flex gap-2 mb-4">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+      <div>{{ form.non_field_errors|join:", " }}</div>
+    </div>
+    {% endif %}
+
+    <div class="card mb-3">
+      <div class="card-body p-4">
+        <div class="row g-3">
+          {% for field in form %}
+          <div class="col-md-{% if field.name in 'start_date,end_date' %}6{% else %}12{% endif %}">
+            <label class="form-label" for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.field.required %}<span class="required-mark">*</span>{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            {% for e in field.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
           {% endfor %}
         </div>
-
-        <!-- Dates -->
-        <div class="row g-3 mb-4">
-          <div class="col-6">
-            <label for="{{ form.start_date.id_for_label }}" class="form-label fw-semibold">
-              {{ form.start_date.label }} <span class="text-danger">*</span>
-            </label>
-            {{ form.start_date }}
-            {% for error in form.start_date.errors %}
-            <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
-          </div>
-          <div class="col-6">
-            <label for="{{ form.end_date.id_for_label }}" class="form-label fw-semibold">
-              {{ form.end_date.label }} <span class="text-danger">*</span>
-            </label>
-            {{ form.end_date }}
-            {% for error in form.end_date.errors %}
-            <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
-          </div>
-        </div>
-
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-        </div>
-        {% endif %}
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary fw-semibold flex-grow-1" style="height:44px;border-radius:10px;">
-            <i class="bi bi-check2 me-2"></i>Enregistrer les modifications
-          </button>
-          <a href="{% url 'school_years:list' %}" class="btn btn-outline-secondary" style="height:44px;border-radius:10px;">
-            Annuler
-          </a>
-        </div>
-
-      </form>
+      </div>
     </div>
-  </div>
 
+    <div class="d-flex gap-2 mb-4">
+      <button type="submit" class="btn btn-primary fw-semibold flex-grow-1" style="height:46px;border-radius:10px;">
+        <i class="bi bi-check2 me-2"></i>Enregistrer les modifications
+      </button>
+      <a href="{% url 'school_years:list' %}" class="btn btn-outline-secondary px-4"
+         style="height:46px;border-radius:10px;display:flex;align-items:center;">Annuler</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

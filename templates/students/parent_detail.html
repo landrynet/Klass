@@ -1,7 +1,112 @@
 {% extends "base.html" %}
-{% block title %}{{ parent }}{% endblock %}
+{% load static %}
+{% block title %}{{ parent.get_full_name }}{% endblock %}
+
 {% block content %}
-<div class="container-fluid" style="max-width:900px"><div class="d-flex justify-content-between align-items-start mb-4"><div><a href="{% url 'students:parents' %}" class="small text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Parents / tuteurs</a><h1 class="h4 fw-bold mt-2 mb-1">{{ parent }}</h1><div class="text-muted small">{{ parent.phone }}{% if parent.email %} · {{ parent.email }}{% endif %}</div></div>{% if user.is_school_admin %}<a href="{% url 'students:parent_edit' parent.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Modifier</a>{% endif %}</div>
-  <div class="card"><div class="card-body"><h6 class="text-muted text-uppercase small">Élèves associés</h6>{% for student in students %}<div class="d-flex justify-content-between align-items-center border-bottom py-3"><a href="{% url 'students:detail' student.pk %}" class="fw-semibold">{{ student.last_name }} {{ student.first_name }}</a><code>{{ student.matricule }}</code></div>{% empty %}<p class="text-muted mb-0">Aucun élève associé.</p>{% endfor %}</div></div>
+<div class="container-fluid" style="max-width:800px;">
+
+  <div class="klass-breadcrumb">
+    <a href="{% url 'students:parents' %}">Parents & tuteurs</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">{{ parent.get_full_name }}</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'students:parents' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title">{{ parent.get_full_name }}</h1>
+        <p class="page-header-sub">{{ parent.get_relationship_type_display }}</p>
+      </div>
+    </div>
+    {% if user.is_school_admin %}
+    <div class="page-header-actions">
+      <a href="{% url 'students:parent_edit' parent.pk %}" class="btn btn-outline-primary" style="border-radius:8px;">
+        <i class="bi bi-pencil me-1"></i>Modifier
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-3">
+    <!-- Infos -->
+    <div class="col-md-5">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="row-avatar orange" style="width:52px;height:52px;font-size:1rem;">
+              {{ parent.first_name|first|upper }}{{ parent.last_name|first|upper }}
+            </span>
+            <div>
+              <div class="fw-bold" style="font-size:1.05rem;">{{ parent.get_full_name }}</div>
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill mt-1">{{ parent.get_relationship_type_display }}</span>
+            </div>
+          </div>
+
+          {% if parent.phone %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-telephone me-1"></i>Téléphone</div>
+            <div class="info-value">{{ parent.phone }}</div>
+          </div>
+          {% endif %}
+          {% if parent.email %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-envelope me-1"></i>Email</div>
+            <div class="info-value">{{ parent.email }}</div>
+          </div>
+          {% endif %}
+          {% if parent.address %}
+          <div class="info-item">
+            <div class="info-label"><i class="bi bi-geo-alt me-1"></i>Adresse</div>
+            <div class="info-value">{{ parent.address }}</div>
+          </div>
+          {% endif %}
+          {% if parent.notes %}
+          <div class="info-item">
+            <div class="info-label">Notes</div>
+            <div class="info-value" style="white-space:pre-line;">{{ parent.notes }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Élèves associés -->
+    <div class="col-md-7">
+      <div class="card h-100">
+        <div class="card-header py-3 px-4">
+          <p class="form-section-title mb-0">
+            <i class="bi bi-people me-1"></i>Élèves associés
+            <span class="badge bg-primary-subtle text-primary ms-2">{{ students|length }}</span>
+          </p>
+        </div>
+        {% if students %}
+        <div class="list-group list-group-flush">
+          {% for student in students %}
+          <a href="{% url 'students:detail' student.pk %}"
+             class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 px-4">
+            <span class="row-avatar">
+              {{ student.first_name|first|upper }}{{ student.last_name|first|upper }}
+            </span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold" style="font-size:.9rem;">{{ student.get_full_name }}</div>
+              <code style="font-size:.72rem;color:var(--klass-primary);">{{ student.matricule }}</code>
+            </div>
+            <i class="bi bi-chevron-right text-muted" style="font-size:.75rem;"></i>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="card-body empty-state" style="padding:2rem;">
+          <div class="empty-state-icon" style="width:48px;height:48px;font-size:1.4rem;"><i class="bi bi-people"></i></div>
+          <p class="empty-state-title" style="font-size:.95rem;">Aucun élève associé</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

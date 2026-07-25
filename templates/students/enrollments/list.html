@@ -1,130 +1,157 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Inscriptions{% endblock %}
-{% block content %}
-<div class="container-fluid" style="max-width:1200px">
 
-  <!-- En-tête -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h4 fw-bold mb-1"><i class="bi bi-journal-bookmark-fill me-2"></i>Inscriptions</h1>
-      <p class="text-muted small mb-0">Gestion des inscriptions et affectations aux classes</p>
+{% block content %}
+<div class="container-fluid">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-header-title"><i class="bi bi-journal-text me-2 text-primary" style="font-size:1.1rem;"></i>Inscriptions</h1>
+      <p class="page-header-sub">Inscriptions actives et historique par année scolaire.</p>
     </div>
-    {% if user.is_school_admin %}
-    <a href="{% url 'students:enrollment_create' %}" class="btn btn-success">
-      <i class="bi bi-plus-lg me-1"></i>Nouvelle inscription
-    </a>
-    {% endif %}
+    <div class="page-header-actions">
+      {% if user.is_school_admin %}
+      <a href="{% url 'students:enrollment_create' %}" class="btn btn-primary fw-semibold" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle inscription
+      </a>
+      {% endif %}
+    </div>
   </div>
 
   <!-- Filtres -->
-  <div class="card mb-4">
-    <div class="card-body py-2">
-      <form method="get" class="row g-2 align-items-end">
-        <div class="col-md-4">
-          <label class="form-label small mb-1">Recherche (matricule, nom, prénom)</label>
-          <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
-                 placeholder="Rechercher un élève…">
+  <div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Recherche</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;">
+            <i class="bi bi-search text-muted" style="font-size:.85rem;"></i>
+          </span>
+          <input name="q" value="{{ q }}" class="form-control border-start-0"
+                 placeholder="Nom d'élève, matricule…" style="border-radius:0 8px 8px 0;">
         </div>
-        <div class="col-md-2">
-          <label class="form-label small mb-1">Année scolaire</label>
-          <select name="year" class="form-select form-select-sm">
-            <option value="">Toutes</option>
-            {% for y in school_years %}
-            <option value="{{ y.pk }}" {% if year_id == y.pk|stringformat:"i" %}selected{% endif %}>
-              {{ y.name }}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small mb-1">Statut</label>
-          <select name="status" class="form-select form-select-sm">
-            <option value="">Tous</option>
-            {% for val, label in EnrollmentStatus.CHOICES %}
-            <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small mb-1">Classe</label>
-          <select name="classroom" class="form-select form-select-sm">
-            <option value="">Toutes</option>
-            {% for c in classrooms %}
-            <option value="{{ c.pk }}" {% if classroom_id == c.pk|stringformat:"i" %}selected{% endif %}>
-              {{ c.full_name }}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2 d-flex gap-1">
-          <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-            <i class="bi bi-search me-1"></i>Filtrer
-          </button>
-          <a href="{% url 'students:enrollment_list' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-x"></i>
-          </a>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Année scolaire</label>
+        <select name="year" class="form-select">
+          <option value="">Toutes les années</option>
+          {% for year in years %}
+          <option value="{{ year.pk }}" {% if selected_year and selected_year.pk == year.pk %}selected{% endif %}>
+            {{ year.name }}{% if year.is_active %} ★{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Statut</label>
+        <select name="status" class="form-select">
+          <option value="">Tous les statuts</option>
+          <option value="active" {% if status_filter == "active" %}selected{% endif %}>Actif</option>
+          <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>En attente</option>
+          <option value="completed" {% if status_filter == "completed" %}selected{% endif %}>Complété</option>
+          <option value="cancelled" {% if status_filter == "cancelled" %}selected{% endif %}>Annulé</option>
+          <option value="transferred" {% if status_filter == "transferred" %}selected{% endif %}>Transféré</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" style="border-radius:8px;">
+          <i class="bi bi-funnel me-1"></i>Filtrer
+        </button>
+      </div>
+    </form>
   </div>
 
-  <!-- Résultats -->
+  <!-- Tableau -->
   <div class="card">
     {% if enrollments %}
-    <div class="card-header d-flex justify-content-between align-items-center py-2">
-      <span class="text-muted small">{{ enrollments|length }} inscription{{ enrollments|length|pluralize }}</span>
-    </div>
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Matricule</th>
-            <th>Élève</th>
-            <th>Année scolaire</th>
-            <th>Niveau</th>
-            <th>Option</th>
-            <th>Classe</th>
-            <th>Date</th>
-            <th>Statut</th>
-            <th></th>
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr style="background:#FAFBFD;">
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Élève</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Année</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Classe</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Date</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Statut</th>
+            <th style="padding:.9rem 1.25rem;"></th>
           </tr>
         </thead>
         <tbody>
-          {% for e in enrollments %}
+          {% for enrollment in enrollments %}
           <tr>
-            <td><code class="small">{{ e.student.matricule }}</code></td>
-            <td>
-              <a href="{% url 'students:detail' e.student.pk %}" class="text-decoration-none fw-semibold">
-                {{ e.student.last_name }} {{ e.student.first_name }}
-              </a>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar">
+                  {{ enrollment.student.first_name|first|upper }}{{ enrollment.student.last_name|first|upper }}
+                </span>
+                <div>
+                  <a class="fw-semibold text-decoration-none d-block"
+                     href="{% url 'students:detail' enrollment.student.pk %}"
+                     style="color:var(--klass-text-primary);">
+                    {{ enrollment.student.get_full_name }}
+                  </a>
+                  <code style="font-size:.72rem;color:var(--klass-primary);">{{ enrollment.student.matricule }}</code>
+                </div>
+              </div>
             </td>
-            <td>{{ e.school_year.name }}</td>
-            <td class="text-muted small">{{ e.classroom.option.level.name }}</td>
-            <td class="text-muted small">{{ e.classroom.option.name }}</td>
-            <td><span class="badge bg-light text-dark border">{{ e.classroom.name }}</span></td>
-            <td class="text-muted small">{{ e.enrollment_date|date:"d/m/Y" }}</td>
-            <td>
-              <span class="badge {{ e.status_badge_class }}">
-                {{ e.get_status_display }}
+            <td style="padding:.85rem 1.25rem;font-size:.875rem;font-weight:500;">
+              {{ enrollment.school_year.name }}
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <span class="fw-medium" style="font-size:.875rem;">{{ enrollment.classroom.name }}</span>
+              <br>
+              <span class="text-muted" style="font-size:.75rem;">
+                {{ enrollment.classroom.option.level.name }} · {{ enrollment.classroom.option.name }}
               </span>
             </td>
-            <td>
-              <a href="{% url 'students:enrollment_detail' e.pk %}"
-                 class="btn btn-outline-secondary btn-sm py-0">
-                <i class="bi bi-eye"></i>
-              </a>
+            <td style="padding:.85rem 1.25rem;font-size:.82rem;color:var(--klass-text-secondary);">
+              {{ enrollment.enrollment_date|date:"d/m/Y" }}
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              {% if enrollment.status == 'active' %}
+              <span class="badge bg-success-subtle text-success rounded-pill">{{ enrollment.get_status_display }}</span>
+              {% elif enrollment.status == 'pending' %}
+              <span class="badge bg-warning-subtle text-warning rounded-pill">{{ enrollment.get_status_display }}</span>
+              {% elif enrollment.status == 'completed' %}
+              <span class="badge bg-info-subtle text-info rounded-pill">{{ enrollment.get_status_display }}</span>
+              {% elif enrollment.status == 'cancelled' %}
+              <span class="badge bg-danger-subtle text-danger rounded-pill">{{ enrollment.get_status_display }}</span>
+              {% else %}
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill">{{ enrollment.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="table-actions">
+                <a href="{% url 'students:enrollment_detail' enrollment.pk %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if user.is_school_admin and enrollment.status == 'active' %}
+                <a href="{% url 'students:enrollment_change_class' enrollment.pk %}" class="btn btn-sm btn-outline-warning" title="Changer de classe">
+                  <i class="bi bi-arrow-left-right"></i>
+                </a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    <div class="card-footer bg-transparent py-3 px-4" style="border-top:1px solid var(--klass-border);">
+      <p class="text-muted mb-0" style="font-size:.82rem;">{{ enrollments|length }} inscription{{ enrollments|length|pluralize }}</p>
+    </div>
     {% else %}
-    <div class="card-body text-center py-5 text-muted">
-      <i class="bi bi-inbox display-6 d-block mb-2"></i>
-      <p class="mb-0">Aucune inscription trouvée.</p>
-      {% if user.is_school_admin %}
-      <a href="{% url 'students:enrollment_create' %}" class="btn btn-success mt-3">
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
+      <h5 class="empty-state-title">{% if q %}Aucun résultat{% else %}Aucune inscription{% endif %}</h5>
+      <p class="empty-state-desc">
+        {% if q %}Aucun résultat pour « {{ q }} ».
+        {% elif selected_year %}Aucune inscription pour cette année scolaire.
+        {% else %}Commencez à inscrire des élèves pour cette année.{% endif %}
+      </p>
+      {% if user.is_school_admin and not q %}
+      <a href="{% url 'students:enrollment_create' %}" class="btn btn-primary" style="border-radius:10px;">
         <i class="bi bi-plus-lg me-1"></i>Créer une inscription
       </a>
       {% endif %}

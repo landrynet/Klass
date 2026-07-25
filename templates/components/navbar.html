@@ -1,77 +1,76 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg sticky-top" id="klass-navbar">
+<nav class="navbar sticky-top" id="klass-navbar">
   <div class="container-fluid px-3 px-md-4">
 
-    <!-- Logo -->
-    <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="/">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="fw-bold" style="color: var(--klass-primary);">
-        {{ school_name|default:'KLASS' }}
-      </span>
-    </a>
+    <!-- Hamburger (mobile only) + Logo -->
+    <div class="d-flex align-items-center gap-2">
+      {% if not user.is_portal_user %}
+      <button id="sidebar-toggler" class="d-lg-none" type="button" aria-label="Menu">
+        <i class="bi bi-list" style="font-size:1.2rem;"></i>
+      </button>
+      {% endif %}
+
+      <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="/">
+        <span class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </span>
+        <span class="fw-bold d-none d-sm-inline" style="color: var(--klass-primary); font-size:1rem;">
+          {{ school_name|default:'KLASS' }}
+        </span>
+      </a>
+    </div>
 
     <!-- Search (desktop) -->
-    <div class="d-none d-md-flex align-items-center ms-3">
-      <div class="position-relative">
-        <i class="bi bi-search position-absolute text-muted" style="top:50%;transform:translateY(-50%);left:12px;font-size:0.8rem;"></i>
-        <input type="text" class="navbar-search" placeholder="Rechercher…" style="padding-left:2rem;">
+    <div class="d-none d-md-flex align-items-center ms-3 flex-grow-1" style="max-width:320px;">
+      <div class="position-relative w-100">
+        <i class="bi bi-search position-absolute text-muted" style="top:50%;transform:translateY(-50%);left:12px;font-size:0.8rem;pointer-events:none;"></i>
+        <input type="text" class="navbar-search w-100" placeholder="Rechercher…" style="padding-left:2.25rem;">
       </div>
     </div>
 
-    <!-- Bouton mobile -->
-    <button class="navbar-toggler border-0 ms-auto me-2" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navbarContent"
-            style="color: var(--klass-text-secondary);">
-      <i class="bi bi-list fs-5"></i>
-    </button>
+    <!-- Right actions -->
+    <div class="d-flex align-items-center gap-2 ms-auto">
 
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <ul class="navbar-nav ms-auto align-items-center gap-2 py-2 py-lg-0">
+      <!-- Notifications -->
+      <a class="nav-icon-btn" href="#" title="Notifications">
+        <i class="bi bi-bell" style="font-size:0.9rem;"></i>
+      </a>
 
-        <!-- Notifications -->
-        <li class="nav-item">
-          <a class="nav-icon-btn" href="#" title="Notifications">
-            <i class="bi bi-bell" style="font-size:0.9rem;"></i>
-          </a>
-        </li>
+      <!-- User dropdown -->
+      <div class="dropdown">
+        <a class="d-flex align-items-center gap-2 text-decoration-none" href="#"
+           data-bs-toggle="dropdown" id="userDropdown" aria-expanded="false">
+          <span class="user-avatar" title="{{ user.get_full_name }}">
+            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+          </span>
+          <span class="d-none d-md-block fw-semibold" style="font-size:0.875rem;color:var(--klass-text-primary);">
+            {{ user.first_name|default:user.get_full_name }}
+          </span>
+          <i class="bi bi-chevron-down d-none d-md-block" style="font-size:0.7rem;color:var(--klass-text-muted);"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 mt-2"
+            style="min-width:210px;border:1px solid var(--klass-border)!important;">
+          <li class="px-3 py-2">
+            <div class="fw-semibold" style="font-size:0.875rem;">{{ user.get_full_name }}</div>
+            <div class="text-muted" style="font-size:0.78rem;">{{ user.get_role_display }}</div>
+          </li>
+          <li><hr class="dropdown-divider my-1"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"
+               style="font-size:0.875rem;">
+              <i class="bi bi-person text-muted"></i>Mon profil
+            </a>
+          </li>
+          <li><hr class="dropdown-divider my-1"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger"
+               href="{% url 'accounts:logout' %}" style="font-size:0.875rem;">
+              <i class="bi bi-box-arrow-right"></i>Déconnexion
+            </a>
+          </li>
+        </ul>
+      </div>
 
-        <!-- User dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-decoration-none px-1"
-             href="#" data-bs-toggle="dropdown" id="userDropdown">
-            <span class="user-avatar" title="{{ user.get_full_name }}">
-              {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-            </span>
-            <span class="d-none d-md-block fw-semibold" style="font-size:0.875rem;color:var(--klass-text-primary);">
-              {{ user.get_full_name }}
-            </span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-1"
-              style="min-width:200px;border:1px solid var(--klass-border)!important;">
-            <li class="px-3 py-2">
-              <div class="fw-semibold" style="font-size:0.875rem;">{{ user.get_full_name }}</div>
-              <div class="text-muted" style="font-size:0.78rem;">{{ user.get_role_display }}</div>
-            </li>
-            <li><hr class="dropdown-divider my-1"></li>
-            <li>
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"
-                 style="font-size:0.875rem;">
-                <i class="bi bi-person text-muted"></i>Mon profil
-              </a>
-            </li>
-            <li><hr class="dropdown-divider my-1"></li>
-            <li>
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="{% url 'accounts:logout' %}"
-                 style="font-size:0.875rem;">
-                <i class="bi bi-box-arrow-right"></i>Déconnexion
-              </a>
-            </li>
-          </ul>
-        </li>
-
-      </ul>
     </div>
   </div>
 </nav>

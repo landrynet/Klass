@@ -1,9 +1,119 @@
 {% extends "base.html" %}
-{% block title %}Parents et tuteurs{% endblock %}
+{% load static %}
+{% block title %}Parents & tuteurs{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-  <div class="d-flex align-items-center justify-content-between mb-4"><div><h1 class="h4 fw-bold mb-0">Parents / tuteurs</h1><p class="text-muted mb-0 small">Un parent peut être associé à plusieurs élèves.</p></div>{% if user.is_school_admin %}<a href="{% url 'students:parent_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nouveau parent</a>{% endif %}</div>
-  <div class="card mb-4"><div class="card-body py-3"><form method="get" class="row g-2"><div class="col-md-10"><input name="q" value="{{ q }}" class="form-control" placeholder="Nom, prénom, téléphone ou email…"></div><div class="col-md-2"><button class="btn btn-outline-primary w-100">Rechercher</button></div></form></div></div>
-  <div class="card"><div class="table-responsive"><table class="table table-hover mb-0 align-middle"><thead><tr><th>Parent / tuteur</th><th>Téléphone</th><th>Email</th><th>Élèves associés</th><th></th></tr></thead><tbody>{% for parent in parents %}<tr><td><a href="{% url 'students:parent_detail' parent.pk %}" class="fw-semibold text-decoration-none">{{ parent }}</a></td><td>{{ parent.phone }}</td><td>{{ parent.email|default:"—" }}</td><td>{{ parent.student_count }}</td><td class="text-end">{% if user.is_school_admin %}<a href="{% url 'students:parent_edit' parent.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>{% endif %}</td></tr>{% empty %}<tr><td colspan="5" class="text-center text-muted py-5">Aucun parent trouvé.</td></tr>{% endfor %}</tbody></table></div></div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="page-header-title"><i class="bi bi-person-hearts me-2 text-primary" style="font-size:1.1rem;"></i>Parents & tuteurs</h1>
+        <p class="page-header-sub">Répertoire des contacts parentaux associés aux élèves.</p>
+      </div>
+    </div>
+    {% if user.is_school_admin %}
+    <div class="page-header-actions">
+      <a href="{% url 'students:parent_create' %}" class="btn btn-primary fw-semibold" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-1"></i>Nouveau contact
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Filtres -->
+  <div class="filter-bar">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-7">
+        <label class="form-label">Recherche</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;">
+            <i class="bi bi-search text-muted" style="font-size:.85rem;"></i>
+          </span>
+          <input name="q" value="{{ q }}" class="form-control border-start-0"
+                 placeholder="Nom, téléphone ou email…" style="border-radius:0 8px 8px 0;">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" style="border-radius:8px;">
+          <i class="bi bi-search me-1"></i>Rechercher
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    {% if parents %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr style="background:#FAFBFD;">
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Contact</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Téléphone</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Email</th>
+            <th style="padding:.9rem 1.25rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--klass-text-muted);">Relation</th>
+            <th style="padding:.9rem 1.25rem;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for parent in parents %}
+          <tr>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar orange">
+                  {{ parent.first_name|first|upper }}{{ parent.last_name|first|upper }}
+                </span>
+                <div>
+                  <a class="fw-semibold text-decoration-none d-block"
+                     href="{% url 'students:parent_detail' parent.pk %}"
+                     style="color:var(--klass-text-primary);">
+                    {{ parent.get_full_name }}
+                  </a>
+                  <span class="text-muted" style="font-size:.75rem;">{{ parent.get_relationship_type_display }}</span>
+                </div>
+              </div>
+            </td>
+            <td style="padding:.85rem 1.25rem;font-size:.875rem;">{{ parent.phone|default:"—" }}</td>
+            <td style="padding:.85rem 1.25rem;font-size:.875rem;color:var(--klass-text-secondary);">{{ parent.email|default:"—" }}</td>
+            <td style="padding:.85rem 1.25rem;">
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill">{{ parent.get_relationship_type_display }}</span>
+            </td>
+            <td style="padding:.85rem 1.25rem;">
+              <div class="table-actions">
+                <a href="{% url 'students:parent_detail' parent.pk %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if user.is_school_admin %}
+                <a href="{% url 'students:parent_edit' parent.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-transparent py-3 px-4" style="border-top:1px solid var(--klass-border);">
+      <p class="text-muted mb-0" style="font-size:.82rem;">{{ parents|length }} contact{{ parents|length|pluralize }}</p>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-person-hearts"></i></div>
+      <h5 class="empty-state-title">{% if q %}Aucun résultat{% else %}Aucun contact enregistré{% endif %}</h5>
+      <p class="empty-state-desc">{% if q %}Aucun résultat pour « {{ q }} ».{% else %}Commencez à ajouter des parents ou tuteurs.{% endif %}</p>
+      {% if user.is_school_admin and not q %}
+      <a href="{% url 'students:parent_create' %}" class="btn btn-primary" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-1"></i>Ajouter un contact
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}

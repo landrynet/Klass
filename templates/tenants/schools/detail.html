@@ -1,164 +1,115 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block title %}{{ school.name }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid" style="max-width:900px;">
 
-  <!-- En-tête -->
-  <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-arrow-left me-1"></i>Retour
-    </a>
-    <div class="d-flex align-items-center gap-3 flex-grow-1">
-      {% if school.logo %}
-      <img src="{{ school.logo.url }}" alt="Logo" class="rounded-3 border" style="width:48px;height:48px;object-fit:cover;">
-      {% else %}
-      <div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
-        <i class="bi bi-building text-primary fs-5"></i>
-      </div>
-      {% endif %}
+  <div class="klass-breadcrumb">
+    <a href="{% url 'tenants:super_admin_dashboard' %}">Super Admin</a>
+    <i class="bi bi-chevron-right klass-breadcrumb-sep"></i>
+    <span class="klass-breadcrumb-current">{{ school.name }}</span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left d-flex align-items-center gap-3">
+      <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+        <i class="bi bi-arrow-left"></i>
+      </a>
       <div>
-        <h1 class="h4 fw-bold mb-0">{{ school.name }}</h1>
-        <span class="badge bg-secondary-subtle text-secondary">{{ school.slug }}</span>
-        {% if school.setup_completed %}
-        <span class="badge bg-success-subtle text-success ms-1">Opérationnelle</span>
-        {% else %}
-        <span class="badge bg-warning-subtle text-warning ms-1">Configuration en attente</span>
-        {% endif %}
+        <h1 class="page-header-title">{{ school.name }}</h1>
+        <p class="page-header-sub">
+          <code style="font-size:.8rem;">{{ school.schema_name }}</code>
+          {% if school.paid_until %} · Abonnement jusqu'au {{ school.paid_until|date:"d/m/Y" }}{% endif %}
+        </p>
       </div>
     </div>
   </div>
 
-  {% include "components/messages.html" %}
-
-  <div class="row g-4">
-    <!-- Informations principales -->
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-          <h2 class="h6 fw-semibold mb-0">
-            <i class="bi bi-building me-2 text-muted"></i>Informations de l'école
-          </h2>
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="card h-100">
+        <div class="card-header py-3 px-4">
+          <p class="form-section-title mb-0"><i class="bi bi-building me-1"></i>Informations</p>
         </div>
-        <div class="card-body px-4 pb-4">
-          <div class="row g-3">
-            <div class="col-sm-6">
-              <div class="text-muted small">Email de contact</div>
-              <div class="fw-semibold">{{ school.email }}</div>
-            </div>
-            {% if school.phone %}
-            <div class="col-sm-6">
-              <div class="text-muted small">Téléphone</div>
-              <div class="fw-semibold">{{ school.phone }}</div>
-            </div>
-            {% endif %}
-            {% if school.city or school.country %}
-            <div class="col-sm-6">
-              <div class="text-muted small">Localisation</div>
-              <div class="fw-semibold">{{ school.city }}{% if school.city and school.country %}, {% endif %}{{ school.country }}</div>
-            </div>
-            {% endif %}
-            {% if school.address %}
-            <div class="col-sm-6">
-              <div class="text-muted small">Adresse</div>
-              <div class="fw-semibold">{{ school.address }}</div>
-            </div>
-            {% endif %}
-            <div class="col-sm-6">
-              <div class="text-muted small">Schéma PostgreSQL</div>
-              <code class="text-muted small">{{ school.schema_name }}</code>
-            </div>
-            <div class="col-sm-6">
-              <div class="text-muted small">Domaine</div>
-              <code class="text-muted small">{{ school.slug }}.klass.app</code>
-            </div>
-            <div class="col-sm-6">
-              <div class="text-muted small">Abonnement</div>
-              <span class="badge bg-secondary-subtle text-secondary">{{ school.get_subscription_status_display }}</span>
-            </div>
-            <div class="col-sm-6">
-              <div class="text-muted small">Créée le</div>
-              <div class="fw-semibold">{{ school.created_at|date:"d F Y à H:i" }}</div>
-            </div>
+        <div class="card-body p-4">
+          <div class="info-item">
+            <div class="info-label">Schéma DB</div>
+            <div class="info-value"><code>{{ school.schema_name }}</code></div>
           </div>
-        </div>
-      </div>
-
-      <!-- Personnel -->
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-          <h2 class="h6 fw-semibold mb-0">
-            <i class="bi bi-people me-2 text-muted"></i>Personnel ({{ staff.count }})
-          </h2>
-        </div>
-        <div class="card-body p-0">
-          {% if staff %}
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th class="ps-4">Nom</th>
-                  <th>Email</th>
-                  <th>Rôle</th>
-                  <th class="pe-4">Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for member in staff %}
-                <tr>
-                  <td class="ps-4 fw-semibold">{{ member.get_full_name }}</td>
-                  <td class="text-muted small">{{ member.email }}</td>
-                  <td>
-                    <span class="badge bg-primary-subtle text-primary">{{ member.get_role_display }}</span>
-                  </td>
-                  <td class="pe-4">
-                    {% if member.must_change_password %}
-                    <span class="badge bg-warning-subtle text-warning small">Première connexion requise</span>
-                    {% elif member.is_active %}
-                    <span class="badge bg-success-subtle text-success small">Actif</span>
-                    {% else %}
-                    <span class="badge bg-secondary-subtle text-secondary small">Inactif</span>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <div class="text-center py-4 text-muted">
-            <i class="bi bi-person-x d-block mb-2 fs-3 opacity-25"></i>
-            <p class="mb-0 small">Aucun membre du personnel.</p>
+          {% if school.country %}
+          <div class="info-item">
+            <div class="info-label">Pays</div>
+            <div class="info-value">{{ school.country }}</div>
           </div>
           {% endif %}
+          {% if school.address %}
+          <div class="info-item">
+            <div class="info-label">Adresse</div>
+            <div class="info-value">{{ school.address }}</div>
+          </div>
+          {% endif %}
+          <div class="info-item">
+            <div class="info-label">Créée le</div>
+            <div class="info-value">{{ school.created_on|date:"d/m/Y" }}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Sidebar infos rapides -->
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="col-md-7">
+      <div class="card h-100">
+        <div class="card-header py-3 px-4">
+          <p class="form-section-title mb-0"><i class="bi bi-person-gear me-1"></i>Administrateur</p>
+        </div>
         <div class="card-body p-4">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center
-              {% if school.is_operational %}bg-success{% elif not school.setup_completed %}bg-warning{% else %}bg-secondary{% endif %}
-              bg-opacity-10" style="width:40px;height:40px;">
-              <i class="bi
-                {% if school.is_operational %}bi-check-circle-fill text-success
-                {% elif not school.setup_completed %}bi-hourglass-split text-warning
-                {% else %}bi-dash-circle text-secondary{% endif %}"></i>
-            </div>
+          {% if admin_user %}
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="row-avatar blue" style="width:48px;height:48px;font-size:.9rem;">
+              {{ admin_user.first_name|first|upper }}{{ admin_user.last_name|first|upper }}
+            </span>
             <div>
-              <div class="fw-semibold small">État</div>
-              <div class="text-muted small">
-                {% if school.is_operational %}Opérationnelle
-                {% elif not school.setup_completed %}Configuration en cours
-                {% else %}Inactive{% endif %}
-              </div>
+              <div class="fw-semibold">{{ admin_user.get_full_name|default:admin_user.email }}</div>
+              <div class="text-muted" style="font-size:.82rem;">{{ admin_user.email }}</div>
             </div>
           </div>
+
+          <!-- Credential display -->
+          <div class="credential-row mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--klass-text-muted);">
+                <i class="bi bi-person me-1"></i>Identifiant
+              </span>
+              <button class="btn btn-sm copy-btn px-2 py-0"
+                      onclick="copyToClipboard('{{ admin_user.email|escapejs }}', this)"
+                      style="font-size:.7rem;border-radius:5px;">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="credential-value">{{ admin_user.email }}</div>
+          </div>
+
+          {% if school.admin_temp_password %}
+          <div class="credential-row password-row">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--klass-text-muted);">
+                <i class="bi bi-key me-1"></i>Mot de passe temporaire
+              </span>
+              <button class="btn btn-sm copy-btn px-2 py-0"
+                      onclick="copyToClipboard('{{ school.admin_temp_password|escapejs }}', this)"
+                      style="font-size:.7rem;border-radius:5px;">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="credential-value">{{ school.admin_temp_password }}</div>
+          </div>
+          {% endif %}
+
+          {% else %}
+          <p class="text-muted" style="font-size:.875rem;">
+            <i class="bi bi-exclamation-circle me-1"></i>Aucun administrateur configuré.
+          </p>
+          {% endif %}
         </div>
       </div>
     </div>
