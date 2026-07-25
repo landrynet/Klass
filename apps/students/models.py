@@ -117,9 +117,17 @@ class Student(TenantAwareModel):
 
 class StudentEnrollment(TenantAwareModel):
     """
-    Inscription d'un élève pour une année scolaire donnée.
-    Créée à chaque nouvelle année (ou lors d'un transfert de classe).
-    Archivée (lecture seule) à la clôture de l'année.
+    Phase 3.1 — Inscription d'un élève pour une année scolaire donnée.
+
+    Règles métier :
+    - Un élève ne peut avoir qu'une seule inscription ACTIVE (pending ou active)
+      par année scolaire.
+    - Les inscriptions annulées / terminées sont conservées pour l'historique.
+    - Le changement de classe crée une nouvelle inscription (traçabilité).
+
+    Cycle de vie :
+        En attente (pending) → Active → Terminée (completed)
+                                     → Annulée (cancelled)
     """
     student = models.ForeignKey(
         Student,
@@ -163,10 +171,50 @@ class StudentEnrollment(TenantAwareModel):
         verbose_name = "Inscription"
         verbose_name_plural = "Inscriptions"
         ordering = ["-school_year__start_date", "student__last_name"]
-        unique_together = [["student", "school_year"]]
+        # Suppression de unique_together pour permettre l'historique
+        # (plusieurs inscriptions par élève/année, mais une seule active)
 
     def __str__(self):
         return f"{self.student} — {self.classroom} ({self.school_year.name})"
+
+    def clean(self):
+        """
+        Valide qu'il n'existe pas déjà une inscription active (pending/active)
+        pour cet élève dans cette année scolaire.
+        """
+        if self.status in EnrollmentStatus.ACTIVE_STATUSES:
+            qs = StudentEnrollment.objects.filter(
+                student=self.student,
+                school_year=self.school_year,
+                status__in=EnrollmentStatus.ACTIVE_STATUSES,
+            )
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs.exists():
+                raise ValidationError(
+                    "Cet élève a déjà une inscription active pour cette année scolaire. "
+                    "Annulez l'inscription existante avant d'en créer une nouvelle."
+                )
+
+    @property
+    def is_active_enrollment(self):
+        return self.status in EnrollmentStatus.ACTIVE_STATUSES
+
+    @property
+    def status_badge_class(self):
+        return EnrollmentStatus.BADGE_CLASSES.get(self.status, "bg-secondary-subtle text-secondary")
+
+    def cancel(self, save=True):
+        """Annule cette inscription."""
+        self.status = EnrollmentStatus.CANCELLED
+        if save:
+            self.save(update_fields=["status", "updated_at"])
+
+    def complete(self, save=True):
+        """Marque cette inscription comme terminée (fin d'année)."""
+        self.status = EnrollmentStatus.COMPLETED
+        if save:
+            self.save(update_fields=["status", "updated_at"])
 
 
 class Parent(TenantAwareModel):

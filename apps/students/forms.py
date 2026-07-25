@@ -1,10 +1,11 @@
-"""Formulaires de gestion des élèves, parents et matricules."""
+"""Formulaires de gestion des élèves, parents, matricules et inscriptions."""
 from datetime import date
 
 from django import forms
 from django.db.models import Q
 
-from .models import MatriculeConfiguration, Parent, ParentStudent, Student
+from apps.core.constants import EnrollmentStatus
+from .models import MatriculeConfiguration, Parent, ParentStudent, Student, StudentEnrollment
 
 
 class ParentForm(forms.Form):
@@ -72,3 +73,152 @@ def potential_parent_duplicates(data, exclude_pk=None):
     if exclude_pk:
         qs = qs.exclude(pk=exclude_pk)
     return qs.order_by("last_name", "first_name")
+
+
+# ---------------------------------------------------------------------------
+# Phase 3.1 — Formulaires d'inscription
+# ---------------------------------------------------------------------------
+
+class EnrollmentForm(forms.Form):
+    """Formulaire de création d'une inscription élève."""
+    student = forms.ModelChoiceField(
+        queryset=Student.objects.none(),
+        label="Élève",
+        empty_label="— Rechercher un élève —",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    school_year = forms.ModelChoiceField(
+        queryset=None,  # défini dynamiquement
+        label="Année scolaire",
+        empty_label="— Sélectionner une année —",
+        widget=forms.Select(attrs={"class": "form-select", "id": "id_school_year"}),
+    )
+    classroom = forms.ModelChoiceField(
+        queryset=None,  # défini dynamiquement
+        label="Classe",
+        empty_label="— Sélectionner une classe —",
+        widget=forms.Select(attrs={"class": "form-select", "id": "id_classroom"}),
+    )
+    status = forms.ChoiceField(
+        choices=[
+            (EnrollmentStatus.ACTIVE, "Active"),
+            (EnrollmentStatus.PENDING, "En attente"),
+        ],
+        initial=EnrollmentStatus.ACTIVE,
+        label="Statut initial",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    notes = forms.CharField(
+        required=False,
+        label="Notes",
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+    )
+
+    def __init__(self, *args, student_queryset=None, school_year_queryset=None, classroom_queryset=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if student_queryset is not None:
+            self.fields["student"].queryset = student_queryset
+        if school_year_queryset is not None:
+            self.fields["school_year"].queryset = school_year_queryset
+        if classroom_queryset is not None:
+            self.fields["classroom"].queryset = classroom_queryset
+
+    def clean(self):
+        cleaned = super().clean()
+        student = cleaned.get("student")
+        school_year = cleaned.get("school_year")
+        classroom = cleaned.get("classroom")
+        status = cleaned.get("status")
+
+        if student and school_year and status in EnrollmentStatus.ACTIVE_STATUSES:
+            # Vérifier qu'il n'y a pas déjà une inscription active
+            existing = StudentEnrollment.objects.filter(
+                student=student,
+                school_year=school_year,
+                status__in=EnrollmentStatus.ACTIVE_STATUSES,
+            )
+            if existing.exists():
+                existing_enrollment = existing.first()
+                raise forms.ValidationError(
+                    f"Cet élève est déjà inscrit dans la classe "
+                    f"«\u00a0{existing_enrollment.classroom}\u00a0» pour cette année scolaire. "
+                    f"Annulez l'inscription existante avant d'en créer une nouvelle."
+                )
+
+        if classroom and school_year:
+            # Vérifier que la classe appartient à l'année scolaire
+            if classroom.school_year_id != school_year.pk:
+                raise forms.ValidationError(
+                    "La classe sélectionnée n'appartient pas à l'année scolaire choisie."
+                )
+
+        if classroom and not classroom.is_active:
+            self.add_error("classroom", "Cette classe est inactive et n'accepte plus d'inscriptions.")
+
+        if classroom and classroom.is_archived:
+            self.add_error("classroom", "Cette classe est archivée.")
+
+        if school_year and school_year.is_archived:
+            self.add_error("school_year", "Cette année scolaire est archivée, les inscriptions ne sont plus possibles.")
+
+        return cleaned
+
+
+class EnrollmentEditForm(forms.Form):
+    """Formulaire de modification d'une inscription (statut + notes uniquement)."""
+    status = forms.ChoiceField(
+        choices=EnrollmentStatus.CHOICES,
+        label="Statut",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    notes = forms.CharField(
+        required=False,
+        label="Notes",
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+    )
+
+    def clean_status(self):
+        return self.cleaned_data["status"]
+
+
+class ChangeClassForm(forms.Form):
+    """
+    Formulaire de changement de classe.
+    Annule l'inscription courante et crée une nouvelle inscription dans la nouvelle classe.
+    """
+    new_classroom = forms.ModelChoiceField(
+        queryset=None,
+        label="Nouvelle classe",
+        empty_label="— Sélectionner la nouvelle classe —",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    reason = forms.CharField(
+        required=False,
+        label="Motif du changement",
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Ex: redoublement, transfert interne, capacité..."}),
+    )
+
+    def __init__(self, *args, classroom_queryset=None, current_classroom=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_classroom = current_classroom
+        if classroom_queryset is not None:
+            self.fields["new_classroom"].queryset = classroom_queryset
+
+    def clean_new_classroom(self):
+        classroom = self.cleaned_data.get("new_classroom")
+        if classroom and self.current_classroom and classroom.pk == self.current_classroom.pk:
+            raise forms.ValidationError("La nouvelle classe doit être différente de la classe actuelle.")
+        if classroom and not classroom.is_active:
+            raise forms.ValidationError("La classe sélectionnée est inactive.")
+        if classroom and classroom.is_archived:
+            raise forms.ValidationError("La classe sélectionnée est archivée.")
+        return classroom
+
+
+class EnrollmentStatusForm(forms.Form):
+    """Formulaire rapide de changement de statut."""
+    status = forms.ChoiceField(
+        choices=EnrollmentStatus.CHOICES,
+        label="Nouveau statut",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )

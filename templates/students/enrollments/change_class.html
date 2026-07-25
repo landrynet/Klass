@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Changement de classe{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:680px">
+
+  <div class="mb-4">
+    <a href="{% url 'students:enrollment_detail' enrollment.pk %}"
+       class="small text-decoration-none text-muted">
+      <i class="bi bi-arrow-left me-1"></i>Retour à l'inscription
+    </a>
+    <h1 class="h4 fw-bold mt-2 mb-0">Changement de classe</h1>
+  </div>
+
+  <!-- Alerte informative -->
+  <div class="alert alert-info d-flex gap-2 align-items-start mb-4">
+    <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
+    <div>
+      <strong>Comment fonctionne le changement de classe ?</strong><br>
+      L'inscription actuelle sera marquée comme <em>Terminée</em> et une nouvelle inscription
+      sera créée dans la nouvelle classe. L'historique est conservé.
+    </div>
+  </div>
+
+  <!-- Inscription actuelle -->
+  <div class="card mb-3">
+    <div class="card-body py-2">
+      <div class="small text-muted mb-1">Inscription actuelle</div>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="fw-semibold">{{ enrollment.student.last_name }} {{ enrollment.student.first_name }}</span>
+          <code class="text-muted ms-2 small">{{ enrollment.student.matricule }}</code>
+        </div>
+        <div class="text-end">
+          <div class="fw-semibold">{{ enrollment.classroom.full_name }}</div>
+          <div class="text-muted small">{{ enrollment.school_year.name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center mb-3">
+    <i class="bi bi-arrow-down fs-4 text-muted"></i>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="card">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+          {% endif %}
+          {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+          <p class="mb-0">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-warning fw-semibold">
+            <i class="bi bi-arrow-left-right me-1"></i>Confirmer le changement
+          </button>
+          <a href="{% url 'students:enrollment_detail' enrollment.pk %}"
+             class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

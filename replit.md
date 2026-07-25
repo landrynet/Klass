@@ -49,6 +49,8 @@ Creates a demo school with 6 levels and 3 options per level (idempotent).
 - **Phase 1** ✅ School creation, setup wizard, school admin
 - **Phase 2.0** ✅ School years CRUD, levels, options/tracks
 - **Phase 2.1** ✅ Classrooms and rooms — CRUD, status lifecycle, tenant isolation
+- **Phase 3.0** ✅ Students, parents, matricules
+- **Phase 3.1** ✅ Enrollments — student → school year → classroom, history, class change
 
 ## User preferences
 - Language: French (project is in French)

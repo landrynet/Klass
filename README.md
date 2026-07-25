@@ -29,6 +29,30 @@
 
 ## État d'avancement du projet
 
+### Phase 3.1 — Inscriptions et affectation des élèves aux classes
+**Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
+
+Documentation : `docs/modules/phase-3-1-inscriptions.md`
+
+**Fonctionnalités implémentées :**
+
+- ✅ Modèle `StudentEnrollment` complet (élève → année scolaire → classe)
+- ✅ Statuts d'inscription : En attente / Active / Terminée / Annulée
+- ✅ Règle métier : une seule inscription active par élève/année (validation backend)
+- ✅ Historique scolaire multi-années préservé (suppression de unique_together)
+- ✅ Changement de classe tracé (ancienne inscription → Terminée, nouvelle créée)
+- ✅ Liste des inscriptions avec filtres (année, statut, classe, recherche)
+- ✅ Vue par classe (tous les élèves inscrits, taux de remplissage)
+- ✅ Fiche élève enrichie (inscription active + historique complet)
+- ✅ API JSON : classes dynamiques par année + recherche élève (pour HTMX)
+- ✅ Isolation multi-tenant complète (schema_context sur toutes les requêtes)
+- ✅ Permissions backend (school_admin écriture, staff lecture)
+- ✅ Seed data Phase 3.1 idempotent (3 élèves, 4 inscriptions dont historique)
+- ✅ 155 tests — 0 échec (Phases 1, 2.0, 2.1, 3.0, 3.1 + régression)
+- ✅ Sidebar mise à jour (lien Inscriptions)
+
+---
+
 ### Phase 2.1 — Classes et salles
 **Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
 

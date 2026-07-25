@@ -63,12 +63,20 @@
     <p class="sidebar-section-title">Élèves</p>
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'students:list' %}">
+        <a class="nav-link {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'students' %}active{% endif %}"
+           href="{% url 'students:list' %}">
           <i class="bi bi-people-fill"></i>Élèves
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'students:parents' %}">
+        <a class="nav-link {% if 'enrollment' in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'students:enrollment_list' %}">
+          <i class="bi bi-journal-bookmark-fill"></i>Inscriptions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'parent' in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'students:parents' %}">
           <i class="bi bi-person-hearts"></i>Parents / tuteurs
         </a>
       </li>

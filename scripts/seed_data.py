@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Script de données de démonstration pour KLASS — Phase 2.1.
-Crée une école de test avec des données pour les Phases 1, 2.0 et 2.1.
+Script de données de démonstration pour KLASS — Phase 3.1.
+Crée une école de test avec des données pour les Phases 1, 2.0, 2.1, 3.0 et 3.1.
 
 Usage:
     python scripts/seed_data.py
@@ -21,14 +21,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 django.setup()
 
 from django.db import transaction
-from apps.core.constants import Roles
+from apps.core.constants import Roles, EnrollmentStatus
 from apps.core.utils import generate_temp_password
 
 
 def seed():
-    """Créer les données de démonstration — Phases 1, 2.0 & 2.1."""
+    """Créer les données de démonstration — Phases 1, 2.0, 2.1, 3.0 & 3.1."""
     print("=" * 60)
-    print("KLASS — Données de démonstration [SEED] — Phase 2.1")
+    print("KLASS — Données de démonstration [SEED] — Phase 3.1")
     print("=" * 60)
 
     # ---- Vérifier l'environnement ----
@@ -74,6 +74,17 @@ def seed():
         print(f"\n2. Années scolaires dans le schéma {school.schema_name}...")
         from apps.school_years.models import SchoolYear
 
+        year_2425, created = SchoolYear.objects.get_or_create(
+            name="2024-2025 [SEED]",
+            defaults={
+                "start_date": datetime.date(2024, 9, 1),
+                "end_date": datetime.date(2025, 6, 30),
+                "is_active": False,
+                "is_closed": True,
+            }
+        )
+        print(f"   ✅ {year_2425.name} ({'créée' if created else 'existante'}) — {year_2425.status_display}")
+
         year_2526, created = SchoolYear.objects.get_or_create(
             name="2025-2026 [SEED]",
             defaults={
@@ -113,15 +124,29 @@ def seed():
             ("6ème secondaire", "6SEC", 5),
         ]
 
-        niveaux = {}
+        # Niveaux pour 2025-2026 (année active)
+        niveaux_2526 = {}
         for nom, code, ordre in niveaux_data:
             level, created = Level.objects.get_or_create(
                 school_year=year_2526,
                 name=f"{nom} [SEED]",
                 defaults={"code": code, "order": ordre, "is_active": True}
             )
-            niveaux[nom] = level
-            print(f"   ✅ {level.name} ({'créé' if created else 'existant'})")
+            niveaux_2526[nom] = level
+            if created:
+                print(f"   ✅ {level.name} (créé)")
+
+        # Niveaux pour 2024-2025 (historique)
+        niveaux_2425 = {}
+        for nom, code, ordre in niveaux_data:
+            level, created = Level.objects.get_or_create(
+                school_year=year_2425,
+                name=f"{nom} [SEED]",
+                defaults={"code": code, "order": ordre, "is_active": True}
+            )
+            niveaux_2425[nom] = level
+
+        print(f"   ℹ️  {len(niveaux_2526)} niveaux vérifiés/créés (2025-2026)")
 
         # ---- 4. Options / Filières (Phase 2.0) ----
         print("\n4. Options / Filières...")
@@ -131,19 +156,29 @@ def seed():
             ("Commerciale", "COM", "Commerce, économie et gestion"),
         ]
 
-        options_par_niveau = {}
-        for nom_niveau, level in niveaux.items():
-            options_par_niveau[nom_niveau] = {}
+        options_2526 = {}
+        for nom_niveau, level in niveaux_2526.items():
+            options_2526[nom_niveau] = {}
             for nom_opt, code_opt, desc in options_data:
                 option, created = Option.objects.get_or_create(
                     level=level,
                     name=f"{nom_opt} [SEED]",
                     defaults={"code": code_opt, "description": desc, "is_active": True}
                 )
-                options_par_niveau[nom_niveau][nom_opt] = option
-                if created:
-                    print(f"   ✅ {option} (créée)")
-        print(f"   ℹ️  {len(options_data) * len(niveaux)} options vérifiées/créées")
+                options_2526[nom_niveau][nom_opt] = option
+
+        options_2425 = {}
+        for nom_niveau, level in niveaux_2425.items():
+            options_2425[nom_niveau] = {}
+            for nom_opt, code_opt, desc in options_data:
+                option, created = Option.objects.get_or_create(
+                    level=level,
+                    name=f"{nom_opt} [SEED]",
+                    defaults={"code": code_opt, "description": desc, "is_active": True}
+                )
+                options_2425[nom_niveau][nom_opt] = option
+
+        print(f"   ℹ️  Options créées/vérifiées pour toutes les années")
 
         # ---- 5. Salles (Phase 2.1) ----
         print("\n5. Salles...")
@@ -168,24 +203,26 @@ def seed():
                 }
             )
             rooms[name] = room
-            print(f"   ✅ {room.name} — {room.get_room_type_display()}, {room.capacity} places ({'créée' if created else 'existante'})")
+            if created:
+                print(f"   ✅ {room.name} — {room.get_room_type_display()}, {room.capacity} places (créée)")
+        print(f"   ℹ️  {len(rooms)} salles vérifiées")
 
         # ---- 6. Classes (Phase 2.1) ----
         print("\n6. Classes...")
-        classes_data = [
-            # (nom_niveau, nom_option, identifiant, capacité, nom_salle)
+        classes_data_2526 = [
             ("6ème secondaire", "Scientifique", "A", 40, "Salle 01 [SEED]"),
             ("6ème secondaire", "Scientifique", "B", 40, "Salle 02 [SEED]"),
             ("5ème secondaire", "Commerciale",  "A", 38, "Salle 01 [SEED]"),
             ("4ème secondaire", "Littéraire",   "A", 35, "Salle 02 [SEED]"),
+            ("5ème secondaire", "Scientifique", "A", 40, "Salle 01 [SEED]"),
         ]
 
-        for nom_niveau, nom_option, section, capacite, nom_salle in classes_data:
-            level = niveaux.get(nom_niveau)
-            option = options_par_niveau.get(nom_niveau, {}).get(nom_option)
+        classrooms_2526 = {}
+        for nom_niveau, nom_option, section, capacite, nom_salle in classes_data_2526:
+            level = niveaux_2526.get(nom_niveau)
+            option = options_2526.get(nom_niveau, {}).get(nom_option)
             room = rooms.get(nom_salle)
             if not level or not option:
-                print(f"   ⚠️  Niveau ou option introuvable pour {nom_niveau} / {nom_option}")
                 continue
             classroom, created = Classroom.objects.get_or_create(
                 school_year=year_2526,
@@ -197,7 +234,31 @@ def seed():
                     "is_active": True,
                 }
             )
-            print(f"   ✅ {classroom.full_name} — {classroom.capacity} élèves ({'créée' if created else 'existante'})")
+            classrooms_2526[f"{nom_niveau}_{nom_option}_{section}"] = classroom
+            if created:
+                print(f"   ✅ {classroom.full_name} — {classroom.capacity} élèves (créée)")
+
+        # Classes pour 2024-2025 (historique)
+        classrooms_2425 = {}
+        classes_data_2425 = [
+            ("5ème secondaire", "Scientifique", "A", 40, "Salle 01 [SEED]"),
+            ("4ème secondaire", "Commerciale",  "A", 38, "Salle 02 [SEED]"),
+        ]
+        for nom_niveau, nom_option, section, capacite, nom_salle in classes_data_2425:
+            level = niveaux_2425.get(nom_niveau)
+            option = options_2425.get(nom_niveau, {}).get(nom_option)
+            room = rooms.get(nom_salle)
+            if not level or not option:
+                continue
+            classroom, created = Classroom.objects.get_or_create(
+                school_year=year_2425,
+                option=option,
+                name=section,
+                defaults={"capacity": capacite, "main_room": room, "is_active": True}
+            )
+            classrooms_2425[f"{nom_niveau}_{nom_option}_{section}"] = classroom
+
+        print(f"   ℹ️  Classes 2025-2026 : {len(classrooms_2526)} | Classes 2024-2025 : {len(classrooms_2425)}")
 
         # ---- 7. Matière ----
         subject, _ = Subject.objects.get_or_create(
@@ -232,59 +293,159 @@ def seed():
                 user.save()
             print(f"   ✅ [{role}] {email} ({'créé' if created else 'existant'})")
 
-        # ---- 9. Élève de test ----
-        print("\n9. Élève de test...")
+        # ---- 9. Élèves de test (Phase 3.0) ----
+        print("\n9. Élèves de test...")
         from apps.students.models import Parent, ParentStudent, Student, StudentEnrollment
-        demo_parent, parent_created = Parent.objects.get_or_create(
+
+        # Parent 1
+        parent1, _ = Parent.objects.get_or_create(
             first_name="Marie",
             last_name="Mukendi [SEED]",
             defaults={
                 "phone": "+243900000001",
                 "email": "marie.mukendi.seed@example.com",
-                "profession": "Parent",
+                "profession": "Commerçante",
             },
         )
-        print(f"   ✅ Parent : {demo_parent} ({'créé' if parent_created else 'existant'})")
-        student, created = Student.objects.get_or_create(
+        # Parent 2
+        parent2, _ = Parent.objects.get_or_create(
+            first_name="Paul",
+            last_name="Kabongo [SEED]",
+            defaults={
+                "phone": "+243900000002",
+                "email": "paul.kabongo.seed@example.com",
+                "profession": "Enseignant",
+            },
+        )
+        print(f"   ✅ Parents : {parent1}, {parent2}")
+
+        # Élève 1 : Jean Kabila — a un historique sur 2 ans
+        student1, created1 = Student.objects.get_or_create(
             first_name="Jean",
             last_name="Kabila [SEED]",
             defaults={
-                "date_of_birth": datetime.date(2010, 3, 15),
+                "date_of_birth": datetime.date(2009, 3, 15),
                 "gender": "M",
                 "nationality": "Congolaise",
-                "primary_parent": demo_parent,
+                "primary_parent": parent1,
             }
         )
-        if student.primary_parent_id != demo_parent.pk:
-            student.primary_parent = demo_parent
-            student.save(update_fields=["primary_parent", "updated_at"])
-        ParentStudent.objects.get_or_create(parent=demo_parent, student=student)
-        # Chercher la classe 6ème Scientifique A pour l'enrollment
-        demo_classroom = Classroom.objects.filter(
-            school_year=year_2526,
-            option__name__contains="Scientifique",
-            name="A"
-        ).first()
-        if created and demo_classroom:
-            StudentEnrollment.objects.get_or_create(
-                student=student,
-                school_year=year_2526,
-                defaults={"classroom": demo_classroom}
+        if student1.primary_parent_id != parent1.pk:
+            student1.primary_parent = parent1
+            student1.save(update_fields=["primary_parent", "updated_at"])
+        ParentStudent.objects.get_or_create(parent=parent1, student=student1)
+        print(f"   ✅ Élève 1 : {student1} — Matricule: {student1.matricule}")
+
+        # Élève 2 : Claire Mutombo
+        student2, created2 = Student.objects.get_or_create(
+            first_name="Claire",
+            last_name="Mutombo [SEED]",
+            defaults={
+                "date_of_birth": datetime.date(2010, 7, 22),
+                "gender": "F",
+                "nationality": "Congolaise",
+                "primary_parent": parent2,
+            }
+        )
+        if student2.primary_parent_id != parent2.pk:
+            student2.primary_parent = parent2
+            student2.save(update_fields=["primary_parent", "updated_at"])
+        ParentStudent.objects.get_or_create(parent=parent2, student=student2)
+        print(f"   ✅ Élève 2 : {student2} — Matricule: {student2.matricule}")
+
+        # Élève 3 : Pierre Tshombe
+        student3, created3 = Student.objects.get_or_create(
+            first_name="Pierre",
+            last_name="Tshombe [SEED]",
+            defaults={
+                "date_of_birth": datetime.date(2008, 11, 5),
+                "gender": "M",
+                "nationality": "Congolaise",
+                "primary_parent": parent1,
+            }
+        )
+        ParentStudent.objects.get_or_create(parent=parent1, student=student3)
+        print(f"   ✅ Élève 3 : {student3} — Matricule: {student3.matricule}")
+
+        # ---- 10. Inscriptions Phase 3.1 ----
+        print("\n10. Inscriptions (Phase 3.1)...")
+
+        cl_6sci_a = classrooms_2526.get("6ème secondaire_Scientifique_A")
+        cl_6sci_b = classrooms_2526.get("6ème secondaire_Scientifique_B")
+        cl_5sci_a = classrooms_2526.get("5ème secondaire_Scientifique_A")
+        cl_5com_a = classrooms_2526.get("5ème secondaire_Commerciale_A")
+        cl_5sci_2425 = classrooms_2425.get("5ème secondaire_Scientifique_A")
+
+        # --- Élève 1 — Historique 2 ans ---
+        # Inscription 2024-2025 (terminée)
+        if cl_5sci_2425:
+            enr1_hist, created = StudentEnrollment.objects.get_or_create(
+                student=student1,
+                school_year=year_2425,
+                classroom=cl_5sci_2425,
+                defaults={"status": EnrollmentStatus.COMPLETED, "notes": "Passé en 6ème"}
             )
-        print(f"   ✅ Élève : {student} — Matricule: {student.matricule}")
+            if created:
+                print(f"   ✅ {student1.first_name} — 2024-2025 → {cl_5sci_2425.full_name} (Terminée) [créée]")
+            else:
+                print(f"   ℹ️  {student1.first_name} — 2024-2025 déjà existante")
+
+        # Inscription 2025-2026 (active)
+        if cl_6sci_a:
+            enr1_active, created = StudentEnrollment.objects.get_or_create(
+                student=student1,
+                school_year=year_2526,
+                classroom=cl_6sci_a,
+                defaults={"status": EnrollmentStatus.ACTIVE}
+            )
+            if created:
+                print(f"   ✅ {student1.first_name} — 2025-2026 → {cl_6sci_a.full_name} (Active) [créée]")
+            else:
+                print(f"   ℹ️  {student1.first_name} — 2025-2026 déjà existante ({enr1_active.get_status_display()})")
+
+        # --- Élève 2 — Inscription active ---
+        if cl_5sci_a:
+            enr2, created = StudentEnrollment.objects.get_or_create(
+                student=student2,
+                school_year=year_2526,
+                classroom=cl_5sci_a,
+                defaults={"status": EnrollmentStatus.ACTIVE}
+            )
+            if created:
+                print(f"   ✅ {student2.first_name} — 2025-2026 → {cl_5sci_a.full_name} (Active) [créée]")
+            else:
+                print(f"   ℹ️  {student2.first_name} — 2025-2026 déjà existante")
+
+        # --- Élève 3 — Inscription en attente ---
+        if cl_6sci_b:
+            enr3, created = StudentEnrollment.objects.get_or_create(
+                student=student3,
+                school_year=year_2526,
+                classroom=cl_6sci_b,
+                defaults={"status": EnrollmentStatus.PENDING, "notes": "En attente de validation"}
+            )
+            if created:
+                print(f"   ✅ {student3.first_name} — 2025-2026 → {cl_6sci_b.full_name} (En attente) [créée]")
+            else:
+                print(f"   ℹ️  {student3.first_name} — 2025-2026 déjà existante")
 
     print("\n" + "=" * 60)
-    print("SEED TERMINÉ — Données Phase 2.1 créées/vérifiées")
+    print("SEED TERMINÉ — Données Phase 3.1 créées/vérifiées")
     print("=" * 60)
     print(f"""
 Récapitulatif :
   École    : {school.name}
   Schéma   : {school.schema_name}
-  Années   : 2025-2026 (active), 2026-2027 (planifiée)
-  Niveaux  : 6 niveaux (1ère → 6ème secondaire)
-  Options  : 3 options par niveau (Scientifique, Littéraire, Commerciale)
-  Salles   : 5 salles (Salle 01, Salle 02, Labo, Info, Polyvalente)
-  Classes  : 4 classes (6ème Sci A/B, 5ème Com A, 4ème Lit A)
+  Années   : 2024-2025 (terminée), 2025-2026 (active), 2026-2027 (planifiée)
+  Niveaux  : 6 niveaux par année
+  Options  : 3 options par niveau
+  Salles   : 5 salles
+  Classes  : 5 classes 2025-2026, 2 classes 2024-2025
+  Élèves   : 3 élèves de test
+  Inscriptions :
+    - Jean Kabila : 2024-2025 Terminée + 2025-2026 Active (historique)
+    - Claire Mutombo : 2025-2026 Active
+    - Pierre Tshombe : 2025-2026 En attente
 
 ⚠️  Ces données sont identifiées par le tag [SEED]
     Pour les supprimer, lancez: python scripts/seed_data.py --delete

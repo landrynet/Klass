@@ -108,19 +108,42 @@ class FeeType:
 # Statuts d'inscription élève
 # ---------------------------------------------------------------------------
 class EnrollmentStatus:
+    # Phase 3.1 — statuts principaux
+    PENDING = "pending"
     ACTIVE = "active"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    # Statuts secondaires (Phase 3.0 — conservation rétro-compatible)
     TRANSFERRED = "transferred"
     GRADUATED = "graduated"
     DROPPED = "dropped"
     REPEATING = "repeating"
 
     CHOICES = [
-        (ACTIVE, "Actif"),
+        (PENDING, "En attente"),
+        (ACTIVE, "Active"),
+        (COMPLETED, "Terminée"),
+        (CANCELLED, "Annulée"),
         (TRANSFERRED, "Transféré"),
         (GRADUATED, "Diplômé"),
         (DROPPED, "Abandonné"),
         (REPEATING, "Redoublant"),
     ]
+
+    # Statuts actifs : l'inscription compte comme "en cours"
+    ACTIVE_STATUSES = [PENDING, ACTIVE]
+
+    # Badge CSS par statut
+    BADGE_CLASSES = {
+        PENDING: "bg-warning-subtle text-warning",
+        ACTIVE: "bg-success-subtle text-success",
+        COMPLETED: "bg-secondary-subtle text-secondary",
+        CANCELLED: "bg-danger-subtle text-danger",
+        TRANSFERRED: "bg-info-subtle text-info",
+        GRADUATED: "bg-primary-subtle text-primary",
+        DROPPED: "bg-danger-subtle text-danger",
+        REPEATING: "bg-warning-subtle text-warning",
+    }
 
 
 # ---------------------------------------------------------------------------

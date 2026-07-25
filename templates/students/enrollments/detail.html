@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}Inscription — {{ enrollment.student.get_full_name }}{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:960px">
+
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <a href="{% url 'students:enrollment_list' %}" class="small text-decoration-none text-muted">
+        <i class="bi bi-arrow-left me-1"></i>Retour aux inscriptions
+      </a>
+      <h1 class="h4 fw-bold mt-2 mb-1">
+        Inscription — {{ enrollment.student.last_name }} {{ enrollment.student.first_name }}
+      </h1>
+      <code class="text-muted">{{ enrollment.student.matricule }}</code>
+    </div>
+    {% if user.is_school_admin %}
+    <div class="d-flex gap-2">
+      {% if enrollment.is_active_enrollment %}
+      <a href="{% url 'students:enrollment_change_class' enrollment.pk %}"
+         class="btn btn-outline-warning btn-sm">
+        <i class="bi bi-arrow-left-right me-1"></i>Changer de classe
+      </a>
+      {% endif %}
+      <a href="{% url 'students:enrollment_edit' enrollment.pk %}"
+         class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Modifier
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-3">
+
+    <!-- Détails de l'inscription -->
+    <div class="col-md-7">
+      <div class="card h-100">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small mb-3">
+            <i class="bi bi-journal-bookmark me-1"></i>Détails de l'inscription
+          </h6>
+          <dl class="row mb-0">
+            <dt class="col-5">Année scolaire</dt>
+            <dd class="col-7 fw-semibold">{{ enrollment.school_year.name }}</dd>
+
+            <dt class="col-5">Niveau</dt>
+            <dd class="col-7">{{ enrollment.classroom.option.level.name }}</dd>
+
+            <dt class="col-5">Option / Filière</dt>
+            <dd class="col-7">{{ enrollment.classroom.option.name }}</dd>
+
+            <dt class="col-5">Classe</dt>
+            <dd class="col-7">
+              <strong>{{ enrollment.classroom.name }}</strong>
+              &nbsp;
+              <a href="{% url 'students:classroom_enrollments' enrollment.classroom.pk %}"
+                 class="small text-muted">(voir la classe)</a>
+            </dd>
+
+            {% if enrollment.classroom.main_room %}
+            <dt class="col-5">Salle</dt>
+            <dd class="col-7">{{ enrollment.classroom.main_room.name }}</dd>
+            {% endif %}
+
+            <dt class="col-5">Capacité</dt>
+            <dd class="col-7">{{ enrollment.classroom.capacity }} élèves</dd>
+
+            <dt class="col-5">Date d'inscription</dt>
+            <dd class="col-7">{{ enrollment.enrollment_date|date:"d/m/Y" }}</dd>
+
+            <dt class="col-5">Inscrit par</dt>
+            <dd class="col-7">
+              {% if enrollment.enrolled_by %}
+                {{ enrollment.enrolled_by.get_full_name }}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </dd>
+
+            {% if enrollment.notes %}
+            <dt class="col-5">Notes</dt>
+            <dd class="col-7 text-muted small">{{ enrollment.notes }}</dd>
+            {% endif %}
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statut + actions -->
+    <div class="col-md-5">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small mb-3">
+            <i class="bi bi-circle-fill me-1"></i>Statut
+          </h6>
+          <div class="mb-3">
+            <span class="badge {{ enrollment.status_badge_class }} fs-6 px-3 py-2">
+              {{ enrollment.get_status_display }}
+            </span>
+          </div>
+          {% if user.is_school_admin %}
+          <form method="post" action="{% url 'students:enrollment_status' enrollment.pk %}">
+            {% csrf_token %}
+            <label class="form-label small">Changer le statut</label>
+            <div class="d-flex gap-1">
+              <select name="status" class="form-select form-select-sm">
+                {% for val, label in EnrollmentStatus.CHOICES %}
+                <option value="{{ val }}" {% if enrollment.status == val %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm text-nowrap">
+                Appliquer
+              </button>
+            </div>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Fiche élève -->
+      <div class="card">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small mb-3">
+            <i class="bi bi-person-badge me-1"></i>Élève
+          </h6>
+          <a href="{% url 'students:detail' enrollment.student.pk %}"
+             class="fw-semibold text-decoration-none d-block mb-1">
+            {{ enrollment.student.last_name }} {{ enrollment.student.first_name }}
+          </a>
+          <code class="text-muted small">{{ enrollment.student.matricule }}</code>
+          {% if enrollment.student.primary_parent %}
+          <div class="mt-2 text-muted small">
+            <i class="bi bi-person-hearts me-1"></i>
+            <a href="{% url 'students:parent_detail' enrollment.student.primary_parent.pk %}"
+               class="text-decoration-none">
+              {{ enrollment.student.primary_parent }}
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique de l'élève -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header py-2">
+          <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-clock-history me-1"></i>Parcours scolaire de l'élève
+          </h6>
+        </div>
+        {% if history %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 table-sm">
+            <thead class="table-light">
+              <tr>
+                <th>Année scolaire</th>
+                <th>Classe</th>
+                <th>Niveau</th>
+                <th>Option</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in history %}
+              <tr class="{% if e.pk == enrollment.pk %}table-primary{% endif %}">
+                <td class="fw-semibold">{{ e.school_year.name }}</td>
+                <td>{{ e.classroom.name }}</td>
+                <td class="text-muted small">{{ e.classroom.option.level.name }}</td>
+                <td class="text-muted small">{{ e.classroom.option.name }}</td>
+                <td class="text-muted small">{{ e.enrollment_date|date:"d/m/Y" }}</td>
+                <td>
+                  <span class="badge {{ e.status_badge_class }}">{{ e.get_status_display }}</span>
+                </td>
+                <td>
+                  {% if e.pk != enrollment.pk %}
+                  <a href="{% url 'students:enrollment_detail' e.pk %}"
+                     class="btn btn-outline-secondary btn-sm py-0">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  {% else %}
+                  <span class="badge bg-primary-subtle text-primary">En cours</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="card-body text-muted">Aucun historique.</div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

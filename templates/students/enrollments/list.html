@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Inscriptions{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:1200px">
+
+  <!-- En-tête -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-1"><i class="bi bi-journal-bookmark-fill me-2"></i>Inscriptions</h1>
+      <p class="text-muted small mb-0">Gestion des inscriptions et affectations aux classes</p>
+    </div>
+    {% if user.is_school_admin %}
+    <a href="{% url 'students:enrollment_create' %}" class="btn btn-success">
+      <i class="bi bi-plus-lg me-1"></i>Nouvelle inscription
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Filtres -->
+  <div class="card mb-4">
+    <div class="card-body py-2">
+      <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label small mb-1">Recherche (matricule, nom, prénom)</label>
+          <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+                 placeholder="Rechercher un élève…">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1">Année scolaire</label>
+          <select name="year" class="form-select form-select-sm">
+            <option value="">Toutes</option>
+            {% for y in school_years %}
+            <option value="{{ y.pk }}" {% if year_id == y.pk|stringformat:"i" %}selected{% endif %}>
+              {{ y.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1">Statut</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="">Tous</option>
+            {% for val, label in EnrollmentStatus.CHOICES %}
+            <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1">Classe</label>
+          <select name="classroom" class="form-select form-select-sm">
+            <option value="">Toutes</option>
+            {% for c in classrooms %}
+            <option value="{{ c.pk }}" {% if classroom_id == c.pk|stringformat:"i" %}selected{% endif %}>
+              {{ c.full_name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 d-flex gap-1">
+          <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+            <i class="bi bi-search me-1"></i>Filtrer
+          </button>
+          <a href="{% url 'students:enrollment_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Résultats -->
+  <div class="card">
+    {% if enrollments %}
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <span class="text-muted small">{{ enrollments|length }} inscription{{ enrollments|length|pluralize }}</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Matricule</th>
+            <th>Élève</th>
+            <th>Année scolaire</th>
+            <th>Niveau</th>
+            <th>Option</th>
+            <th>Classe</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in enrollments %}
+          <tr>
+            <td><code class="small">{{ e.student.matricule }}</code></td>
+            <td>
+              <a href="{% url 'students:detail' e.student.pk %}" class="text-decoration-none fw-semibold">
+                {{ e.student.last_name }} {{ e.student.first_name }}
+              </a>
+            </td>
+            <td>{{ e.school_year.name }}</td>
+            <td class="text-muted small">{{ e.classroom.option.level.name }}</td>
+            <td class="text-muted small">{{ e.classroom.option.name }}</td>
+            <td><span class="badge bg-light text-dark border">{{ e.classroom.name }}</span></td>
+            <td class="text-muted small">{{ e.enrollment_date|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge {{ e.status_badge_class }}">
+                {{ e.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'students:enrollment_detail' e.pk %}"
+                 class="btn btn-outline-secondary btn-sm py-0">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+      <i class="bi bi-inbox display-6 d-block mb-2"></i>
+      <p class="mb-0">Aucune inscription trouvée.</p>
+      {% if user.is_school_admin %}
+      <a href="{% url 'students:enrollment_create' %}" class="btn btn-success mt-3">
+        <i class="bi bi-plus-lg me-1"></i>Créer une inscription
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

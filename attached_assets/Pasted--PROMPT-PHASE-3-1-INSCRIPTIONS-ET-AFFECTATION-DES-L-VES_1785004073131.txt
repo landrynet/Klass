@@ -1,0 +1,966 @@
+# PROMPT — PHASE 3.1 : INSCRIPTIONS ET AFFECTATION DES ÉLÈVES AUX CLASSES
+
+## CONTEXTE
+
+Les phases suivantes ont été développées :
+
+* Phase 1 — Fondations du système ✅
+* Phase 2.0 — Années scolaires, niveaux et options/filières ✅
+* Phase 2.1 — Classes et salles ✅
+* Phase 3.0 — Élèves, parents et matricules ✅
+
+L'architecture actuelle est :
+
+```text
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Élève
+    ↓
+Parent / Tuteur principal
+```
+
+La Phase 3.1 doit maintenant gérer le parcours scolaire de l'élève :
+
+```text
+Élève
+    ↓
+Inscription
+    ↓
+Année scolaire
+    ↓
+Classe
+```
+
+IMPORTANT :
+
+L'élève ne doit pas être directement et définitivement lié à une classe.
+
+C'est l'inscription qui doit déterminer dans quelle classe l'élève se trouve pour une année scolaire donnée.
+
+---
+
+# PARTIE A — AUDIT COMPLET OBLIGATOIRE AVANT LE DÉVELOPPEMENT
+
+Avant de développer la Phase 3.1, effectuer un audit complet du projet.
+
+## 1. VÉRIFIER TOUS LES FICHIERS
+
+Analyser tous les fichiers du projet et vérifier :
+
+* fichiers incomplets ;
+* fichiers coupés ;
+* fonctions incomplètes ;
+* imports inutilisés ou cassés ;
+* erreurs de syntaxe ;
+* routes manquantes ;
+* templates incomplets ;
+* formulaires incomplets ;
+* modèles incomplets ;
+* services incomplets ;
+* migrations incorrectes ;
+* URLs qui ne fonctionnent pas ;
+* liens internes cassés ;
+* boutons qui ne fonctionnent pas ;
+* actions sans traitement backend ;
+* pages accessibles mais non fonctionnelles.
+
+Ne pas se limiter à vérifier que les fichiers existent.
+
+Vérifier que le code est réellement fonctionnel.
+
+---
+
+## 2. VÉRIFIER TOUTES LES URLS ET ROUTES
+
+Auditer toutes les URLs des fonctionnalités suivantes :
+
+### Phase 2.0
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+### Phase 2.1
+
+* classes ;
+* salles.
+
+### Phase 3.0
+
+* élèves ;
+* parents/tuteurs ;
+* configuration des matricules.
+
+Pour chaque URL, vérifier :
+
+* que la route existe ;
+* que le nom de route est correct ;
+* que la vue fonctionne ;
+* que le template existe ;
+* que les boutons et liens pointent vers la bonne URL ;
+* que les paramètres nécessaires sont corrects ;
+* que les permissions fonctionnent ;
+* que les accès directs sont sécurisés.
+
+Tester réellement chaque page.
+
+---
+
+# PARTIE B — AUDIT FONCTIONNEL DES PHASES PRÉCÉDENTES
+
+## PHASE 2.0 — ANNÉES SCOLAIRES
+
+Vérifier que toutes les fonctionnalités sont opérationnelles :
+
+* liste des années scolaires ;
+* création ;
+* modification ;
+* consultation ;
+* activation ;
+* changement de statut ;
+* archivage si prévu ;
+* recherche ;
+* filtres ;
+* règle d'une seule année active ;
+* isolation multi-tenant.
+
+Tester toutes les pages et toutes les actions.
+
+---
+
+## PHASE 2.0 — NIVEAUX
+
+Vérifier :
+
+* liste ;
+* création ;
+* modification ;
+* consultation ;
+* activation/désactivation ;
+* recherche ;
+* ordre d'affichage ;
+* isolation.
+
+---
+
+## PHASE 2.0 — OPTIONS / FILIÈRES
+
+Vérifier :
+
+* liste ;
+* création ;
+* modification ;
+* consultation ;
+* activation/désactivation ;
+* association aux niveaux ;
+* recherche ;
+* isolation.
+
+---
+
+## PHASE 2.1 — CLASSES
+
+Vérifier :
+
+* liste ;
+* création ;
+* modification ;
+* consultation ;
+* activation ;
+* désactivation ;
+* archivage ;
+* recherche ;
+* filtres ;
+* association à une année scolaire ;
+* association à un niveau ;
+* association à une option/filière ;
+* association à une salle ;
+* isolation multi-tenant.
+
+---
+
+## PHASE 2.1 — SALLES
+
+Vérifier :
+
+* liste ;
+* création ;
+* modification ;
+* consultation ;
+* capacité ;
+* type ;
+* statut ;
+* archivage ;
+* recherche ;
+* filtres ;
+* association avec une classe ;
+* isolation multi-tenant.
+
+---
+
+## PHASE 3.0 — ÉLÈVES
+
+Vérifier :
+
+* liste ;
+* création ;
+* consultation ;
+* modification ;
+* recherche par nom ;
+* recherche par prénom ;
+* recherche par matricule ;
+* filtres ;
+* statut ;
+* parent/tuteur principal ;
+* génération automatique du matricule ;
+* unicité du matricule.
+
+---
+
+## PHASE 3.0 — PARENTS
+
+Vérifier :
+
+* liste ;
+* création ;
+* consultation ;
+* modification ;
+* recherche ;
+* association avec un élève ;
+* association avec plusieurs élèves ;
+* affichage des élèves associés ;
+* détection des doublons potentiels.
+
+---
+
+## PHASE 3.0 — MATRICULES
+
+Vérifier :
+
+* configuration ;
+* préfixe ;
+* année ;
+* compteur ;
+* format ;
+* génération automatique ;
+* unicité ;
+* stabilité ;
+* changement de configuration ;
+* préservation des anciens matricules.
+
+---
+
+# PARTIE C — CORRECTION DES PROBLÈMES EXISTANTS
+
+Si un problème est découvert dans les Phases 2.0, 2.1 ou 3.0 :
+
+1. identifier précisément le problème ;
+2. comprendre sa cause ;
+3. corriger proprement ;
+4. ne pas contourner le problème ;
+5. ne pas désactiver une fonctionnalité ;
+6. ne pas casser les fonctionnalités existantes ;
+7. ajouter ou mettre à jour les tests ;
+8. mettre à jour la documentation si nécessaire.
+
+La Phase 3.1 ne doit pas être considérée comme terminée si les pages des phases précédentes sont cassées.
+
+---
+
+# PARTIE D — PHASE 3.1 : INSCRIPTIONS
+
+## 1. OBJECTIF
+
+Créer un système d'inscription permettant d'affecter un élève à une classe pour une année scolaire donnée.
+
+Structure :
+
+```text
+Élève
+    ↓
+Inscription
+    ↓
+Année scolaire
+    ↓
+Classe
+```
+
+Une inscription doit permettre de connaître :
+
+* quel élève ;
+* dans quelle école ;
+* pour quelle année scolaire ;
+* dans quelle classe ;
+* à quelle date ;
+* avec quel statut.
+
+---
+
+# 2. MODÈLE D'INSCRIPTION
+
+Créer une architecture cohérente avec les modèles existants.
+
+Une inscription doit être liée à :
+
+* l'élève ;
+* l'école ;
+* le tenant ;
+* l'année scolaire ;
+* la classe ;
+* éventuellement l'option/filière selon l'architecture existante ;
+* la date d'inscription ;
+* le statut.
+
+Les relations doivent être validées côté backend.
+
+---
+
+# 3. RÈGLES MÉTIER
+
+Un élève ne doit pas avoir plusieurs inscriptions actives pour la même année scolaire.
+
+Exemple interdit :
+
+```text
+Élève A
+    ├── 2026-2027 → Classe A
+    └── 2026-2027 → Classe B
+```
+
+Exemple autorisé :
+
+```text
+Élève A
+    ├── 2024-2025 → Classe A
+    ├── 2025-2026 → Classe B
+    └── 2026-2027 → Classe C
+```
+
+Un élève peut donc avoir un historique scolaire.
+
+---
+
+# 4. HISTORIQUE DES INSCRIPTIONS
+
+L'architecture doit permettre de conserver l'historique :
+
+```text
+Élève
+    ↓
+2024-2025 → Classe A
+2025-2026 → Classe B
+2026-2027 → Classe C
+```
+
+Ne pas supprimer l'historique d'une ancienne année scolaire simplement parce que l'élève change de classe.
+
+Les anciennes inscriptions doivent pouvoir être :
+
+* consultées ;
+* archivées ;
+* conservées pour l'historique.
+
+---
+
+# 5. STATUTS D'INSCRIPTION
+
+Prévoir des statuts cohérents.
+
+Par exemple :
+
+```text
+En attente
+Active
+Terminée
+Annulée
+```
+
+Les statuts doivent être adaptés à l'architecture et aux règles du projet.
+
+Une inscription annulée ne doit pas être considérée comme une inscription active.
+
+---
+
+# 6. CRÉATION D'UNE INSCRIPTION
+
+Prévoir un flux clair :
+
+```text
+Créer une inscription
+        ↓
+Sélectionner un élève
+        ↓
+Sélectionner une année scolaire
+        ↓
+Sélectionner une classe
+        ↓
+Vérifier les relations
+        ↓
+Valider
+        ↓
+Créer l'inscription
+```
+
+Lors de la sélection de la classe :
+
+* ne montrer que les classes de l'école courante ;
+* ne montrer que les classes compatibles avec l'année scolaire ;
+* vérifier les relations avec le niveau et l'option ;
+* empêcher les associations incohérentes.
+
+---
+
+# 7. RECHERCHE D'UN ÉLÈVE
+
+Lors de la création d'une inscription, permettre de rechercher l'élève par :
+
+* matricule ;
+* nom ;
+* prénom.
+
+La recherche doit être dynamique.
+
+Ne pas charger inutilement tous les élèves si la base devient importante.
+
+---
+
+# 8. SÉLECTION DE L'ANNÉE SCOLAIRE
+
+Afficher uniquement les années scolaires de l'école courante.
+
+Une année scolaire d'une autre école ne doit jamais pouvoir être utilisée.
+
+Si une année scolaire est inactive, terminée ou archivée, respecter les règles métier définies.
+
+Ne pas permettre une nouvelle inscription dans une année qui ne doit plus accepter d'inscriptions.
+
+---
+
+# 9. SÉLECTION DE LA CLASSE
+
+Afficher uniquement les classes compatibles avec :
+
+* l'école ;
+* le tenant ;
+* l'année scolaire sélectionnée.
+
+Si la classe est liée à un niveau ou une option, respecter ces relations.
+
+Ne jamais permettre :
+
+```text
+Élève de l'École A
+        ↓
+Classe de l'École B
+```
+
+---
+
+# 10. CHANGEMENT DE CLASSE
+
+Prévoir un mécanisme permettant de gérer un changement de classe lorsque cela est nécessaire.
+
+Le système doit conserver l'historique.
+
+Ne pas simplement modifier silencieusement l'ancienne inscription.
+
+Selon les règles métier retenues :
+
+```text
+Ancienne inscription
+        ↓
+Terminée / Historique
+        ↓
+Nouvelle inscription
+        ↓
+Nouvelle classe
+```
+
+La modification doit être traçable.
+
+---
+
+# 11. LISTE DES INSCRIPTIONS
+
+Créer une page complète avec :
+
+* matricule de l'élève ;
+* nom de l'élève ;
+* année scolaire ;
+* classe ;
+* niveau ;
+* option/filière si applicable ;
+* date ;
+* statut.
+
+Prévoir :
+
+* recherche ;
+* filtres ;
+* consultation ;
+* modification selon les règles ;
+* changement de statut.
+
+---
+
+# 12. FICHE DÉTAILLÉE DE L'ÉLÈVE
+
+La fiche de l'élève doit permettre de consulter :
+
+```text
+Informations personnelles
+        ↓
+Matricule
+        ↓
+Parent / Tuteur principal
+        ↓
+Historique des inscriptions
+        ↓
+Année actuelle
+        ↓
+Classe actuelle
+```
+
+Ne pas afficher de données provenant d'une autre école.
+
+---
+
+# 13. CAPACITÉ DES CLASSES
+
+Vérifier la capacité de la classe si le modèle existant le permet.
+
+Si une classe possède une capacité maximale :
+
+```text
+Capacité maximale : 50
+Élèves inscrits : 50
+```
+
+Le système doit appliquer la règle métier définie.
+
+Si la classe est pleine :
+
+* empêcher une nouvelle inscription ;
+* ou demander une confirmation/autorisation selon les règles de l'application.
+
+Ne pas contourner la capacité silencieusement.
+
+---
+
+# 14. PERMISSIONS
+
+Respecter les permissions existantes.
+
+Un utilisateur ne doit jamais pouvoir :
+
+* inscrire un élève d'une autre école ;
+* utiliser une classe d'une autre école ;
+* utiliser une année scolaire d'une autre école ;
+* consulter les inscriptions d'une autre école ;
+* modifier une inscription d'une autre école.
+
+Tester les accès directs aux URLs.
+
+Tester la modification manuelle des identifiants.
+
+---
+
+# 15. ISOLATION MULTI-TENANT
+
+Tester explicitement :
+
+```text
+École A ≠ École B
+```
+
+Vérifier :
+
+```text
+Élève A
+    ↓
+École A
+    ↓
+Année A
+    ↓
+Classe A
+```
+
+Ne doit jamais pouvoir être associé à :
+
+```text
+Année B
+Classe B
+École B
+```
+
+Toutes les validations doivent être faites côté backend.
+
+---
+
+# PARTIE E — DONNÉES DE TEST
+
+Mettre à jour le système de données de test existant.
+
+Ne pas créer un système concurrent.
+
+Ajouter des inscriptions de test :
+
+```text
+Élève 1
+    ↓
+2025-2026
+    ↓
+Classe A
+```
+
+```text
+Élève 1
+    ↓
+2026-2027
+    ↓
+Classe B
+```
+
+Créer également :
+
+* une inscription active ;
+* une inscription terminée ;
+* une inscription annulée si le statut est utilisé ;
+* un historique pour un élève.
+
+Le système doit être idempotent.
+
+Exécuter plusieurs fois le script et vérifier :
+
+* aucun doublon ;
+* aucune relation incohérente ;
+* aucune violation des règles métier.
+
+---
+
+# PARTIE F — AUDIT COMPLET DES PAGES
+
+Après le développement, parcourir réellement toutes les pages des modules suivants :
+
+## Phase 2.0
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+## Phase 2.1
+
+* classes ;
+* salles.
+
+## Phase 3.0
+
+* élèves ;
+* parents ;
+* configuration des matricules.
+
+## Phase 3.1
+
+* inscriptions ;
+* création ;
+* modification ;
+* détail ;
+* historique.
+
+Pour chaque page, vérifier :
+
+* affichage ;
+* navigation ;
+* boutons ;
+* formulaires ;
+* validation ;
+* messages de succès ;
+* messages d'erreur ;
+* recherche ;
+* filtres ;
+* permissions ;
+* responsive design.
+
+Aucune page ne doit être uniquement visuelle.
+
+Chaque bouton visible doit fonctionner correctement ou être supprimé.
+
+Chaque lien doit pointer vers une URL valide.
+
+---
+
+# PARTIE G — TESTS OBLIGATOIRES
+
+## Tests fonctionnels
+
+Tester :
+
+* création d'une inscription ;
+* consultation ;
+* modification ;
+* changement de classe ;
+* historique ;
+* changement de statut ;
+* recherche ;
+* filtres.
+
+## Tests métier
+
+Tester :
+
+* une seule inscription active par élève et par année ;
+* plusieurs années scolaires ;
+* changement de classe ;
+* capacité ;
+* relations cohérentes.
+
+## Tests sécurité
+
+Tester :
+
+* isolation ;
+* accès direct ;
+* modification d'identifiant ;
+* POST interdit ;
+* données d'une autre école.
+
+---
+
+# PARTIE H — TESTS DE RÉGRESSION COMPLETS
+
+Exécuter tous les tests des :
+
+* Phase 1 ;
+* Phase 2.0 ;
+* Phase 2.1 ;
+* Phase 3.0 ;
+* Phase 3.1.
+
+Vérifier que toutes les pages fonctionnent réellement.
+
+Le résultat attendu est :
+
+```text
+Phase 2.0
+    ↓
+Toutes les pages fonctionnelles
+    ↓
+Phase 2.1
+    ↓
+Toutes les pages fonctionnelles
+    ↓
+Phase 3.0
+    ↓
+Toutes les pages fonctionnelles
+    ↓
+Phase 3.1
+    ↓
+Toutes les pages fonctionnelles
+```
+
+---
+
+# PARTIE I — VÉRIFICATIONS TECHNIQUES
+
+Exécuter :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si le projet utilise pytest :
+
+```bash
+pytest
+```
+
+Vérifier également :
+
+* toutes les migrations ;
+* tous les imports ;
+* toutes les URLs ;
+* tous les templates ;
+* tous les formulaires ;
+* tous les services ;
+* toutes les permissions ;
+* toutes les relations ;
+* tous les tests.
+
+Corriger les erreurs réelles.
+
+Ne pas désactiver les tests.
+
+Ne pas masquer les erreurs.
+
+---
+
+# PARTIE J — DOCUMENTATION
+
+Créer ou mettre à jour :
+
+```text
+docs/modules/phase-3-1-inscriptions.md
+```
+
+Documenter :
+
+* objectif ;
+* modèle d'inscription ;
+* relations ;
+* règles métier ;
+* statuts ;
+* historique ;
+* changement de classe ;
+* capacité ;
+* permissions ;
+* sécurité ;
+* isolation ;
+* routes ;
+* interfaces ;
+* tests ;
+* données de test.
+
+Mettre également à jour la documentation des Phases 2.0, 2.1 et 3.0 si l'audit a entraîné des corrections.
+
+La documentation doit refléter le code réellement présent.
+
+---
+
+# PARTIE K — MISE À JOUR DU README.md
+
+Pendant le développement :
+
+```text
+Phase 3.1 — Inscriptions
+Statut : ⏳ EN COURS
+```
+
+Après validation complète :
+
+```text
+Phase 3.1 — Inscriptions
+Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Le README doit également refléter le statut réel :
+
+```text
+Phase 2.0 ✅
+Phase 2.1 ✅
+Phase 3.0 ✅
+Phase 3.1 ⏳ / ✅
+```
+
+Ne jamais déclarer une phase terminée si certaines pages ou URLs importantes sont cassées.
+
+---
+
+# PARTIE L — RAPPORT FINAL OBLIGATOIRE
+
+À la fin, fournir un rapport contenant :
+
+## 1. Audit des anciennes phases
+
+Indiquer :
+
+* fichiers vérifiés ;
+* URLs vérifiées ;
+* pages vérifiées ;
+* problèmes trouvés ;
+* corrections effectuées.
+
+## 2. Phase 3.1
+
+Indiquer :
+
+* fonctionnalités développées ;
+* modèles ;
+* relations ;
+* règles métier ;
+* historique ;
+* statuts.
+
+## 3. Tests
+
+Indiquer les résultats de :
+
+* Phase 2.0 ;
+* Phase 2.1 ;
+* Phase 3.0 ;
+* Phase 3.1.
+
+## 4. URLs
+
+Confirmer que toutes les URLs principales sont :
+
+* présentes ;
+* accessibles avec les bonnes permissions ;
+* fonctionnelles ;
+* correctement liées dans l'interface.
+
+## 5. Fichiers
+
+Confirmer qu'aucun fichier important n'est :
+
+* incomplet ;
+* coupé ;
+* inutilisé ;
+* cassé.
+
+## 6. Documentation
+
+Lister les fichiers de documentation créés ou mis à jour.
+
+---
+
+# STATUT FINAL
+
+Si tout fonctionne réellement :
+
+```text
+PHASE 3.1 — INSCRIPTIONS
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Si des problèmes restent :
+
+```text
+PHASE 3.1 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes.
+
+---
+
+# RÈGLE FINALE
+
+Ne pas considérer la Phase 3.1 comme terminée uniquement parce que le code a été écrit.
+
+La phase est terminée uniquement si :
+
+* les fonctionnalités sont développées ;
+* toutes les pages fonctionnent ;
+* toutes les URLs fonctionnent ;
+* les boutons fonctionnent ;
+* les formulaires fonctionnent ;
+* les permissions fonctionnent ;
+* l'isolation multi-tenant est validée ;
+* les Phases 2.0, 2.1 et 3.0 ont été auditées ;
+* les tests passent ;
+* les migrations sont valides ;
+* les données de test fonctionnent ;
+* la documentation est à jour ;
+* le README est à jour.
+
+L'objectif est d'avoir une base réellement fonctionnelle et non simplement une architecture contenant des pages incomplètes.
