@@ -4,135 +4,118 @@
 {% block title %}Configuration — Confirmation{% endblock %}
 
 {% block wizard_content %}
-<div class="py-5" style="min-height: calc(100vh - 60px);">
-  <div class="container" style="max-width: 680px;">
+<div class="container" style="max-width: 640px; padding: 0 1.25rem;">
 
-    <!-- Stepper -->
-    <div class="wizard-stepper mb-4">
-      <div class="wizard-step done">
-        <span class="wizard-step-num"><i class="bi bi-check"></i></span>
-        <span class="d-none d-sm-inline">Informations</span>
-      </div>
-      <div class="wizard-step-line done"></div>
-      <div class="wizard-step done">
-        <span class="wizard-step-num"><i class="bi bi-check"></i></span>
-        <span class="d-none d-sm-inline">Année scolaire</span>
-      </div>
-      <div class="wizard-step-line active"></div>
-      <div class="wizard-step active">
-        <span class="wizard-step-num">3</span>
-        <span class="d-none d-sm-inline">Confirmation</span>
-      </div>
+  <!-- Stepper -->
+  <div class="wz-stepper">
+    <div class="wz-step done">
+      <span class="wz-step-dot"><i class="bi bi-check"></i></span>
+      <span class="d-none d-sm-inline">Informations</span>
+    </div>
+    <div class="wz-step-line done"></div>
+    <div class="wz-step done">
+      <span class="wz-step-dot"><i class="bi bi-check"></i></span>
+      <span class="d-none d-sm-inline">Année scolaire</span>
+    </div>
+    <div class="wz-step-line active"></div>
+    <div class="wz-step active">
+      <span class="wz-step-dot">3</span>
+      <span class="d-none d-sm-inline">Confirmation</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="wz-progress-wrap">
+    <div class="wz-progress-meta">
+      <span class="wz-progress-label">Dernière étape — Tout est prêt !</span>
+      <span class="wz-progress-pct" style="color:var(--klass-green);">100%</span>
+    </div>
+    <div class="wz-progress-bar">
+      <div class="wz-progress-fill" style="width:100%;background:linear-gradient(90deg,var(--klass-green),#4ade80);"></div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="wz-card">
+    <div class="wz-card-header">
+      <div class="wz-card-icon green"><i class="bi bi-check-circle-fill"></i></div>
+      <p class="wz-card-title">Prêt à lancer votre école !</p>
+      <p class="wz-card-subtitle">Vérifiez les informations ci-dessous avant de confirmer</p>
     </div>
 
-    <!-- Barre de progression -->
-    <div class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-1">
-        <span class="small fw-semibold" style="color:var(--klass-text-primary);">Étape 3 sur 3 — Presque terminé !</span>
-        <span class="small" style="color:var(--klass-green);">100%</span>
-      </div>
-      <div class="progress" style="height:5px;border-radius:3px;background:var(--klass-border);">
-        <div class="progress-bar" role="progressbar" style="width:100%;background:var(--klass-green);border-radius:3px;"></div>
-      </div>
-    </div>
+    <div class="wz-card-body">
 
-    <!-- Carte confirmation -->
-    <div class="card border-0 rounded-4" style="box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-      <div class="card-body p-4 p-md-5">
-
-        <div class="text-center mb-4">
-          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-               style="width:64px;height:64px;background:rgba(34,197,94,0.12);">
-            <i class="bi bi-check-circle-fill fs-3" style="color:var(--klass-green);"></i>
-          </div>
-          <h2 class="h5 fw-bold mb-1">Prêt à lancer votre école !</h2>
-          <p class="text-muted small mb-0">Vérifiez les informations et confirmez pour activer votre espace.</p>
+      <!-- Récap école -->
+      <div class="wz-recap">
+        <div class="wz-recap-title">
+          <i class="bi bi-building"></i>Votre établissement
         </div>
+        <div class="wz-recap-row">
+          <span>Nom</span>
+          <span>{{ school.name }}</span>
+        </div>
+        {% if school.email %}
+        <div class="wz-recap-row">
+          <span>Email</span>
+          <span>{{ school.email }}</span>
+        </div>
+        {% endif %}
+        {% if school.city %}
+        <div class="wz-recap-row">
+          <span>Ville</span>
+          <span>{{ school.city }}{% if school.country %}, {{ school.country }}{% endif %}</span>
+        </div>
+        {% endif %}
+      </div>
 
-        <!-- Récap école -->
-        <div class="rounded-3 p-3 mb-3" style="border:1.5px solid var(--klass-border);background:#fafbfc;">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
-                 style="width:30px;height:30px;background:rgba(67,97,238,0.1);">
-              <i class="bi bi-building" style="color:var(--klass-primary);font-size:0.85rem;"></i>
-            </div>
-            <span class="fw-semibold small">Votre école</span>
-          </div>
-          <div class="row g-2 small">
-            <div class="col-sm-6">
-              <span class="text-muted">Nom :</span>
-              <span class="fw-semibold ms-1">{{ school.name }}</span>
-            </div>
-            <div class="col-sm-6">
-              <span class="text-muted">Email :</span>
-              <span class="fw-semibold ms-1">{{ school.email }}</span>
-            </div>
-            {% if school.city %}
-            <div class="col-sm-6">
-              <span class="text-muted">Ville :</span>
-              <span class="fw-semibold ms-1">{{ school.city }}, {{ school.country }}</span>
-            </div>
-            {% endif %}
+      <!-- Récap année scolaire -->
+      <div class="wz-recap">
+        <div class="wz-recap-title">
+          <i class="bi bi-calendar-event"></i>Année scolaire
+        </div>
+        {% if active_year %}
+        <div class="wz-recap-row">
+          <span>Nom</span>
+          <span>{{ active_year.name }}</span>
+        </div>
+        <div class="wz-recap-row">
+          <span>Début</span>
+          <span>{{ active_year.start_date|date:"d/m/Y" }}</span>
+        </div>
+        <div class="wz-recap-row">
+          <span>Fin</span>
+          <span>{{ active_year.end_date|date:"d/m/Y" }}</span>
+        </div>
+        {% else %}
+        <div class="wz-alert warning" style="margin-bottom:0;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>Aucune année scolaire.
+            <a href="{% url 'tenants:setup_school_year' %}" style="color:inherit;font-weight:700;">En créer une</a>
           </div>
         </div>
+        {% endif %}
+      </div>
 
-        <!-- Récap année scolaire -->
-        <div class="rounded-3 p-3 mb-4" style="border:1.5px solid var(--klass-border);background:#fafbfc;">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
-                 style="width:30px;height:30px;background:rgba(67,97,238,0.1);">
-              <i class="bi bi-calendar-event" style="color:var(--klass-primary);font-size:0.85rem;"></i>
-            </div>
-            <span class="fw-semibold small">Année scolaire</span>
-          </div>
+      <!-- Actions -->
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="d-flex gap-2 mt-2">
+          <a href="{% url 'tenants:setup_school_year' %}" class="wz-btn-outline" style="width:auto;flex-shrink:0;">
+            <i class="bi bi-arrow-left"></i>Retour
+          </a>
           {% if active_year %}
-          <div class="row g-2 small">
-            <div class="col-sm-4">
-              <span class="text-muted">Nom :</span>
-              <span class="fw-semibold ms-1">{{ active_year.name }}</span>
-            </div>
-            <div class="col-sm-4">
-              <span class="text-muted">Début :</span>
-              <span class="fw-semibold ms-1">{{ active_year.start_date|date:"d/m/Y" }}</span>
-            </div>
-            <div class="col-sm-4">
-              <span class="text-muted">Fin :</span>
-              <span class="fw-semibold ms-1">{{ active_year.end_date|date:"d/m/Y" }}</span>
-            </div>
-          </div>
+          <button type="submit" class="wz-btn-primary wz-btn-success">
+            <i class="bi bi-rocket-takeoff-fill"></i>Activer mon école
+          </button>
           {% else %}
-          <div class="alert alert-warning d-flex gap-2 align-items-center mb-0 py-2">
-            <i class="bi bi-exclamation-triangle flex-shrink-0"></i>
-            <div class="small">
-              Aucune année scolaire.
-              <a href="{% url 'tenants:setup_school_year' %}" class="alert-link">Créer une année scolaire</a>
-            </div>
-          </div>
+          <a href="{% url 'tenants:setup_school_year' %}" class="wz-btn-primary" style="background:#F59E0B;">
+            <i class="bi bi-calendar-plus"></i>Créer l'année scolaire d'abord
+          </a>
           {% endif %}
         </div>
-
-        <!-- Boutons -->
-        <form method="post" novalidate>
-          {% csrf_token %}
-          <div class="d-flex gap-2">
-            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-outline-secondary" style="border-radius:10px;">
-              <i class="bi bi-arrow-left me-1"></i>Retour
-            </a>
-            {% if active_year %}
-            <button type="submit" class="btn btn-success flex-grow-1 py-2 fw-semibold" style="border-radius:10px;">
-              <i class="bi bi-rocket-takeoff me-2"></i>Activer mon école !
-            </button>
-            {% else %}
-            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-warning flex-grow-1 py-2 fw-semibold" style="border-radius:10px;">
-              <i class="bi bi-calendar-plus me-2"></i>Créer l'année scolaire d'abord
-            </a>
-            {% endif %}
-          </div>
-        </form>
-
-      </div>
+      </form>
     </div>
-
   </div>
+
 </div>
 {% endblock %}

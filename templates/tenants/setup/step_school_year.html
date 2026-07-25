@@ -4,118 +4,103 @@
 {% block title %}Configuration — Année scolaire{% endblock %}
 
 {% block wizard_content %}
-<div class="py-5" style="min-height: calc(100vh - 60px);">
-  <div class="container" style="max-width: 680px;">
+<div class="container" style="max-width: 640px; padding: 0 1.25rem;">
 
-    <!-- Stepper -->
-    <div class="wizard-stepper mb-4">
-      <div class="wizard-step done">
-        <span class="wizard-step-num"><i class="bi bi-check"></i></span>
-        <span class="d-none d-sm-inline">Informations</span>
-      </div>
-      <div class="wizard-step-line done"></div>
-      <div class="wizard-step active">
-        <span class="wizard-step-num">2</span>
-        <span class="d-none d-sm-inline">Année scolaire</span>
-      </div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step">
-        <span class="wizard-step-num">3</span>
-        <span class="d-none d-sm-inline">Confirmation</span>
-      </div>
+  <!-- Stepper -->
+  <div class="wz-stepper">
+    <div class="wz-step done">
+      <span class="wz-step-dot"><i class="bi bi-check"></i></span>
+      <span class="d-none d-sm-inline">Informations</span>
+    </div>
+    <div class="wz-step-line done"></div>
+    <div class="wz-step active">
+      <span class="wz-step-dot">2</span>
+      <span class="d-none d-sm-inline">Année scolaire</span>
+    </div>
+    <div class="wz-step-line"></div>
+    <div class="wz-step">
+      <span class="wz-step-dot">3</span>
+      <span class="d-none d-sm-inline">Confirmation</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="wz-progress-wrap">
+    <div class="wz-progress-meta">
+      <span class="wz-progress-label">Étape 2 sur 3</span>
+      <span class="wz-progress-pct">66%</span>
+    </div>
+    <div class="wz-progress-bar"><div class="wz-progress-fill" style="width:66%;"></div></div>
+  </div>
+
+  <!-- Card -->
+  <div class="wz-card">
+    <div class="wz-card-header">
+      <div class="wz-card-icon blue"><i class="bi bi-calendar-event"></i></div>
+      <p class="wz-card-title">Année scolaire initiale</p>
+      <p class="wz-card-subtitle">Définissez la première année de référence — elle sera activée immédiatement</p>
     </div>
 
-    <!-- Barre de progression -->
-    <div class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-1">
-        <span class="small fw-semibold" style="color:var(--klass-text-primary);">Étape 2 sur 3</span>
-        <span class="small" style="color:var(--klass-text-muted);">66%</span>
-      </div>
-      <div class="progress" style="height:5px;border-radius:3px;background:var(--klass-border);">
-        <div class="progress-bar" role="progressbar" style="width:66%;background:var(--klass-primary);border-radius:3px;"></div>
-      </div>
-    </div>
+    <div class="wz-card-body">
 
-    <!-- Carte formulaire -->
-    <div class="card border-0 rounded-4" style="box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-      <div class="card-body p-4 p-md-5">
+      {% if existing_year %}
+      <div class="wz-alert info">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>Année active : <strong>{{ existing_year.name }}</strong>.
+          Vous pouvez en créer une nouvelle ou
+          <a href="{% url 'tenants:setup_confirm' %}" style="color:inherit;font-weight:700;">passer à la confirmation</a>.
+        </div>
+      </div>
+      {% endif %}
 
-        <div class="mb-4">
-          <div class="d-flex align-items-center gap-3 mb-2">
-            <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0"
-                 style="width:44px;height:44px;background:rgba(67,97,238,0.1);">
-              <i class="bi bi-calendar-event" style="color:var(--klass-primary);font-size:1.1rem;"></i>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="wz-field">
+          <label class="wz-label">{{ form.name.label }} <span class="req">*</span></label>
+          {{ form.name }}
+          <div class="wz-field-hint">{{ form.name.help_text }}</div>
+          {% if form.name.errors %}<div class="wz-field-error">{{ form.name.errors|join:", " }}</div>{% endif %}
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.start_date.label }} <span class="req">*</span></label>
+              {{ form.start_date }}
+              {% if form.start_date.errors %}<div class="wz-field-error">{{ form.start_date.errors|join:", " }}</div>{% endif %}
             </div>
-            <div>
-              <h2 class="h5 fw-bold mb-0">Année scolaire initiale</h2>
-              <p class="text-muted small mb-0">Définissez la première année de référence de votre école</p>
+          </div>
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.end_date.label }} <span class="req">*</span></label>
+              {{ form.end_date }}
+              {% if form.end_date.errors %}<div class="wz-field-error">{{ form.end_date.errors|join:", " }}</div>{% endif %}
             </div>
           </div>
         </div>
 
-        {% if existing_year %}
-        <div class="alert alert-info d-flex gap-2 align-items-center mb-4">
-          <i class="bi bi-info-circle-fill flex-shrink-0"></i>
-          <div class="small">
-            Année active existante : <strong>{{ existing_year.name }}</strong>.
-            Vous pouvez en créer une nouvelle ou
-            <a href="{% url 'tenants:setup_confirm' %}" class="alert-link">passer à la confirmation</a>.
-          </div>
+        {% if form.non_field_errors %}
+        <div class="wz-alert danger">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>{{ form.non_field_errors|join:"<br>" }}</div>
         </div>
         {% endif %}
 
-        <form method="post" novalidate>
-          {% csrf_token %}
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{{ form.name.label }} <span class="text-danger">*</span></label>
-            {{ form.name }}
-            <div class="form-text">{{ form.name.help_text }}</div>
-            {% if form.name.errors %}
-            <div class="text-danger small mt-1">{{ form.name.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.start_date.label }} <span class="text-danger">*</span></label>
-              {{ form.start_date }}
-              {% if form.start_date.errors %}
-              <div class="text-danger small mt-1">{{ form.start_date.errors|join:", " }}</div>
-              {% endif %}
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.end_date.label }} <span class="text-danger">*</span></label>
-              {{ form.end_date }}
-              {% if form.end_date.errors %}
-              <div class="text-danger small mt-1">{{ form.end_date.errors|join:", " }}</div>
-              {% endif %}
-            </div>
-          </div>
-
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger d-flex gap-2 align-items-start mb-4">
-            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
-            <div class="small">{{ form.non_field_errors|join:"<br>" }}</div>
-          </div>
-          {% endif %}
-
-          <div class="d-flex gap-2">
-            <a href="{% url 'tenants:setup_school_info' %}" class="btn btn-outline-secondary" style="border-radius:10px;">
-              <i class="bi bi-arrow-left me-1"></i>Retour
-            </a>
-            <button type="submit" class="btn btn-primary flex-grow-1 py-2 fw-semibold" style="border-radius:10px;">
-              <i class="bi bi-arrow-right me-2"></i>Continuer — Confirmation
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="d-flex gap-2 mt-4">
+          <a href="{% url 'tenants:setup_school_info' %}" class="wz-btn-outline" style="width:auto;flex-shrink:0;">
+            <i class="bi bi-arrow-left"></i>Retour
+          </a>
+          <button type="submit" class="wz-btn-primary">
+            <i class="bi bi-arrow-right-circle"></i>Continuer — Confirmation
+          </button>
+        </div>
+      </form>
     </div>
-
-    <p class="text-center text-muted small mt-3">
-      <i class="bi bi-shield me-1"></i>
-      Vous pourrez gérer les années scolaires ultérieurement depuis le module dédié.
-    </p>
   </div>
+
+  <p class="text-center mt-3" style="font-size:0.78rem;color:#94A3B8;">
+    <i class="bi bi-calendar-check me-1"></i>Vous pourrez gérer les années scolaires depuis le module dédié
+  </p>
 </div>
 {% endblock %}

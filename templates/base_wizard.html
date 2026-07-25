@@ -4,57 +4,116 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}KLASS{% endblock %} — KLASS</title>
-  <!-- Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <!-- KLASS Custom -->
   <link rel="stylesheet" href="/static/css/klass.css" />
   <style>
-    .wizard-topbar {
-      background: #fff;
-      border-bottom: 1px solid var(--klass-border);
-      height: 60px;
+    :root {
+      --klass-primary:      #4361EE;
+      --klass-primary-dark: #3451d1;
+      --klass-sidebar-bg:   #1E2140;
+      --klass-bg:           #F0F2F8;
+      --klass-border:       #E2E8F0;
+      --klass-text-primary: #1E2140;
+      --klass-text-secondary:#64748B;
+      --klass-text-muted:   #94A3B8;
+      --klass-green:        #22C55E;
+      --klass-yellow:       #F59E0B;
+      --klass-radius-sm:    8px;
+      --klass-radius:       14px;
+      --klass-radius-lg:    20px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100vh; margin: 0; }
+
+    body {
+      background: var(--klass-bg);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--klass-text-primary);
+    }
+
+    /* ---- Floating top nav (transparent, not a bar) ---- */
+    .wz-topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
       display: flex;
       align-items: center;
-      padding: 0 1.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      padding: 1.125rem 2rem;
+      /* no background — floats above the page */
     }
-    .wizard-brand {
+
+    .wz-brand {
       display: flex;
       align-items: center;
       gap: 0.6rem;
       text-decoration: none;
     }
-    .wizard-brand-icon {
-      width: 36px; height: 36px;
+    .wz-brand-icon {
+      width: 34px; height: 34px;
       background: var(--klass-primary);
-      border-radius: 10px;
+      border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1rem;
+      color: #fff; font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(67,97,238,0.35);
     }
-    .wizard-brand-name {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--klass-primary);
-      letter-spacing: -0.02em;
+    .wz-brand-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--klass-text-primary);
+      letter-spacing: -0.025em;
     }
-    .wizard-body {
-      min-height: calc(100vh - 60px);
-      background: var(--klass-bg);
-    }
-    /* Stepper pills */
-    .wizard-stepper {
+
+    .wz-user {
+      margin-left: auto;
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 0.875rem;
+    }
+    .wz-user-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--klass-text-secondary);
+    }
+    .wz-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--klass-text-secondary);
+      text-decoration: none;
+      padding: 0.375rem 0.875rem;
+      border: 1.5px solid var(--klass-border);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      transition: all 0.15s;
+    }
+    .wz-logout:hover {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: var(--klass-text-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* ---- Page body ---- */
+    .wz-page {
+      min-height: 100vh;
+      padding-top: 72px; /* space for floating topnav */
+      padding-bottom: 2.5rem;
+    }
+
+    /* ---- Stepper ---- */
+    .wz-stepper {
+      display: flex;
+      align-items: center;
       justify-content: center;
+      gap: 0;
       margin-bottom: 2rem;
     }
-    .wizard-step {
+    .wz-step {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -62,78 +121,312 @@
       font-weight: 600;
       color: var(--klass-text-muted);
     }
-    .wizard-step.active { color: var(--klass-primary); }
-    .wizard-step.done { color: var(--klass-green); }
-    .wizard-step-num {
-      width: 28px; height: 28px;
+    .wz-step.active  { color: var(--klass-primary); }
+    .wz-step.done    { color: var(--klass-green); }
+    .wz-step-dot {
+      width: 30px; height: 30px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.78rem; font-weight: 700;
-      border: 2px solid currentColor;
+      border: 2px solid #CBD5E1;
+      color: var(--klass-text-muted);
+      background: #fff;
       flex-shrink: 0;
+      transition: all 0.2s;
     }
-    .wizard-step.active .wizard-step-num {
+    .wz-step.active .wz-step-dot {
       background: var(--klass-primary);
       border-color: var(--klass-primary);
       color: #fff;
+      box-shadow: 0 4px 12px rgba(67,97,238,0.3);
     }
-    .wizard-step.done .wizard-step-num {
+    .wz-step.done .wz-step-dot {
       background: var(--klass-green);
       border-color: var(--klass-green);
       color: #fff;
     }
-    .wizard-step-line {
-      width: 48px; height: 2px;
-      background: var(--klass-border);
-      margin: 0 0.25rem;
+    .wz-step-line {
+      width: 64px; height: 2px;
+      background: #CBD5E1;
+      margin: 0 0.125rem;
+      flex-shrink: 0;
     }
-    .wizard-step-line.done { background: var(--klass-green); }
-    .wizard-step-line.active { background: var(--klass-primary); }
+    .wz-step-line.done   { background: var(--klass-green); }
+    .wz-step-line.active { background: var(--klass-primary); }
+
+    /* ---- Progress bar ---- */
+    .wz-progress-wrap {
+      margin-bottom: 1.75rem;
+    }
+    .wz-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.82rem;
+    }
+    .wz-progress-label { font-weight: 600; color: var(--klass-text-secondary); }
+    .wz-progress-pct   { font-weight: 700; color: var(--klass-primary); }
+    .wz-progress-bar {
+      height: 4px;
+      background: #E2E8F0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .wz-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--klass-primary), #7c8ef0);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    /* ---- Card ---- */
+    .wz-card {
+      background: #fff;
+      border: 1px solid var(--klass-border);
+      border-radius: var(--klass-radius-lg);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 30px -5px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+    .wz-card-header {
+      padding: 1.75rem 2rem 1.25rem;
+      border-bottom: 1px solid #F1F5F9;
+      background: linear-gradient(135deg, #FAFBFF 0%, #F8F9FF 100%);
+    }
+    .wz-card-icon {
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 0.875rem;
+    }
+    .wz-card-icon.blue   { background: rgba(67,97,238,0.1);  color: var(--klass-primary); }
+    .wz-card-icon.yellow { background: rgba(245,158,11,0.1); color: var(--klass-yellow); }
+    .wz-card-icon.green  { background: rgba(34,197,94,0.1);  color: var(--klass-green); }
+    .wz-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--klass-text-primary);
+      margin: 0 0 0.25rem;
+      letter-spacing: -0.015em;
+    }
+    .wz-card-subtitle {
+      font-size: 0.825rem;
+      color: var(--klass-text-secondary);
+      margin: 0;
+    }
+    .wz-card-body {
+      padding: 1.75rem 2rem;
+    }
+
+    /* ---- Form fields ---- */
+    .wz-field { margin-bottom: 1.125rem; }
+    .wz-label {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--klass-text-primary);
+      margin-bottom: 0.4rem;
+    }
+    .wz-label .req { color: #EF4444; margin-left: 2px; }
+    .wz-input {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.875rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      background: #FAFBFC;
+      color: var(--klass-text-primary);
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      outline: none;
+    }
+    .wz-input:focus {
+      border-color: var(--klass-primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+    }
+    .wz-field-error {
+      font-size: 0.76rem;
+      color: #EF4444;
+      margin-top: 0.3rem;
+    }
+    .wz-field-hint {
+      font-size: 0.76rem;
+      color: var(--klass-text-muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ---- Buttons ---- */
+    .wz-btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      background: var(--klass-primary);
+      color: #fff;
+      font-size: 0.875rem; font-weight: 700;
+      border: none; border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      width: 100%;
+    }
+    .wz-btn-primary:hover {
+      background: var(--klass-primary-dark);
+      box-shadow: 0 6px 20px rgba(67,97,238,0.35);
+      transform: translateY(-1px);
+      color: #fff;
+    }
+    .wz-btn-success {
+      background: var(--klass-green);
+    }
+    .wz-btn-success:hover {
+      background: #16a34a;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+    }
+    .wz-btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      background: #fff;
+      color: var(--klass-text-secondary);
+      font-size: 0.875rem; font-weight: 600;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .wz-btn-outline:hover {
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+      color: var(--klass-text-primary);
+    }
+
+    /* ---- Alerts ---- */
+    .wz-alert {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: 10px;
+      font-size: 0.825rem;
+      margin-bottom: 1.25rem;
+    }
+    .wz-alert i { flex-shrink: 0; margin-top: 1px; font-size: 0.95rem; }
+    .wz-alert.info    { background: #EFF6FF; color: #1d4ed8; border: 1px solid #BFDBFE; }
+    .wz-alert.warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+    .wz-alert.danger  { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+    .wz-alert.success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+
+    /* ---- Flash messages ---- */
+    .wz-messages {
+      position: fixed;
+      top: 80px; right: 1.5rem;
+      z-index: 200;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      max-width: 360px;
+    }
+    .wz-toast {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border-left: 4px solid;
+      font-size: 0.83rem;
+      font-weight: 500;
+      animation: toastIn 0.25s ease;
+    }
+    .wz-toast.success { border-color: var(--klass-green); }
+    .wz-toast.error, .wz-toast.danger { border-color: #EF4444; }
+    .wz-toast.info   { border-color: var(--klass-primary); }
+    .wz-toast.warning{ border-color: var(--klass-yellow); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ---- Recap boxes ---- */
+    .wz-recap {
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.125rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .wz-recap-title {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--klass-text-secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 0.875rem;
+    }
+    .wz-recap-title i {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background: rgba(67,97,238,0.1);
+      color: var(--klass-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+    }
+    .wz-recap-row {
+      display: flex; gap: 0.375rem;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+    .wz-recap-row span:first-child { color: var(--klass-text-muted); min-width: 60px; }
+    .wz-recap-row span:last-child  { font-weight: 600; color: var(--klass-text-primary); }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <!-- Top bar -->
-  <div class="wizard-topbar">
-    <a href="/" class="wizard-brand">
-      <span class="wizard-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-      <span class="wizard-brand-name">KLASS</span>
-    </a>
-    <div class="ms-auto d-flex align-items-center gap-3">
-      {% if user.is_authenticated %}
-      <span class="text-muted small d-none d-md-block">
-        <i class="bi bi-person-circle me-1"></i>{{ user.get_full_name }}
-      </span>
-      <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger">
-        <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
-      </a>
-      {% endif %}
-    </div>
-  </div>
 
-  <!-- Content -->
-  <div class="wizard-body">
-    <!-- Flash messages -->
-    {% if messages %}
-    <div class="container pt-3" style="max-width: 720px;">
-      {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center gap-2 mb-2" role="alert">
-        {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill flex-shrink-0"></i>
-        {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
-        {% else %}<i class="bi bi-info-circle-fill flex-shrink-0"></i>{% endif %}
-        {{ message }}
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-      </div>
-      {% endfor %}
+  <!-- Floating topnav -->
+  <div class="wz-topnav">
+    <a href="/" class="wz-brand">
+      <span class="wz-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+      <span class="wz-brand-name">KLASS</span>
+    </a>
+    {% if user.is_authenticated %}
+    <div class="wz-user">
+      <span class="wz-user-name d-none d-sm-inline">
+        <i class="bi bi-person-circle me-1" style="opacity:.6;"></i>{{ user.get_full_name }}
+      </span>
+      <a href="{% url 'accounts:logout' %}" class="wz-logout">
+        <i class="bi bi-box-arrow-right"></i>Déconnexion
+      </a>
     </div>
     {% endif %}
+  </div>
 
+  <!-- Toast messages -->
+  {% if messages %}
+  <div class="wz-messages" id="wz-messages">
+    {% for message in messages %}
+    <div class="wz-toast {{ message.tags|default:'info' }}">
+      {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill" style="color:var(--klass-green);"></i>
+      {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-triangle-fill" style="color:#EF4444;"></i>
+      {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-circle-fill" style="color:var(--klass-yellow);"></i>
+      {% else %}<i class="bi bi-info-circle-fill" style="color:var(--klass-primary);"></i>{% endif %}
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Page content -->
+  <div class="wz-page">
     {% block wizard_content %}{% endblock %}
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  <script>
+    // Auto-dismiss toasts after 4s
+    setTimeout(function() {
+      var msgs = document.getElementById('wz-messages');
+      if (msgs) msgs.style.transition = 'opacity 0.4s', msgs.style.opacity = '0';
+      setTimeout(function() { if (msgs) msgs.remove(); }, 400);
+    }, 4000);
+  </script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

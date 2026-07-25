@@ -4,138 +4,119 @@
 {% block title %}Configuration — Informations de l'école{% endblock %}
 
 {% block wizard_content %}
-<div class="py-5" style="min-height: calc(100vh - 60px);">
-  <div class="container" style="max-width: 680px;">
+<div class="container" style="max-width: 640px; padding: 0 1.25rem;">
 
-    <!-- Stepper -->
-    <div class="wizard-stepper mb-4">
-      <div class="wizard-step active">
-        <span class="wizard-step-num">1</span>
-        <span class="d-none d-sm-inline">Informations</span>
-      </div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step">
-        <span class="wizard-step-num">2</span>
-        <span class="d-none d-sm-inline">Année scolaire</span>
-      </div>
-      <div class="wizard-step-line"></div>
-      <div class="wizard-step">
-        <span class="wizard-step-num">3</span>
-        <span class="d-none d-sm-inline">Confirmation</span>
-      </div>
+  <!-- Stepper -->
+  <div class="wz-stepper">
+    <div class="wz-step active">
+      <span class="wz-step-dot">1</span>
+      <span class="d-none d-sm-inline">Informations</span>
+    </div>
+    <div class="wz-step-line"></div>
+    <div class="wz-step">
+      <span class="wz-step-dot">2</span>
+      <span class="d-none d-sm-inline">Année scolaire</span>
+    </div>
+    <div class="wz-step-line"></div>
+    <div class="wz-step">
+      <span class="wz-step-dot">3</span>
+      <span class="d-none d-sm-inline">Confirmation</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="wz-progress-wrap">
+    <div class="wz-progress-meta">
+      <span class="wz-progress-label">Étape 1 sur 3</span>
+      <span class="wz-progress-pct">33%</span>
+    </div>
+    <div class="wz-progress-bar"><div class="wz-progress-fill" style="width:33%;"></div></div>
+  </div>
+
+  <!-- Card -->
+  <div class="wz-card">
+    <!-- Header -->
+    <div class="wz-card-header">
+      <div class="wz-card-icon blue"><i class="bi bi-building"></i></div>
+      <p class="wz-card-title">Informations de votre école</p>
+      <p class="wz-card-subtitle">Ces données apparaîtront sur les documents générés</p>
     </div>
 
-    <!-- Barre de progression -->
-    <div class="mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-1">
-        <span class="small fw-semibold" style="color:var(--klass-text-primary);">Étape 1 sur 3</span>
-        <span class="small" style="color:var(--klass-text-muted);">33%</span>
-      </div>
-      <div class="progress" style="height:5px;border-radius:3px;background:var(--klass-border);">
-        <div class="progress-bar" role="progressbar" style="width:33%;background:var(--klass-primary);border-radius:3px;"></div>
-      </div>
-    </div>
+    <!-- Body -->
+    <div class="wz-card-body">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
 
-    <!-- Carte formulaire -->
-    <div class="card border-0 rounded-4" style="box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-      <div class="card-body p-4 p-md-5">
+        <div class="wz-field">
+          <label class="wz-label">{{ form.name.label }} <span class="req">*</span></label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="wz-field-error">{{ form.name.errors|join:", " }}</div>{% endif %}
+        </div>
 
-        <div class="mb-4">
-          <div class="d-flex align-items-center gap-3 mb-2">
-            <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0"
-                 style="width:44px;height:44px;background:rgba(67,97,238,0.1);">
-              <i class="bi bi-building" style="color:var(--klass-primary);font-size:1.1rem;"></i>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.email.label }}</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="wz-field-error">{{ form.email.errors|join:", " }}</div>{% endif %}
             </div>
-            <div>
-              <h2 class="h5 fw-bold mb-0">Informations de votre école</h2>
-              <p class="text-muted small mb-0">Ces données apparaîtront sur les documents générés</p>
+          </div>
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.phone.label }}</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}<div class="wz-field-error">{{ form.phone.errors|join:", " }}</div>{% endif %}
             </div>
           </div>
         </div>
 
-        <form method="post" enctype="multipart/form-data" novalidate>
-          {% csrf_token %}
+        <div class="wz-field">
+          <label class="wz-label">{{ form.address.label }}</label>
+          {{ form.address }}
+          {% if form.address.errors %}<div class="wz-field-error">{{ form.address.errors|join:", " }}</div>{% endif %}
+        </div>
 
-          <!-- Nom -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{{ form.name.label }} <span class="text-danger">*</span></label>
-            {{ form.name }}
-            {% if form.name.errors %}
-            <div class="text-danger small mt-1">{{ form.name.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <!-- Email + Téléphone -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.email.label }}</label>
-              {{ form.email }}
-              {% if form.email.errors %}
-              <div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>
-              {% endif %}
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.phone.label }}</label>
-              {{ form.phone }}
-              {% if form.phone.errors %}
-              <div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- Adresse -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">{{ form.address.label }}</label>
-            {{ form.address }}
-            {% if form.address.errors %}
-            <div class="text-danger small mt-1">{{ form.address.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <!-- Ville + Pays -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.city.label }}</label>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.city.label }}</label>
               {{ form.city }}
-              {% if form.city.errors %}
-              <div class="text-danger small mt-1">{{ form.city.errors|join:", " }}</div>
-              {% endif %}
+              {% if form.city.errors %}<div class="wz-field-error">{{ form.city.errors|join:", " }}</div>{% endif %}
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ form.country.label }}</label>
+          </div>
+          <div class="col-md-6">
+            <div class="wz-field">
+              <label class="wz-label">{{ form.country.label }}</label>
               {{ form.country }}
-              {% if form.country.errors %}
-              <div class="text-danger small mt-1">{{ form.country.errors|join:", " }}</div>
-              {% endif %}
+              {% if form.country.errors %}<div class="wz-field-error">{{ form.country.errors|join:", " }}</div>{% endif %}
             </div>
           </div>
+        </div>
 
-          <!-- Logo -->
-          <div class="mb-4">
-            <label class="form-label fw-semibold">{{ form.logo.label }}</label>
-            {% if school.logo %}
-            <div class="mb-2">
-              <img src="{{ school.logo.url }}" alt="Logo actuel" class="rounded border" style="height:56px;">
-              <span class="text-muted small ms-2">Logo actuel</span>
-            </div>
-            {% endif %}
-            {{ form.logo }}
-            <div class="form-text">Formats : JPG, PNG, SVG. Taille recommandée : 200×200 px.</div>
-            {% if form.logo.errors %}
-            <div class="text-danger small mt-1">{{ form.logo.errors|join:", " }}</div>
-            {% endif %}
+        <div class="wz-field">
+          <label class="wz-label">{{ form.logo.label }}</label>
+          {% if school.logo %}
+          <div class="mb-2">
+            <img src="{{ school.logo.url }}" alt="Logo actuel" class="rounded-2 border" style="height:50px;">
           </div>
+          {% endif %}
+          {{ form.logo }}
+          <div class="wz-field-hint">JPG, PNG ou SVG · Recommandé : 200×200 px</div>
+          {% if form.logo.errors %}<div class="wz-field-error">{{ form.logo.errors|join:", " }}</div>{% endif %}
+        </div>
 
-          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="border-radius:10px;">
-            <i class="bi bi-arrow-right me-2"></i>Continuer — Année scolaire
+        <div class="mt-4">
+          <button type="submit" class="wz-btn-primary">
+            <i class="bi bi-arrow-right-circle"></i>Continuer — Année scolaire
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
-
-    <p class="text-center text-muted small mt-3">
-      <i class="bi bi-lock me-1"></i>Ces informations restent dans votre espace isolé.
-    </p>
   </div>
+
+  <p class="text-center mt-3" style="font-size:0.78rem;color:#94A3B8;">
+    <i class="bi bi-shield-check me-1"></i>Données isolées dans votre espace sécurisé
+  </p>
+
 </div>
 {% endblock %}
