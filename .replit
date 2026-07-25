@@ -1,7 +1,50 @@
-modules = ["python-3.12", "bash", "web", "nodejs-20"]
+modules = ["python-3.12", "bash", "web", "nodejs-20", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["freetype", "glibcLocales", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib"]
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+ALLOWED_HOSTS = "*,localhost,127.0.0.1,.localhost,.replit.dev,.repl.co"
+CELERY_TASK_ALWAYS_EAGER = "True"
+DEBUG = "True"
+DEFAULT_FROM_EMAIL = "noreply@klass.app"
+DJANGO_SETTINGS_MODULE = "config.settings.development"
+ENVIRONMENT = "development"
+KLASS_DOMAIN = "localhost"
+SERVER_EMAIL = "server@klass.app"
+USE_EXTERNAL_STORAGE = "False"
+SECRET_KEY = "klass-dev-secret-key-replace-in-production-xK9mP2nQ8vR4sT7w"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "DJANGO_SETTINGS_MODULE=config.settings.development python manage.py runserver 0.0.0.0:5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Configuration — Confirmation{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block auth_content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+  <div class="w-100" style="max-width: 680px; padding: 0 1rem;">
+
+    <!-- Logo KLASS -->
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-3 mb-2">
+        <i class="bi bi-mortarboard-fill text-white fs-3"></i>
+      </div>
+      <h1 class="h5 fw-bold mb-0">KLASS</h1>
+      <p class="text-muted small">Assistant de configuration initiale</p>
+    </div>
+
+    <!-- Progression -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body px-4 pt-4 pb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-semibold small">Étape {{ step }} sur {{ total_steps }}</span>
+          <span class="text-muted small">{{ step }}/{{ total_steps }}</span>
+        </div>
+        <div class="progress" style="height: 6px; border-radius: 3px;">
+          <div class="progress-bar bg-success" role="progressbar"
+            style="width: 100%"
+            aria-valuenow="{{ step }}" aria-valuemin="0" aria-valuemax="{{ total_steps }}"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <span class="small text-muted">① Informations</span>
+          <span class="small text-muted">② Année scolaire</span>
+          <span class="small fw-semibold text-success">③ Confirmation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Récapitulatif -->
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4 p-md-5">
+
+        <div class="text-center mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle p-3 mb-3">
+            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+          </div>
+          <h2 class="h5 fw-bold mb-1">Prêt à lancer votre école !</h2>
+          <p class="text-muted small">Vérifiez les informations et confirmez pour activer votre espace.</p>
+        </div>
+
+        {% include "components/messages.html" %}
+
+        <!-- Récap école -->
+        <div class="border rounded-3 p-3 mb-3">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-building text-primary"></i>
+            <span class="fw-semibold small">Votre école</span>
+          </div>
+          <div class="row g-2 small">
+            <div class="col-sm-6">
+              <span class="text-muted">Nom :</span>
+              <span class="fw-semibold ms-1">{{ school.name }}</span>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted">Email :</span>
+              <span class="fw-semibold ms-1">{{ school.email }}</span>
+            </div>
+            {% if school.city %}
+            <div class="col-sm-6">
+              <span class="text-muted">Ville :</span>
+              <span class="fw-semibold ms-1">{{ school.city }}, {{ school.country }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Récap année scolaire -->
+        <div class="border rounded-3 p-3 mb-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-calendar-event text-primary"></i>
+            <span class="fw-semibold small">Année scolaire</span>
+          </div>
+          {% if active_year %}
+          <div class="row g-2 small">
+            <div class="col-sm-4">
+              <span class="text-muted">Nom :</span>
+              <span class="fw-semibold ms-1">{{ active_year.name }}</span>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted">Début :</span>
+              <span class="fw-semibold ms-1">{{ active_year.start_date|date:"d/m/Y" }}</span>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted">Fin :</span>
+              <span class="fw-semibold ms-1">{{ active_year.end_date|date:"d/m/Y" }}</span>
+            </div>
+          </div>
+          {% else %}
+          <div class="alert alert-warning d-flex gap-2 align-items-center mb-0 py-2">
+            <i class="bi bi-exclamation-triangle flex-shrink-0"></i>
+            <div class="small">
+              Aucune année scolaire n'a été créée.
+              <a href="{% url 'tenants:setup_school_year' %}" class="alert-link">Créer une année scolaire</a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Boutons -->
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+            {% if active_year %}
+            <button type="submit" class="btn btn-success flex-grow-1 py-2 fw-semibold">
+              <i class="bi bi-rocket-takeoff me-2"></i>Activer mon école !
+            </button>
+            {% else %}
+            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-warning flex-grow-1 py-2 fw-semibold">
+              <i class="bi bi-calendar-plus me-2"></i>Créer l'année scolaire d'abord
+            </a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

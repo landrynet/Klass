@@ -71,6 +71,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name="Dernière IP de connexion"
     )
 
+    # École associée (null pour super_admin)
+    school = models.ForeignKey(
+        "tenants.School",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="staff",
+        verbose_name="École",
+        help_text="L'école à laquelle appartient cet utilisateur (null pour le Super Admin)."
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = "email"

@@ -59,7 +59,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "apps.core.middleware.TenantContextMiddleware",  # Middleware custom KLASS
+    "apps.core.middleware.TenantContextMiddleware",    # Contexte école courant
+    "apps.core.middleware.MustChangePasswordMiddleware",  # Changement mot de passe obligatoire
+    "apps.core.middleware.SetupRequiredMiddleware",    # Configuration initiale obligatoire
 ]
 
 ROOT_URLCONF = "config.urls"

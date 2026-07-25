@@ -1,22 +1,53 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Tableau de bord{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-  <div class="d-flex align-items-center mb-4">
-    <i class="bi bi-house-door-fill text-primary fs-4 me-2"></i>
-    <h1 class="h4 fw-bold mb-0">Tableau de bord</h1>
+
+  <!-- En-tête -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center gap-3">
+      {% if school and school.logo %}
+      <img src="{{ school.logo.url }}" alt="Logo" class="rounded-3 border" style="width:44px;height:44px;object-fit:cover;">
+      {% else %}
+      <div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
+        <i class="bi bi-building text-primary fs-5"></i>
+      </div>
+      {% endif %}
+      <div>
+        <h1 class="h4 fw-bold mb-0">{{ school.name|default:"Tableau de bord" }}</h1>
+        {% if active_year %}
+        <span class="badge bg-success-subtle text-success">
+          <i class="bi bi-calendar-check me-1"></i>{{ active_year.name }}
+        </span>
+        {% else %}
+        <span class="badge bg-secondary-subtle text-secondary">
+          <i class="bi bi-calendar-x me-1"></i>Aucune année active
+        </span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small d-none d-md-inline">{{ user.get_full_name }}</span>
+      <span class="badge bg-primary-subtle text-primary">{{ user.get_role_display }}</span>
+    </div>
   </div>
 
-  <div class="alert alert-info d-flex align-items-center gap-2">
-    <i class="bi bi-info-circle-fill"></i>
-    Bienvenue dans KLASS, {{ user.get_full_name }} !
-    Le tableau de bord avec les statistiques sera développé en Phase 1.
+  <!-- Bannière setup en cours (si applicable) -->
+  {% if school and not school.setup_completed %}
+  <div class="alert alert-warning d-flex gap-2 align-items-center mb-4">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+    <div>
+      La configuration initiale de votre école n'est pas encore terminée.
+      <a href="{% url 'tenants:setup_school_info' %}" class="alert-link fw-semibold">Compléter la configuration</a>
+    </div>
   </div>
+  {% endif %}
 
   <!-- Raccourcis rapides -->
-  <div class="row g-3 mt-2">
+  <div class="row g-3">
     {% if is_school_admin or user.is_secretary %}
     <div class="col-6 col-md-3">
       <a href="{% url 'students:list' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
@@ -46,8 +77,6 @@
         </div>
       </a>
     </div>
-    {% endif %}
-    {% if is_school_admin or user.is_teacher %}
     <div class="col-6 col-md-3">
       <a href="{% url 'resources:list' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
         <div class="card-body text-center py-4">
@@ -57,6 +86,32 @@
       </a>
     </div>
     {% endif %}
+    {% if is_school_admin %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'academics:classrooms' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-diagram-3 fs-1 text-secondary d-block mb-2"></i>
+          <span class="fw-semibold">Structure</span>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{% url 'school_years:list' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-calendar-event fs-1 text-purple d-block mb-2" style="color:#8b5cf6;"></i>
+          <span class="fw-semibold">Années scolaires</span>
+        </div>
+      </a>
+    </div>
+    {% endif %}
   </div>
+
+  {% if not is_school_admin and not user.is_secretary and not user.is_accountant and not user.is_teacher %}
+  <div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle me-2"></i>
+    Bienvenue dans KLASS, {{ user.get_full_name }} !
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}

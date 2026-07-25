@@ -14,19 +14,26 @@ def home_view(request):
     """
     Vue racine intelligente :
     - Utilisateur non connecté → page de connexion
-    - super_admin → page d'accueil super-admin (dashboard personnalisé à venir)
-    - Autres rôles → dashboard académique
+    - super_admin → dashboard super-admin personnalisé
+    - school_admin non configuré → assistant de configuration
+    - Autres rôles → dashboard académique ou portail
     """
     if not request.user.is_authenticated:
         return redirect("accounts:login")
 
     from apps.core.constants import Roles
+
     if request.user.role == Roles.SUPER_ADMIN:
-        # Placeholder jusqu'à la création du dashboard super_admin personnalisé
-        return render(request, "accounts/super_admin_home.html")
+        return redirect("tenants:super_admin_dashboard")
 
     if request.user.role in Roles.PORTAL_ROLES:
         return redirect("portal:dashboard")
+
+    # School admin ou personnel scolaire
+    if request.user.role == Roles.SCHOOL_ADMIN:
+        school = getattr(request.user, "school", None)
+        if school and not school.setup_completed:
+            return redirect("tenants:setup_school_info")
 
     return redirect("academics:dashboard")
 
@@ -52,7 +59,7 @@ class LoginView(View):
             login(request, user)
             messages.success(request, f"Bienvenue, {user.get_full_name()} !")
 
-            # Vérifier si changement de mot de passe obligatoire
+            # Vérifier si changement de mot de passe obligatoire (première connexion)
             if user.must_change_password:
                 return redirect("accounts:change_password_required")
 
@@ -60,20 +67,13 @@ class LoginView(View):
         return render(request, self.template_name, {"form": form})
 
     def _get_redirect_url(self, user):
-        """Détermine l'URL de redirection selon le rôle.
-
-        Note : Django Admin est désactivé. Le super_admin est redirigé vers
-        le tableau de bord super-admin personnalisé. En attendant qu'il soit
-        créé, il atterrit sur la racine ("/").
-        """
         from apps.core.constants import Roles
         if user.role == Roles.SUPER_ADMIN:
-            # TODO: remplacer par reverse("super_admin:dashboard") quand le module sera créé
-            return "/"
+            return "/"  # home_view gère la redirection vers le dashboard super-admin
         elif user.role in Roles.PORTAL_ROLES:
             return "portal:dashboard"
         else:
-            return "academics:dashboard"
+            return "/"
 
 
 @login_required
@@ -103,5 +103,17 @@ class ChangePasswordRequiredView(View):
             user.save(update_fields=["must_change_password"])
             update_session_auth_hash(request, user)
             messages.success(request, "Mot de passe mis à jour avec succès.")
+
+            # Si school_admin avec école non configurée → assistant de configuration
+            from apps.core.constants import Roles
+            if user.role == Roles.SCHOOL_ADMIN:
+                school = getattr(user, "school", None)
+                if school and not school.setup_completed:
+                    messages.info(
+                        request,
+                        "Bienvenue ! Veuillez compléter la configuration de votre école."
+                    )
+                    return redirect("tenants:setup_school_info")
+
             return redirect("home")
         return render(request, self.template_name, {"form": form})

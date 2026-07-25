@@ -17,8 +17,11 @@ SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
 # ---------------------------------------------------------------------------
 # Base de données locale
 # ---------------------------------------------------------------------------
-# Utilise DATABASE_URL depuis .env ou valeur par défaut
-DATABASES["default"]["HOST"] = env("POSTGRES_HOST", default="localhost")
+# Ne surcharger HOST que si POSTGRES_HOST est explicitement défini.
+# Si DATABASE_URL est utilisé (cas Replit), le HOST vient déjà du URL.
+import os as _os
+if _postgres_host := _os.environ.get("POSTGRES_HOST"):
+    DATABASES["default"]["HOST"] = _postgres_host
 
 # ---------------------------------------------------------------------------
 # Email — console en développement

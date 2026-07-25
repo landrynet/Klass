@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Configuration — Année scolaire{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block auth_content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+  <div class="w-100" style="max-width: 680px; padding: 0 1rem;">
+
+    <!-- Logo KLASS -->
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-3 mb-2">
+        <i class="bi bi-mortarboard-fill text-white fs-3"></i>
+      </div>
+      <h1 class="h5 fw-bold mb-0">KLASS</h1>
+      <p class="text-muted small">Assistant de configuration initiale</p>
+    </div>
+
+    <!-- Progression -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body px-4 pt-4 pb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-semibold small">Étape {{ step }} sur {{ total_steps }}</span>
+          <span class="text-muted small">{{ step }}/{{ total_steps }}</span>
+        </div>
+        <div class="progress" style="height: 6px; border-radius: 3px;">
+          <div class="progress-bar bg-primary" role="progressbar"
+            style="width: {% widthratio step total_steps 100 %}%"
+            aria-valuenow="{{ step }}" aria-valuemin="0" aria-valuemax="{{ total_steps }}"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <span class="small text-muted">① Informations</span>
+          <span class="small fw-semibold text-primary">② Année scolaire</span>
+          <span class="small text-muted">③ Confirmation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4 p-md-5">
+
+        <div class="mb-4">
+          <h2 class="h5 fw-bold mb-1">
+            <i class="bi bi-calendar-event me-2 text-primary"></i>Année scolaire initiale
+          </h2>
+          <p class="text-muted small mb-0">
+            Définissez la première année scolaire de votre établissement.
+            Elle sera activée immédiatement et servira de référence pour tous les autres modules.
+          </p>
+        </div>
+
+        {% include "components/messages.html" %}
+
+        {% if existing_year %}
+        <div class="alert alert-info d-flex gap-2 align-items-center mb-4">
+          <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+          <div>
+            Une année scolaire active existe déjà : <strong>{{ existing_year.name }}</strong>.
+            Vous pouvez en créer une nouvelle pour la remplacer, ou
+            <a href="{% url 'tenants:setup_confirm' %}" class="alert-link">passer à la confirmation</a>.
+          </div>
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ form.name.label }} <span class="text-danger">*</span></label>
+            {{ form.name }}
+            <div class="form-text">{{ form.name.help_text }}</div>
+            {% if form.name.errors %}
+            <div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">{{ form.start_date.label }} <span class="text-danger">*</span></label>
+              {{ form.start_date }}
+              {% if form.start_date.errors %}
+              <div class="invalid-feedback d-block">{{ form.start_date.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">{{ form.end_date.label }} <span class="text-danger">*</span></label>
+              {{ form.end_date }}
+              {% if form.end_date.errors %}
+              <div class="invalid-feedback d-block">{{ form.end_date.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger d-flex gap-2 align-items-start mb-4">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+            <div>{{ form.non_field_errors|join:"<br>" }}</div>
+          </div>
+          {% endif %}
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'tenants:setup_school_info' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+            <button type="submit" class="btn btn-primary flex-grow-1 py-2 fw-semibold">
+              <i class="bi bi-arrow-right me-2"></i>Continuer — Confirmation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <p class="text-center text-muted small mt-3">
+      <i class="bi bi-shield me-1"></i>
+      Vous pourrez gérer les années scolaires ultérieurement depuis le module dédié.
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -14,6 +14,13 @@ urlpatterns = [
     # Authentification
     path("auth/", include("apps.accounts.urls", namespace="accounts")),
 
+    # Super Admin — gestion des écoles (accès réservé au super_admin)
+    path("super-admin/", include("apps.tenants.urls", namespace="tenants")),
+
+    # Assistant de configuration initiale (Admin École — premier accès)
+    # Inclus dans tenants.urls sous le préfixe /super-admin/
+    # Les routes /setup/ sont mappées dans tenants.urls
+
     # Modules métier
     path("academics/", include("apps.academics.urls", namespace="academics")),
     path("school-years/", include("apps.school_years.urls", namespace="school_years")),

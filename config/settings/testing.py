@@ -1,6 +1,6 @@
 """
 Settings pour les tests de KLASS.
-Base de données de test en mémoire, Celery synchrone, emails dans la console.
+Base de données de test séparée, Celery synchrone, Debug Toolbar désactivé.
 """
 from .base import *  # noqa
 
@@ -9,7 +9,11 @@ from .base import *  # noqa
 # ---------------------------------------------------------------------------
 DEBUG = False
 
-# Utilise une base de données de test séparée
+# Désactiver Debug Toolbar (incompatible avec les tests)
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != "debug_toolbar"]  # noqa
+MIDDLEWARE = [m for m in MIDDLEWARE if "debug_toolbar" not in m.lower()]  # noqa
+
+# Base de données de test séparée
 DATABASES["default"]["TEST"] = {  # noqa
     "NAME": "klass_test",
 }
@@ -34,7 +38,7 @@ USE_EXTERNAL_STORAGE = False
 # ---------------------------------------------------------------------------
 # Sécurité allégée pour les tests
 # ---------------------------------------------------------------------------
-SECRET_KEY = "test-insecure-key-not-for-production"
+SECRET_KEY = "test-insecure-key-not-for-production-klass-phase1"
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",  # Rapide pour les tests
 ]

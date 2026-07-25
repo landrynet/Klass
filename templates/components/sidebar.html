@@ -6,10 +6,21 @@
     <!-- Super Admin Navigation — dashboards personnalisés (Django Admin désactivé) -->
     <p class="text-muted text-uppercase small fw-semibold px-2 mb-1">Administration</p>
     <ul class="nav flex-column">
-      {# TODO: remplacer par les URLs du dashboard super_admin une fois créé #}
-      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-grid me-2"></i>Dashboard (à venir)</a></li>
-      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-building me-2"></i>Écoles (à venir)</a></li>
-      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-people me-2"></i>Utilisateurs (à venir)</a></li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'tenants:super_admin_dashboard' %}">
+          <i class="bi bi-grid me-2"></i>Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'tenants:super_admin_dashboard' %}">
+          <i class="bi bi-building me-2"></i>Écoles
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'tenants:school_create' %}">
+          <i class="bi bi-plus-circle me-2"></i>Créer une école
+        </a>
+      </li>
     </ul>
 
     {% else %}
@@ -87,6 +98,6 @@
 
   <!-- Version en bas -->
   <div class="mt-auto p-3 border-top">
-    <small class="text-muted">KLASS v1.0 — Socle</small>
+    <small class="text-muted">KLASS v1.0 — Phase 1</small>
   </div>
 </nav>

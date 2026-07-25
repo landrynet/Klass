@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Créer une école{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- En-tête -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+    <div>
+      <h1 class="h4 fw-bold mb-0">Créer une nouvelle école</h1>
+      <p class="text-muted small mb-0">Création du tenant, du schéma PostgreSQL et de l'Admin École</p>
+    </div>
+  </div>
+
+  {% include "components/messages.html" %}
+
+  <div class="row g-4">
+    <!-- Formulaire -->
+    <div class="col-lg-8">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Section : Informations de l'établissement -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
+            <h2 class="h6 fw-semibold mb-0">
+              <i class="bi bi-building me-2 text-primary"></i>Informations de l'établissement
+            </h2>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">{{ form.name.label }} <span class="text-danger">*</span></label>
+              {{ form.name }}
+              {% if form.name.errors %}
+              <div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text">Le slug et le sous-domaine seront générés automatiquement depuis ce nom.</div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.email.label }} <span class="text-danger">*</span></label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <div class="invalid-feedback d-block">{{ form.phone.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+              <label class="form-label fw-semibold">{{ form.address.label }}</label>
+              {{ form.address }}
+              {% if form.address.errors %}
+              <div class="invalid-feedback d-block">{{ form.address.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.city.label }}</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                <div class="invalid-feedback d-block">{{ form.city.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.country.label }}</label>
+                {{ form.country }}
+                {% if form.country.errors %}
+                <div class="invalid-feedback d-block">{{ form.country.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section : Admin École -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
+            <h2 class="h6 fw-semibold mb-0">
+              <i class="bi bi-person-badge me-2 text-primary"></i>Compte Admin École
+            </h2>
+            <p class="text-muted small mb-0 mt-1">
+              Un compte Admin École sera créé automatiquement avec un mot de passe temporaire.
+            </p>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.admin_first_name.label }} <span class="text-danger">*</span></label>
+                {{ form.admin_first_name }}
+                {% if form.admin_first_name.errors %}
+                <div class="invalid-feedback d-block">{{ form.admin_first_name.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">{{ form.admin_last_name.label }} <span class="text-danger">*</span></label>
+                {{ form.admin_last_name }}
+                {% if form.admin_last_name.errors %}
+                <div class="invalid-feedback d-block">{{ form.admin_last_name.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mt-3">
+              <label class="form-label fw-semibold">{{ form.admin_email.label }} <span class="text-danger">*</span></label>
+              {{ form.admin_email }}
+              {% if form.admin_email.errors %}
+              <div class="invalid-feedback d-block">{{ form.admin_email.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text">{{ form.admin_email.help_text }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger d-flex gap-2 align-items-start">
+          <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+          <div>{{ form.non_field_errors|join:"<br>" }}</div>
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary px-4 fw-semibold">
+            <i class="bi bi-building-check me-2"></i>Créer l'école
+          </button>
+          <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-outline-secondary">
+            Annuler
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Aide contextuelle -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-5 border-primary border-opacity-10">
+        <div class="card-body p-4">
+          <h3 class="h6 fw-semibold mb-3">
+            <i class="bi bi-info-circle me-2 text-primary"></i>Ce qui sera créé
+          </h3>
+          <ul class="list-unstyled text-muted small mb-0">
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>tenant PostgreSQL</strong> isolé pour l'école</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>schéma PostgreSQL</strong> dédié</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>domaine</strong> (<em>slug</em>.klass.app)</li>
+            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>compte Admin École</strong> avec mot de passe temporaire</li>
+            <li><i class="bi bi-check2 text-success me-2"></i>Un <strong>accès immédiat</strong> pour l'Admin à configurer son établissement</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm rounded-4 mt-3">
+        <div class="card-body p-4">
+          <h3 class="h6 fw-semibold mb-2">
+            <i class="bi bi-shield-lock me-2 text-warning"></i>Identifiants temporaires
+          </h3>
+          <p class="text-muted small mb-0">
+            Le mot de passe temporaire de l'Admin École sera affiché <strong>une seule fois</strong> après la création.
+            Notez-le et transmettez-le de manière sécurisée.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
