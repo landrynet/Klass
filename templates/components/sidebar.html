@@ -1,6 +1,21 @@
 {% load static %}
 <nav id="klass-sidebar" class="d-none d-lg-flex flex-column flex-shrink-0">
 
+  <!-- Brand / École -->
+  <div class="sidebar-brand">
+    <div class="d-flex align-items-center gap-2">
+      <div class="sidebar-brand-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </div>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-name">{{ school_name|default:'KLASS' }}</span>
+        <span class="sidebar-brand-sub">
+          {% if is_super_admin %}Super Admin{% else %}Espace école{% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
   <!-- Navigation -->
   <div class="flex-grow-1 overflow-auto py-2">
 
@@ -115,9 +130,20 @@
     {% endif %}
   </div>
 
-  <!-- Footer -->
-  <div class="sidebar-footer">
-    <small>KLASS v1.0 — Phase 1</small>
+  <!-- User card + Footer -->
+  <div class="sidebar-user-card">
+    <div class="d-flex align-items-center gap-2">
+      <div class="sidebar-user-avatar">
+        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+      </div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">{{ user.get_full_name }}</div>
+        <div class="sidebar-user-role">{{ user.get_role_display }}</div>
+      </div>
+    </div>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-logout-btn" title="Déconnexion">
+      <i class="bi bi-box-arrow-right"></i>
+    </a>
   </div>
 
 </nav>

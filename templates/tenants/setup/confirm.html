@@ -1,60 +1,61 @@
-{% extends "base.html" %}
+{% extends "base_wizard.html" %}
 {% load static %}
 
 {% block title %}Configuration — Confirmation{% endblock %}
-{% block body_class %}bg-light{% endblock %}
 
-{% block auth_content %}
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
-  <div class="w-100" style="max-width: 680px; padding: 0 1rem;">
+{% block wizard_content %}
+<div class="py-5" style="min-height: calc(100vh - 60px);">
+  <div class="container" style="max-width: 680px;">
 
-    <!-- Logo KLASS -->
-    <div class="text-center mb-4">
-      <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-3 mb-2">
-        <i class="bi bi-mortarboard-fill text-white fs-3"></i>
+    <!-- Stepper -->
+    <div class="wizard-stepper mb-4">
+      <div class="wizard-step done">
+        <span class="wizard-step-num"><i class="bi bi-check"></i></span>
+        <span class="d-none d-sm-inline">Informations</span>
       </div>
-      <h1 class="h5 fw-bold mb-0">KLASS</h1>
-      <p class="text-muted small">Assistant de configuration initiale</p>
-    </div>
-
-    <!-- Progression -->
-    <div class="card border-0 shadow-sm rounded-4 mb-3">
-      <div class="card-body px-4 pt-4 pb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-semibold small">Étape {{ step }} sur {{ total_steps }}</span>
-          <span class="text-muted small">{{ step }}/{{ total_steps }}</span>
-        </div>
-        <div class="progress" style="height: 6px; border-radius: 3px;">
-          <div class="progress-bar bg-success" role="progressbar"
-            style="width: 100%"
-            aria-valuenow="{{ step }}" aria-valuemin="0" aria-valuemax="{{ total_steps }}"></div>
-        </div>
-        <div class="d-flex justify-content-between mt-2">
-          <span class="small text-muted">① Informations</span>
-          <span class="small text-muted">② Année scolaire</span>
-          <span class="small fw-semibold text-success">③ Confirmation</span>
-        </div>
+      <div class="wizard-step-line done"></div>
+      <div class="wizard-step done">
+        <span class="wizard-step-num"><i class="bi bi-check"></i></span>
+        <span class="d-none d-sm-inline">Année scolaire</span>
+      </div>
+      <div class="wizard-step-line active"></div>
+      <div class="wizard-step active">
+        <span class="wizard-step-num">3</span>
+        <span class="d-none d-sm-inline">Confirmation</span>
       </div>
     </div>
 
-    <!-- Récapitulatif -->
-    <div class="card border-0 shadow-sm rounded-4">
+    <!-- Barre de progression -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <span class="small fw-semibold" style="color:var(--klass-text-primary);">Étape 3 sur 3 — Presque terminé !</span>
+        <span class="small" style="color:var(--klass-green);">100%</span>
+      </div>
+      <div class="progress" style="height:5px;border-radius:3px;background:var(--klass-border);">
+        <div class="progress-bar" role="progressbar" style="width:100%;background:var(--klass-green);border-radius:3px;"></div>
+      </div>
+    </div>
+
+    <!-- Carte confirmation -->
+    <div class="card border-0 rounded-4" style="box-shadow:0 4px 24px rgba(0,0,0,0.08);">
       <div class="card-body p-4 p-md-5">
 
         <div class="text-center mb-4">
-          <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle p-3 mb-3">
-            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+               style="width:64px;height:64px;background:rgba(34,197,94,0.12);">
+            <i class="bi bi-check-circle-fill fs-3" style="color:var(--klass-green);"></i>
           </div>
           <h2 class="h5 fw-bold mb-1">Prêt à lancer votre école !</h2>
-          <p class="text-muted small">Vérifiez les informations et confirmez pour activer votre espace.</p>
+          <p class="text-muted small mb-0">Vérifiez les informations et confirmez pour activer votre espace.</p>
         </div>
 
-        {% include "components/messages.html" %}
-
         <!-- Récap école -->
-        <div class="border rounded-3 p-3 mb-3">
+        <div class="rounded-3 p-3 mb-3" style="border:1.5px solid var(--klass-border);background:#fafbfc;">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <i class="bi bi-building text-primary"></i>
+            <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                 style="width:30px;height:30px;background:rgba(67,97,238,0.1);">
+              <i class="bi bi-building" style="color:var(--klass-primary);font-size:0.85rem;"></i>
+            </div>
             <span class="fw-semibold small">Votre école</span>
           </div>
           <div class="row g-2 small">
@@ -76,9 +77,12 @@
         </div>
 
         <!-- Récap année scolaire -->
-        <div class="border rounded-3 p-3 mb-4">
+        <div class="rounded-3 p-3 mb-4" style="border:1.5px solid var(--klass-border);background:#fafbfc;">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <i class="bi bi-calendar-event text-primary"></i>
+            <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                 style="width:30px;height:30px;background:rgba(67,97,238,0.1);">
+              <i class="bi bi-calendar-event" style="color:var(--klass-primary);font-size:0.85rem;"></i>
+            </div>
             <span class="fw-semibold small">Année scolaire</span>
           </div>
           {% if active_year %}
@@ -100,7 +104,7 @@
           <div class="alert alert-warning d-flex gap-2 align-items-center mb-0 py-2">
             <i class="bi bi-exclamation-triangle flex-shrink-0"></i>
             <div class="small">
-              Aucune année scolaire n'a été créée.
+              Aucune année scolaire.
               <a href="{% url 'tenants:setup_school_year' %}" class="alert-link">Créer une année scolaire</a>
             </div>
           </div>
@@ -111,20 +115,21 @@
         <form method="post" novalidate>
           {% csrf_token %}
           <div class="d-flex gap-2">
-            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-outline-secondary" style="border-radius:10px;">
               <i class="bi bi-arrow-left me-1"></i>Retour
             </a>
             {% if active_year %}
-            <button type="submit" class="btn btn-success flex-grow-1 py-2 fw-semibold">
+            <button type="submit" class="btn btn-success flex-grow-1 py-2 fw-semibold" style="border-radius:10px;">
               <i class="bi bi-rocket-takeoff me-2"></i>Activer mon école !
             </button>
             {% else %}
-            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-warning flex-grow-1 py-2 fw-semibold">
+            <a href="{% url 'tenants:setup_school_year' %}" class="btn btn-warning flex-grow-1 py-2 fw-semibold" style="border-radius:10px;">
               <i class="bi bi-calendar-plus me-2"></i>Créer l'année scolaire d'abord
             </a>
             {% endif %}
           </div>
         </form>
+
       </div>
     </div>
 

@@ -132,7 +132,7 @@ body {
 }
 
 /* ============================================================
-   SIDEBAR (dark — comme Figma)
+   SIDEBAR (dark — redesigned)
    ============================================================ */
 #klass-sidebar {
   background: var(--klass-sidebar-bg) !important;
@@ -140,30 +140,59 @@ body {
   max-width: var(--klass-sidebar-width);
   min-height: calc(100vh - var(--klass-navbar-height));
   border-right: none !important;
-  box-shadow: none !important;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.15) !important;
 }
 
+/* Brand section */
 #klass-sidebar .sidebar-brand {
-  padding: 1.25rem 1rem 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 0.5rem;
+  padding: 1rem 1rem 0.875rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 0.375rem;
+}
+#klass-sidebar .sidebar-brand-icon {
+  width: 36px; height: 36px;
+  background: var(--klass-primary);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(67,97,238,0.4);
+}
+#klass-sidebar .sidebar-brand-text {
+  display: flex; flex-direction: column; gap: 1px;
+}
+#klass-sidebar .sidebar-brand-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+#klass-sidebar .sidebar-brand-sub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.38);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
+/* Section titles */
 #klass-sidebar .sidebar-section-title {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: 600;
-  color: rgba(255,255,255,0.35);
-  padding: 1rem 1rem 0.25rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.28);
+  padding: 0.875rem 1rem 0.2rem;
   margin: 0;
 }
 
+/* Nav links */
 #klass-sidebar .nav-link {
-  color: rgba(255,255,255,0.65) !important;
+  color: rgba(255,255,255,0.6) !important;
   border-radius: var(--klass-radius-sm);
-  padding: 0.55rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.855rem;
   font-weight: 500;
   margin: 1px 0.5rem;
   display: flex;
@@ -172,31 +201,73 @@ body {
   transition: background 0.15s, color 0.15s;
   text-decoration: none;
 }
-
 #klass-sidebar .nav-link i {
-  font-size: 1rem;
+  font-size: 0.95rem;
   width: 18px;
   text-align: center;
   flex-shrink: 0;
+  opacity: 0.8;
 }
-
 #klass-sidebar .nav-link:hover {
-  background: rgba(255,255,255,0.08) !important;
-  color: #fff !important;
+  background: rgba(255,255,255,0.07) !important;
+  color: rgba(255,255,255,0.9) !important;
 }
-
+#klass-sidebar .nav-link:hover i { opacity: 1; }
 #klass-sidebar .nav-link.active,
 #klass-sidebar .nav-link[aria-current="page"] {
   background: var(--klass-primary) !important;
   color: #fff !important;
-  box-shadow: 0 4px 12px rgba(67,97,238,0.35);
+  box-shadow: 0 3px 10px rgba(67,97,238,0.4);
 }
+#klass-sidebar .nav-link.active i { opacity: 1; }
 
-#klass-sidebar .sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.3);
+/* User card at bottom */
+#klass-sidebar .sidebar-user-card {
+  padding: 0.875rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+#klass-sidebar .sidebar-user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--klass-primary), var(--klass-purple));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 0.75rem;
+  flex-shrink: 0;
+}
+#klass-sidebar .sidebar-user-info {
+  flex: 1; min-width: 0;
+}
+#klass-sidebar .sidebar-user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#klass-sidebar .sidebar-user-role {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#klass-sidebar .sidebar-logout-btn {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+#klass-sidebar .sidebar-logout-btn:hover {
+  background: rgba(239,68,68,0.15);
+  border-color: rgba(239,68,68,0.3);
+  color: #fca5a5;
 }
 
 /* ============================================================

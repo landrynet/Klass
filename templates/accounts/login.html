@@ -2,68 +2,443 @@
 {% load static %}
 
 {% block title %}Connexion{% endblock %}
-{% block body_class %}bg-light{% endblock %}
 
 {% block auth_content %}
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
-  <div class="card shadow-lg border-0 rounded-4" style="width: 100%; max-width: 420px;">
-    <div class="card-body p-4 p-md-5">
+<div class="login-page">
 
-      <!-- Logo + Titre -->
-      <div class="text-center mb-4">
-        <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-3 mb-3">
-          <i class="bi bi-mortarboard-fill text-white fs-2"></i>
-        </div>
-        <h1 class="h4 fw-bold mb-0">{{ school_name|default:'KLASS' }}</h1>
-        <p class="text-muted small mt-1">Plateforme de gestion scolaire</p>
+  <!-- ===== Panneau gauche — branding ===== -->
+  <div class="login-left d-none d-lg-flex">
+    <!-- Shapes décoratifs -->
+    <div class="login-shape login-shape-1"></div>
+    <div class="login-shape login-shape-2"></div>
+    <div class="login-shape login-shape-3"></div>
+
+    <div class="login-left-inner">
+      <!-- Logo -->
+      <div class="login-logo">
+        <span class="login-logo-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        <span class="login-logo-name">KLASS</span>
       </div>
 
-      <!-- Messages d'erreur -->
-      {% include "components/messages.html" %}
+      <!-- Tagline -->
+      <div class="login-tagline">
+        <h2>La gestion scolaire,<br>réinventée.</h2>
+        <p>Plateforme multi-établissements pour piloter votre école de façon simple, rapide et sécurisée.</p>
+      </div>
 
-      <!-- Formulaire de connexion -->
+      <!-- Features -->
+      <div class="login-features">
+        <div class="login-feature">
+          <div class="login-feature-icon"><i class="bi bi-shield-lock-fill"></i></div>
+          <div>
+            <div class="login-feature-title">Données isolées par école</div>
+            <div class="login-feature-desc">Chaque établissement dispose de son propre espace sécurisé</div>
+          </div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <div class="login-feature-title">Gestion complète des rôles</div>
+            <div class="login-feature-desc">Directeurs, secrétaires, enseignants, parents et élèves</div>
+          </div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <div>
+            <div class="login-feature-title">Suivi en temps réel</div>
+            <div class="login-feature-desc">Inscriptions, paiements, emplois du temps centralisés</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer branding -->
+      <div class="login-left-footer">
+        Université Don Bosco de Lubumbashi · UDBL
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Panneau droit — formulaire ===== -->
+  <div class="login-right">
+    <!-- Logo mobile uniquement -->
+    <div class="login-mobile-logo d-flex d-lg-none">
+      <span class="login-logo-icon sm"><i class="bi bi-mortarboard-fill"></i></span>
+      <span class="login-logo-name sm">KLASS</span>
+    </div>
+
+    <div class="login-form-box">
+      <!-- En-tête -->
+      <div class="login-form-header">
+        <h1>Connexion</h1>
+        <p>Entrez vos identifiants pour accéder à votre espace</p>
+      </div>
+
+      <!-- Messages d'erreur globaux -->
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+        <div>{{ form.non_field_errors|join:", " }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Messages Django -->
+      {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+        <div>{{ message }}</div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <!-- Formulaire -->
       <form method="post" novalidate>
         {% csrf_token %}
 
-        <div class="mb-3">
-          <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
-            <i class="bi bi-envelope me-1"></i>Adresse email
+        <!-- Email -->
+        <div class="login-field">
+          <label for="{{ form.username.id_for_label }}" class="login-label">
+            Adresse email
           </label>
-          {{ form.username }}
+          <div class="login-input-wrapper">
+            <i class="bi bi-envelope login-input-icon"></i>
+            {{ form.username }}
+          </div>
           {% if form.username.errors %}
-          <div class="invalid-feedback d-block">{{ form.username.errors|join:", " }}</div>
+          <div class="login-field-error">{{ form.username.errors|join:", " }}</div>
           {% endif %}
         </div>
 
-        <div class="mb-4">
-          <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">
-            <i class="bi bi-lock me-1"></i>Mot de passe
+        <!-- Mot de passe -->
+        <div class="login-field">
+          <label for="{{ form.password.id_for_label }}" class="login-label">
+            Mot de passe
           </label>
-          {{ form.password }}
+          <div class="login-input-wrapper" x-data="{ show: false }">
+            <i class="bi bi-lock login-input-icon"></i>
+            {{ form.password }}
+            <button type="button" class="login-eye-btn" @click="show = !show"
+                    @click.prevent="document.getElementById('{{ form.password.id_for_label }}').type = show ? 'password' : 'text'">
+              <i class="bi" :class="show ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
           {% if form.password.errors %}
-          <div class="invalid-feedback d-block">{{ form.password.errors|join:", " }}</div>
+          <div class="login-field-error">{{ form.password.errors|join:", " }}</div>
           {% endif %}
         </div>
 
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger d-flex align-items-center gap-2 mb-3">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          {{ form.non_field_errors|join:", " }}
-        </div>
-        {% endif %}
-
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+        <!-- Submit -->
+        <button type="submit" class="login-btn-submit">
           <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
         </button>
       </form>
 
-      <hr class="my-4" />
-
-      <p class="text-center text-muted small mb-0">
+      <!-- Footer -->
+      <div class="login-form-footer">
+        <i class="bi bi-question-circle me-1"></i>
         Identifiants oubliés ? Contactez l'administrateur de votre école.
-      </p>
-
+      </div>
     </div>
+
+    <!-- Version -->
+    <div class="login-version">KLASS v1.0 &nbsp;·&nbsp; Tous droits réservés</div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ============================================================
+   LOGIN PAGE — Design professionnel split-screen
+   ============================================================ */
+html, body { height: 100%; }
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Panneau gauche ---------- */
+.login-left {
+  flex: 0 0 42%;
+  background: linear-gradient(145deg, #0f1128 0%, #1E2140 35%, #2a3270 70%, #1a1d3a 100%);
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  padding: 2.5rem;
+}
+
+/* Shapes décoratives */
+.login-shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.login-shape-1 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(67,97,238,0.3) 0%, transparent 70%);
+  top: -120px; right: -120px;
+}
+.login-shape-2 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+  bottom: 40px; left: -80px;
+}
+.login-shape-3 {
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+  bottom: 200px; right: 60px;
+}
+
+.login-left-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Logo */
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+.login-logo-icon {
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  backdrop-filter: blur(8px);
+}
+.login-logo-icon.sm {
+  width: 36px; height: 36px;
+  background: var(--klass-primary);
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+.login-logo-name {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+.login-logo-name.sm {
+  color: var(--klass-primary);
+  font-size: 1.2rem;
+}
+
+/* Tagline */
+.login-tagline {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.login-tagline h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.login-tagline p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  max-width: 340px;
+  margin-bottom: 2.5rem;
+}
+
+/* Features */
+.login-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+.login-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.login-feature-icon {
+  width: 36px; height: 36px;
+  background: rgba(67,97,238,0.25);
+  border: 1px solid rgba(67,97,238,0.4);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #a5b4fc;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.login-feature-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 2px;
+}
+.login-feature-desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.4;
+}
+
+.login-left-footer {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.25);
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ---------- Panneau droit ---------- */
+.login-right {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+
+.login-mobile-logo {
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.login-form-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form-header {
+  margin-bottom: 2rem;
+}
+.login-form-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--klass-text-primary);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.375rem;
+}
+.login-form-header p {
+  font-size: 0.875rem;
+  color: var(--klass-text-secondary);
+  margin: 0;
+}
+
+/* Champs */
+.login-field {
+  margin-bottom: 1.25rem;
+}
+.login-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--klass-text-primary);
+  margin-bottom: 0.5rem;
+}
+.login-input-wrapper {
+  position: relative;
+}
+.login-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--klass-text-muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 1;
+}
+.login-input-wrapper input {
+  width: 100%;
+  padding: 0.7rem 0.875rem 0.7rem 2.5rem;
+  font-size: 0.9rem;
+  border: 1.5px solid var(--klass-border);
+  border-radius: 10px;
+  background: #fafbfc;
+  color: var(--klass-text-primary);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  outline: none;
+  -webkit-appearance: none;
+}
+.login-input-wrapper input:focus {
+  border-color: var(--klass-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+}
+.login-eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--klass-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.login-eye-btn:hover { color: var(--klass-text-primary); }
+.login-field-error {
+  font-size: 0.78rem;
+  color: var(--klass-red);
+  margin-top: 0.375rem;
+}
+
+/* Bouton submit */
+.login-btn-submit {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: var(--klass-primary);
+  color: #fff;
+  font-size: 0.925rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+}
+.login-btn-submit:hover {
+  background: var(--klass-primary-dark);
+  box-shadow: 0 6px 20px rgba(67,97,238,0.35);
+  transform: translateY(-1px);
+}
+.login-btn-submit:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Footer */
+.login-form-footer {
+  margin-top: 1.75rem;
+  font-size: 0.8rem;
+  color: var(--klass-text-muted);
+  text-align: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--klass-border);
+}
+
+.login-version {
+  position: absolute;
+  bottom: 1.25rem;
+  font-size: 0.72rem;
+  color: var(--klass-text-muted);
+}
+</style>
 {% endblock %}

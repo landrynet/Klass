@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}KLASS{% endblock %} — KLASS</title>
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- KLASS Custom -->
+  <link rel="stylesheet" href="/static/css/klass.css" />
+  <style>
+    .wizard-topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--klass-border);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .wizard-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+    .wizard-brand-icon {
+      width: 36px; height: 36px;
+      background: var(--klass-primary);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1rem;
+    }
+    .wizard-brand-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--klass-primary);
+      letter-spacing: -0.02em;
+    }
+    .wizard-body {
+      min-height: calc(100vh - 60px);
+      background: var(--klass-bg);
+    }
+    /* Stepper pills */
+    .wizard-stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .wizard-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--klass-text-muted);
+    }
+    .wizard-step.active { color: var(--klass-primary); }
+    .wizard-step.done { color: var(--klass-green); }
+    .wizard-step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      border: 2px solid currentColor;
+      flex-shrink: 0;
+    }
+    .wizard-step.active .wizard-step-num {
+      background: var(--klass-primary);
+      border-color: var(--klass-primary);
+      color: #fff;
+    }
+    .wizard-step.done .wizard-step-num {
+      background: var(--klass-green);
+      border-color: var(--klass-green);
+      color: #fff;
+    }
+    .wizard-step-line {
+      width: 48px; height: 2px;
+      background: var(--klass-border);
+      margin: 0 0.25rem;
+    }
+    .wizard-step-line.done { background: var(--klass-green); }
+    .wizard-step-line.active { background: var(--klass-primary); }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="wizard-topbar">
+    <a href="/" class="wizard-brand">
+      <span class="wizard-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+      <span class="wizard-brand-name">KLASS</span>
+    </a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      {% if user.is_authenticated %}
+      <span class="text-muted small d-none d-md-block">
+        <i class="bi bi-person-circle me-1"></i>{{ user.get_full_name }}
+      </span>
+      <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger">
+        <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="wizard-body">
+    <!-- Flash messages -->
+    {% if messages %}
+    <div class="container pt-3" style="max-width: 720px;">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center gap-2 mb-2" role="alert">
+        {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill flex-shrink-0"></i>
+        {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+        {% else %}<i class="bi bi-info-circle-fill flex-shrink-0"></i>{% endif %}
+        {{ message }}
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block wizard_content %}{% endblock %}
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
