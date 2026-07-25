@@ -1,0 +1,925 @@
+# PROMPT — PHASE 3.5 : REFONTE COMPLÈTE DU DESIGN, STABILISATION ET RÉINITIALISATION DES DONNÉES
+
+## CONTEXTE
+
+Les phases suivantes sont actuellement développées :
+
+* Phase 1 — Fondations du système ✅
+* Phase 2.0 — Années scolaires, niveaux et options/filières ✅
+* Phase 2.1 — Classes et salles ✅
+* Phase 3.0 — Élèves, parents et matricules ✅
+* Phase 3.1 — Inscriptions et historique scolaire ✅
+* Phase 3.2 — Enseignants et personnel scolaire ✅
+
+Avant de continuer vers de nouveaux modules, nous devons maintenant stabiliser complètement le système et harmoniser toute l'interface.
+
+---
+
+# PARTIE A — DESIGN DE RÉFÉRENCE
+
+Le design Figma suivant sera fourni comme référence principale :
+
+```text
+LIEN FIGMA :
+[COLLER ICI LE LIEN FIGMA]
+```
+
+IMPORTANT :
+
+Le design existant de l'application ne doit pas être conservé comme référence visuelle.
+
+Analyser attentivement le design fourni et l'adapter à l'application KLASS.
+
+L'objectif est de remplacer complètement l'ancien système visuel par une interface cohérente, moderne et professionnelle inspirée du design de référence.
+
+---
+
+# PARTIE B — REFONTE COMPLÈTE DE L'INTERFACE
+
+Ne pas simplement modifier quelques couleurs ou quelques composants.
+
+Refondre l'interface de manière cohérente.
+
+L'interface doit suivre le design de référence pour :
+
+* layout général ;
+* sidebar ;
+* header ;
+* navigation ;
+* cartes ;
+* tableaux ;
+* formulaires ;
+* boutons ;
+* badges ;
+* modals ;
+* dropdowns ;
+* pagination ;
+* filtres ;
+* recherche ;
+* pages de détail ;
+* pages vides ;
+* messages ;
+* notifications ;
+* loaders ;
+* responsive design.
+
+Le résultat doit donner l'impression d'une seule application conçue avec un seul système de design.
+
+---
+
+# PARTIE C — SUPPRESSION DE L'ANCIEN DESIGN
+
+Identifier les anciens composants et styles utilisés par l'interface actuelle.
+
+Supprimer ou remplacer proprement :
+
+* anciens layouts ;
+* anciennes structures de navigation ;
+* anciens composants visuels ;
+* styles contradictoires ;
+* CSS inutilisé ;
+* templates obsolètes ;
+* composants dupliqués ;
+* anciens systèmes de boutons ;
+* anciens systèmes de formulaires ;
+* anciennes classes de style inutilisées.
+
+Ne pas laisser deux systèmes de design concurrents.
+
+Le projet doit disposer d'un système visuel principal cohérent.
+
+ATTENTION :
+
+Ne pas supprimer le code métier fonctionnel.
+
+La refonte doit concerner principalement :
+
+* templates ;
+* composants UI ;
+* styles ;
+* layouts ;
+* scripts frontend nécessaires.
+
+Ne pas casser :
+
+* modèles ;
+* migrations ;
+* services ;
+* permissions ;
+* logique métier ;
+* URLs ;
+* fonctionnalités existantes.
+
+---
+
+# PARTIE D — DESIGN SYSTEM KLASS
+
+Créer ou harmoniser un système de design global.
+
+Définir de manière cohérente :
+
+* couleurs ;
+* typographie ;
+* tailles ;
+* espacements ;
+* bordures ;
+* rayons ;
+* ombres ;
+* boutons ;
+* inputs ;
+* select ;
+* badges ;
+* tables ;
+* cards ;
+* modals ;
+* alertes ;
+* loaders.
+
+Tous les modules doivent utiliser les mêmes composants.
+
+Par exemple :
+
+```text
+Élèves
+Classes
+Enseignants
+Inscriptions
+Parents
+Années scolaires
+```
+
+doivent avoir une cohérence visuelle.
+
+---
+
+# PARTIE E — REFONTE DE TOUTES LES PAGES
+
+Refondre toutes les pages existantes.
+
+## Super Admin
+
+* connexion ;
+* dashboard ;
+* liste des écoles ;
+* création d'une école ;
+* détail d'une école ;
+* gestion des informations nécessaires à l'Admin École ;
+* états vides ;
+* erreurs.
+
+## Admin École
+
+* connexion ;
+* première connexion ;
+* changement de mot de passe ;
+* assistant de configuration ;
+* dashboard ;
+* navigation principale.
+
+## Années scolaires
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut ;
+* recherche ;
+* filtres.
+
+## Niveaux
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut.
+
+## Options / Filières
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut.
+
+## Classes
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut ;
+* filtres.
+
+## Salles
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut.
+
+## Élèves
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* recherche ;
+* filtres.
+
+## Parents
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* association avec les élèves.
+
+## Matricules
+
+* configuration ;
+* génération ;
+* affichage ;
+* règles.
+
+## Inscriptions
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* historique ;
+* statut.
+
+## Enseignants
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* recherche ;
+* filtres.
+
+## Personnel
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* statut.
+
+---
+
+# PARTIE F — DASHBOARDS
+
+Améliorer les dashboards selon le design de référence.
+
+Les dashboards doivent être :
+
+* clairs ;
+* lisibles ;
+* responsives ;
+* visuellement hiérarchisés ;
+* utiles.
+
+Ne pas afficher des informations fictives qui ne correspondent pas aux données réelles.
+
+Les statistiques doivent provenir des données réelles de la base de données.
+
+---
+
+# PARTIE G — TABLEAUX
+
+Harmoniser tous les tableaux.
+
+Chaque tableau doit gérer correctement :
+
+* en-têtes ;
+* colonnes ;
+* actions ;
+* statut ;
+* recherche ;
+* filtres ;
+* pagination ;
+* état vide ;
+* chargement ;
+* erreurs.
+
+Sur mobile, les tableaux doivent rester utilisables.
+
+Utiliser une présentation responsive cohérente avec le design de référence.
+
+---
+
+# PARTIE H — FORMULAIRES
+
+Refondre tous les formulaires.
+
+Chaque formulaire doit avoir :
+
+* labels clairs ;
+* champs correctement alignés ;
+* aide contextuelle si nécessaire ;
+* validation ;
+* messages d'erreur ;
+* état de chargement ;
+* bouton d'enregistrement ;
+* bouton d'annulation ;
+* protection contre les doubles soumissions.
+
+Lors de la soumission :
+
+```text
+Utilisateur clique
+        ↓
+Bouton désactivé
+        ↓
+Loader affiché
+        ↓
+Traitement
+        ↓
+Succès ou erreur
+```
+
+Ne jamais laisser l'utilisateur cliquer plusieurs fois sur une action sensible.
+
+---
+
+# PARTIE I — SYSTÈME DE LOADING
+
+Mettre en place un système de chargement cohérent.
+
+Utiliser :
+
+## Skeleton Loading
+
+Pour :
+
+* dashboards ;
+* listes ;
+* tableaux ;
+* cartes.
+
+## Spinner
+
+Pour :
+
+* enregistrement ;
+* modification ;
+* suppression ;
+* changement de statut ;
+* actions rapides.
+
+## Progress Bar
+
+Pour :
+
+* import ;
+* export ;
+* opérations longues.
+
+Ne pas afficher inutilement un écran blanc ou un loader plein écran.
+
+Le loader doit être utilisé uniquement là où il est nécessaire.
+
+---
+
+# PARTIE J — ÉTATS VIDES ET ERREURS
+
+Toutes les pages doivent gérer correctement :
+
+## Données inexistantes
+
+Afficher une vraie interface vide :
+
+```text
+Aucune donnée disponible
+        ↓
+Explication
+        ↓
+Bouton d'action
+```
+
+Exemple :
+
+```text
+Aucun élève trouvé
+
+Commencez par ajouter votre premier élève.
+
+[Ajouter un élève]
+```
+
+## Erreurs
+
+Afficher des messages compréhensibles.
+
+Ne pas afficher inutilement :
+
+* traceback ;
+* erreurs SQL ;
+* messages techniques ;
+* informations sensibles.
+
+---
+
+# PARTIE K — RESPONSIVE DESIGN
+
+Tester l'interface sur :
+
+* desktop ;
+* tablette ;
+* mobile.
+
+Vérifier particulièrement :
+
+* sidebar ;
+* header ;
+* tableaux ;
+* formulaires ;
+* modals ;
+* boutons ;
+* cartes ;
+* filtres.
+
+L'application doit être réellement utilisable sur mobile.
+
+---
+
+# PARTIE L — AUDIT FONCTIONNEL COMPLET
+
+La refonte visuelle ne doit pas casser le fonctionnement.
+
+Tester réellement toutes les fonctionnalités existantes :
+
+* Super Admin ;
+* écoles ;
+* Admin École ;
+* assistant de configuration ;
+* années scolaires ;
+* niveaux ;
+* options/filières ;
+* classes ;
+* salles ;
+* élèves ;
+* parents ;
+* matricules ;
+* inscriptions ;
+* enseignants ;
+* personnel.
+
+Pour chaque module vérifier :
+
+* liste ;
+* création ;
+* détail ;
+* modification ;
+* archivage ou suppression si prévu ;
+* recherche ;
+* filtres ;
+* pagination ;
+* permissions ;
+* isolation multi-tenant.
+
+Chaque bouton visible doit fonctionner.
+
+Chaque lien doit pointer vers une URL fonctionnelle.
+
+Aucune page ne doit être uniquement décorative.
+
+---
+
+# PARTIE M — AUDIT DE TOUTES LES URLS
+
+Vérifier toutes les URLs du projet.
+
+Pour chaque route :
+
+* route existante ;
+* nom correct ;
+* vue fonctionnelle ;
+* template existant ;
+* permissions correctes ;
+* accès sécurisé ;
+* liens internes fonctionnels.
+
+Tester également les accès directs aux URLs.
+
+Vérifier qu'un utilisateur ne peut pas accéder aux données d'un autre tenant en modifiant simplement un identifiant dans l'URL.
+
+---
+
+# PARTIE N — SCRIPT DE RÉINITIALISATION DES DONNÉES DE TEST
+
+Créer ou mettre à jour un script officiel permettant de réinitialiser les données de développement/test.
+
+Le script doit être clairement documenté.
+
+Exemple d'utilisation :
+
+```bash
+python manage.py reset_test_data
+```
+
+ou utiliser l'architecture de commande existante du projet si elle est différente.
+
+Le script doit :
+
+1. supprimer proprement les données de test ;
+2. préserver la structure de la base ;
+3. préserver les migrations ;
+4. recréer une école de test complète ;
+5. recréer les données nécessaires à tous les modules.
+
+IMPORTANT :
+
+Ne pas supprimer les données de production par erreur.
+
+Le script doit être explicitement réservé au développement/test.
+
+Si nécessaire, demander une confirmation ou vérifier l'environnement avant l'exécution.
+
+---
+
+# PARTIE O — ÉCOLE DE TEST COMPLÈTE
+
+Après la réinitialisation, créer automatiquement une école de test complète.
+
+Structure :
+
+```text
+École de test
+    ↓
+Admin École
+    ↓
+Année scolaire
+    ↓
+Niveaux
+    ↓
+Options / Filières
+    ↓
+Classes
+    ↓
+Salles
+    ↓
+Élèves
+    ↓
+Parents
+    ↓
+Inscriptions
+    ↓
+Enseignants
+    ↓
+Personnel
+```
+
+Créer des données réalistes et cohérentes.
+
+Exemple :
+
+```text
+École de démonstration KLASS
+```
+
+avec :
+
+* un administrateur d'école ;
+* une année scolaire ;
+* plusieurs niveaux ;
+* plusieurs options/filières ;
+* plusieurs classes ;
+* plusieurs salles ;
+* plusieurs élèves ;
+* plusieurs parents ;
+* plusieurs inscriptions ;
+* plusieurs enseignants ;
+* plusieurs membres du personnel.
+
+Respecter toutes les règles métier existantes.
+
+---
+
+# PARTIE P — DONNÉES DE TEST RÉALISTES
+
+Les données de test doivent permettre de tester réellement l'interface.
+
+Créer suffisamment de données pour vérifier :
+
+* pagination ;
+* recherche ;
+* filtres ;
+* tableaux ;
+* dashboard ;
+* statistiques ;
+* relations ;
+* détails.
+
+Créer par exemple :
+
+* plusieurs dizaines d'élèves ;
+* plusieurs parents ;
+* plusieurs classes ;
+* plusieurs enseignants.
+
+Ne pas créer uniquement un seul enregistrement par module.
+
+---
+
+# PARTIE Q — SCRIPT IDEMPOTENT
+
+Le script de données de test doit être idempotent.
+
+Il doit pouvoir être exécuté plusieurs fois sans créer de doublons inattendus.
+
+Tester :
+
+```text
+Exécution 1
+        ↓
+Données créées
+
+Exécution 2
+        ↓
+Pas de doublons incohérents
+```
+
+---
+
+# PARTIE R — TESTS AUTOMATISÉS
+
+Après la refonte :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si pytest est utilisé :
+
+```bash
+pytest
+```
+
+Vérifier :
+
+* modèles ;
+* migrations ;
+* URLs ;
+* vues ;
+* templates ;
+* formulaires ;
+* permissions ;
+* isolation ;
+* données de test.
+
+La refonte UI ne doit pas casser les tests existants.
+
+Si un test échoue :
+
+1. identifier la cause ;
+2. corriger correctement ;
+3. relancer les tests.
+
+Ne pas désactiver un test simplement parce qu'il échoue.
+
+---
+
+# PARTIE S — DOCUMENTATION
+
+Mettre à jour la documentation du projet.
+
+Lire et respecter :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Mettre à jour ou créer une documentation pour :
+
+* architecture UI ;
+* design system ;
+* composants ;
+* loading ;
+* responsive ;
+* états vides ;
+* erreurs ;
+* script de reset des données ;
+* données de test.
+
+Créer par exemple :
+
+```text
+docs/ui/design-system.md
+docs/testing/test-data.md
+docs/testing/reset-test-data.md
+```
+
+La documentation doit correspondre au code réel.
+
+---
+
+# PARTIE T — README.md
+
+Mettre à jour le README.md avec :
+
+## Design
+
+* design de référence ;
+* système de design ;
+* responsive ;
+* loaders.
+
+## Données de test
+
+* commande de réinitialisation ;
+* école de test ;
+* données générées.
+
+## État des modules
+
+Mettre à jour les statuts réels :
+
+```text
+Phase 1       ✅
+Phase 2.0     ✅
+Phase 2.1     ✅
+Phase 3.0     ✅
+Phase 3.1     ✅
+Phase 3.2     ✅
+Phase 3.5     ⏳
+```
+
+Ne pas marquer la phase comme terminée si des fonctionnalités sont cassées.
+
+---
+
+# PARTIE U — VÉRIFICATION GIT ET PUSH GITHUB OBLIGATOIRE
+
+Après avoir terminé :
+
+* la refonte ;
+* les corrections ;
+* les tests ;
+* la documentation ;
+* la mise à jour du README.md ;
+* le script de réinitialisation ;
+* la création des données de test ;
+
+exécuter :
+
+```bash
+git status
+```
+
+Puis :
+
+```bash
+git diff
+```
+
+Vérifier que toutes les modifications nécessaires sont présentes.
+
+Ensuite :
+
+```bash
+git add .
+```
+
+Créer un commit clair :
+
+```bash
+git commit -m "Complete Phase 3.5 - UI redesign and system stabilization"
+```
+
+Puis pousser obligatoirement :
+
+```bash
+git push origin main
+```
+
+Vérifier ensuite :
+
+```bash
+git status
+```
+
+Le dépôt doit être synchronisé avec GitHub.
+
+Résultat attendu :
+
+```text
+Your branch is up to date with 'origin/main'
+working tree clean
+```
+
+Si le push échoue :
+
+1. identifier la cause ;
+2. corriger le problème ;
+3. réessayer ;
+4. vérifier à nouveau le dépôt.
+
+Ne pas déclarer la phase terminée tant que le push GitHub n'est pas réussi.
+
+---
+
+# PARTIE V — RAPPORT FINAL OBLIGATOIRE
+
+À la fin, fournir un rapport contenant :
+
+## 1. Design
+
+* design Figma analysé ;
+* éléments adaptés ;
+* anciens composants supprimés ;
+* nouveaux composants créés.
+
+## 2. Templates
+
+Lister les templates refondus.
+
+## 3. Fonctionnalités
+
+Confirmer que les modules existants fonctionnent.
+
+## 4. Tests
+
+Indiquer les résultats des tests.
+
+## 5. Données de test
+
+Indiquer :
+
+* commande de reset ;
+* école créée ;
+* données générées.
+
+## 6. Documentation
+
+Lister les fichiers créés ou mis à jour.
+
+## 7. GitHub
+
+Indiquer :
+
+```text
+Commit : [message du commit]
+Push GitHub : ✅ RÉUSSI
+Branche : main
+Dépôt : synchronisé
+Working tree : clean
+```
+
+---
+
+# STATUT FINAL
+
+Si tout est terminé et validé :
+
+```text
+PHASE 3.5 — REFONTE UI/UX ET STABILISATION
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text
+PHASE 3.5 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+Ne pas simplement appliquer le design Figma à une seule page.
+
+Le design de référence doit être adapté de manière cohérente à toutes les pages et tous les modules existants.
+
+L'objectif est :
+
+```text
+Ancien design
+        ↓
+Suppression des incohérences
+        ↓
+Nouveau design de référence
+        ↓
+Design System KLASS
+        ↓
+Tous les templates harmonisés
+        ↓
+Fonctionnalités conservées
+        ↓
+Tests validés
+        ↓
+Données de test réinitialisables
+        ↓
+GitHub synchronisé
+```
+
+Ne pas commencer la Phase 4 avant d'avoir terminé cette stabilisation.
