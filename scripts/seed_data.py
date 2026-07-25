@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Script de données de démonstration pour KLASS — Phase 3.1.
-Crée une école de test avec des données pour les Phases 1, 2.0, 2.1, 3.0 et 3.1.
+Script de données de démonstration pour KLASS — Phase 3.2.
+Crée une école de test avec des données pour les Phases 1 à 3.2.
 
 Usage:
     python scripts/seed_data.py
@@ -26,9 +26,9 @@ from apps.core.utils import generate_temp_password
 
 
 def seed():
-    """Créer les données de démonstration — Phases 1, 2.0, 2.1, 3.0 & 3.1."""
+    """Créer les données de démonstration — Phases 1 à 3.2."""
     print("=" * 60)
-    print("KLASS — Données de démonstration [SEED] — Phase 3.1")
+    print("KLASS — Données de démonstration [SEED] — Phase 3.2")
     print("=" * 60)
 
     # ---- Vérifier l'environnement ----
@@ -293,8 +293,67 @@ def seed():
                 user.save()
             print(f"   ✅ [{role}] {email} ({'créé' if created else 'existant'})")
 
-        # ---- 9. Élèves de test (Phase 3.0) ----
-        print("\n9. Élèves de test...")
+        # ---- 9. Personnel et enseignants (Phase 3.2) ----
+        print("\n9. Personnel et enseignants...")
+        from apps.core.constants import StaffStatus, StaffType
+        from apps.teachers.models import Personnel, Teacher
+
+        personnel_data = [
+            {
+                "first_name": "Aline", "last_name": "Mbuyi [SEED]",
+                "staff_type": StaffType.TEACHER, "status": StaffStatus.ACTIVE,
+                "specialization": "Mathématiques et sciences", "education_level": "Master",
+                "diploma": "Agrégation de mathématiques", "experience_years": 8,
+                "phone": "+243900000101", "email": "aline.mbuyi.seed@example.com",
+                "contract_type": "permanent", "hire_date": datetime.date(2018, 9, 1),
+            },
+            {
+                "first_name": "Samuel", "last_name": "Ilunga [SEED]",
+                "staff_type": StaffType.TEACHER, "status": StaffStatus.ON_LEAVE,
+                "specialization": "Français et littérature", "education_level": "Licence",
+                "diploma": "Licence en lettres", "experience_years": 5,
+                "phone": "+243900000102", "email": "samuel.ilunga.seed@example.com",
+                "contract_type": "temporary", "hire_date": datetime.date(2021, 9, 1),
+            },
+            {
+                "first_name": "Chantal", "last_name": "Kasongo [SEED]",
+                "staff_type": StaffType.ADMINISTRATIVE, "status": StaffStatus.ACTIVE,
+                "phone": "+243900000103", "email": "chantal.kasongo.seed@example.com",
+                "contract_type": "permanent", "hire_date": datetime.date(2019, 1, 15),
+            },
+            {
+                "first_name": "David", "last_name": "Tshisekedi [SEED]",
+                "staff_type": StaffType.TECHNICAL, "status": StaffStatus.INACTIVE,
+                "phone": "+243900000104", "email": "david.tshisekedi.seed@example.com",
+                "contract_type": "permanent",
+            },
+        ]
+        personnel_seed = {}
+        for data in personnel_data:
+            lookup = {
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "staff_type": data["staff_type"],
+            }
+            person, created = Personnel.objects.get_or_create(**lookup, defaults=data)
+            personnel_seed[data["first_name"]] = person
+            if person.staff_type == StaffType.TEACHER:
+                teacher, _ = Teacher.objects.get_or_create(personnel=person)
+                teacher.specialization = person.specialization
+                teacher.phone = person.phone
+                teacher.hire_date = person.hire_date
+                teacher.contract_type = person.contract_type
+                teacher.save()
+            print(f"   ✅ {person.full_name} — {person.employee_id} ({'créé' if created else 'existant'})")
+
+        teacher_user = User.objects.filter(email="teacher@demo-klass.app").first()
+        if teacher_user and personnel_seed.get("Aline"):
+            personnel_seed["Aline"].user = teacher_user
+            personnel_seed["Aline"].save(update_fields=["user", "updated_at"])
+            Teacher.objects.filter(personnel=personnel_seed["Aline"]).update(user=teacher_user)
+
+        # ---- 10. Élèves de test (Phase 3.0) ----
+        print("\n10. Élèves de test...")
         from apps.students.models import Parent, ParentStudent, Student, StudentEnrollment
 
         # Parent 1
@@ -367,8 +426,8 @@ def seed():
         ParentStudent.objects.get_or_create(parent=parent1, student=student3)
         print(f"   ✅ Élève 3 : {student3} — Matricule: {student3.matricule}")
 
-        # ---- 10. Inscriptions Phase 3.1 ----
-        print("\n10. Inscriptions (Phase 3.1)...")
+        # ---- 11. Inscriptions Phase 3.1 ----
+        print("\n11. Inscriptions (Phase 3.1)...")
 
         cl_6sci_a = classrooms_2526.get("6ème secondaire_Scientifique_A")
         cl_6sci_b = classrooms_2526.get("6ème secondaire_Scientifique_B")
@@ -430,7 +489,7 @@ def seed():
                 print(f"   ℹ️  {student3.first_name} — 2025-2026 déjà existante")
 
     print("\n" + "=" * 60)
-    print("SEED TERMINÉ — Données Phase 3.1 créées/vérifiées")
+    print("SEED TERMINÉ — Données Phases 1 à 3.2 créées/vérifiées")
     print("=" * 60)
     print(f"""
 Récapitulatif :
@@ -441,7 +500,8 @@ Récapitulatif :
   Options  : 3 options par niveau
   Salles   : 5 salles
   Classes  : 5 classes 2025-2026, 2 classes 2024-2025
-  Élèves   : 3 élèves de test
+   Personnel : 4 membres (2 enseignants, administratif, technique)
+   Élèves   : 3 élèves de test
   Inscriptions :
     - Jean Kabila : 2024-2025 Terminée + 2025-2026 Active (historique)
     - Claire Mutombo : 2025-2026 Active

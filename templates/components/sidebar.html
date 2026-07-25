@@ -114,10 +114,15 @@
     <p class="sidebar-section-title">Personnel</p>
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'teachers:list' %}">
+         <a class="nav-link {% if request.resolver_match.app_name == 'teachers' %}active{% endif %}" href="{% url 'teachers:list' %}">
           <i class="bi bi-person-badge-fill"></i>Enseignants
         </a>
       </li>
+       <li class="nav-item">
+         <a class="nav-link {% if request.resolver_match.url_name == 'personnel_list' %}active{% endif %}" href="{% url 'teachers:personnel_list' %}">
+           <i class="bi bi-person-lines-fill"></i>Tout le personnel
+         </a>
+       </li>
     </ul>
 
     <p class="sidebar-section-title">Structure académique</p>

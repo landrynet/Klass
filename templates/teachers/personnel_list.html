@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Personnel{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Personnel scolaire</h1>
+    <p class="text-muted mb-0">Tous les membres de l'établissement, enseignants compris.</p>
+  </div>
+  {% if user.is_school_admin %}
+  <a class="btn btn-primary" href="{% url 'teachers:personnel_create' %}"><i class="bi bi-plus-lg"></i> Nouveau membre</a>
+  {% endif %}
+</div>
+<form class="card card-body mb-4" method="get">
+  <div class="row g-2">
+    <div class="col-md-5"><label class="form-label">Recherche</label><input class="form-control" name="q" value="{{ q }}" placeholder="Nom, prénom, matricule ou téléphone"></div>
+    <div class="col-md-3"><label class="form-label">Type</label><select class="form-select" name="type"><option value="">Tous</option>{% for value,label in StaffType.CHOICES %}<option value="{{ value }}" {% if staff_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label">Statut</label><select class="form-select" name="status"><option value="">Tous</option>{% for value,label in StaffStatus.CHOICES %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-outline-primary w-100" title="Filtrer"><i class="bi bi-search"></i></button></div>
+  </div>
+</form>
+<div class="card shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Matricule</th><th>Nom complet</th><th>Type</th><th>Téléphone</th><th>Statut</th><th></th></tr></thead>
+  <tbody>
+  {% for person in personnel %}
+  <tr>
+    <td><code>{{ person.employee_id }}</code></td>
+    <td><a class="fw-semibold text-decoration-none" href="{% url 'teachers:personnel_detail' person.pk %}">{{ person.full_name }}</a><br><small class="text-muted">{{ person.email|default:"Email non renseigné" }}</small></td>
+    <td>{{ person.get_staff_type_display }}</td><td>{{ person.phone|default:"—" }}</td>
+    <td><span class="badge {{ person.status_badge_class }}">{{ person.get_status_display }}</span></td>
+    <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{% url 'teachers:personnel_detail' person.pk %}">Voir</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="6" class="text-center py-5 text-muted">Aucun membre du personnel trouvé.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

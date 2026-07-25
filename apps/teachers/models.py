@@ -2,8 +2,102 @@
 Module 4 — Gestion du Personnel Enseignant.
 Profils enseignants, matières, disponibilités et affectations.
 """
-from django.db import models
+from django.db import models, transaction
+from django.utils import timezone
 from apps.core.models import TenantAwareModel
+from apps.core.constants import Gender, StaffStatus, StaffType
+
+
+class PersonnelNumberConfiguration(TenantAwareModel):
+    """Compteur tenant pour les matricules professionnels."""
+    next_number = models.PositiveIntegerField(default=1, verbose_name="Prochain numéro")
+
+    class Meta:
+        verbose_name = "Configuration des matricules du personnel"
+        verbose_name_plural = "Configuration des matricules du personnel"
+
+    def format_number(self, staff_type, number):
+        prefix = "ENS" if staff_type == StaffType.TEACHER else "PER"
+        return f"{prefix}-{timezone.now().year}-{number:04d}"
+
+
+class Personnel(TenantAwareModel):
+    """Dossier permanent d'un membre du personnel, indépendant d'un compte."""
+    employee_id = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        verbose_name="Matricule du personnel",
+        help_text="Généré automatiquement par KLASS.",
+    )
+    first_name = models.CharField(max_length=100, verbose_name="Prénom")
+    last_name = models.CharField(max_length=100, verbose_name="Nom")
+    gender = models.CharField(max_length=1, choices=Gender.CHOICES, blank=True, verbose_name="Genre")
+    date_of_birth = models.DateField(null=True, blank=True, verbose_name="Date de naissance")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
+    email = models.EmailField(blank=True, verbose_name="Email")
+    address = models.TextField(blank=True, verbose_name="Adresse")
+    specialization = models.CharField(max_length=200, blank=True, verbose_name="Spécialité")
+    staff_type = models.CharField(
+        max_length=20, choices=StaffType.CHOICES, default=StaffType.OTHER, verbose_name="Type de personnel"
+    )
+    status = models.CharField(
+        max_length=20, choices=StaffStatus.CHOICES, default=StaffStatus.ACTIVE, verbose_name="Statut"
+    )
+    education_level = models.CharField(max_length=150, blank=True, verbose_name="Niveau d'étude")
+    diploma = models.CharField(max_length=200, blank=True, verbose_name="Diplôme")
+    experience_years = models.PositiveSmallIntegerField(default=0, verbose_name="Années d'expérience")
+    hire_date = models.DateField(null=True, blank=True, verbose_name="Date d'embauche")
+    contract_type = models.CharField(
+        max_length=30,
+        choices=[
+            ("permanent", "Permanent"),
+            ("temporary", "Temporaire"),
+            ("volunteer", "Bénévole"),
+        ],
+        default="permanent",
+        verbose_name="Type de contrat",
+    )
+    user = models.OneToOneField(
+        "accounts.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="personnel_profile",
+        verbose_name="Compte de connexion",
+    )
+    notes = models.TextField(blank=True, verbose_name="Notes")
+
+    class Meta:
+        verbose_name = "Membre du personnel"
+        verbose_name_plural = "Membres du personnel"
+        ordering = ["last_name", "first_name"]
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.employee_id})"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+    @property
+    def status_badge_class(self):
+        return StaffStatus.BADGE_CLASSES.get(self.status, "bg-secondary-subtle text-secondary")
+
+    @property
+    def is_archived(self):
+        return self.status == StaffStatus.ARCHIVED
+
+    def save(self, *args, **kwargs):
+        if not self.employee_id:
+            with transaction.atomic():
+                config, _ = PersonnelNumberConfiguration.objects.get_or_create(pk=1)
+                config = PersonnelNumberConfiguration.objects.select_for_update().get(pk=config.pk)
+                self.employee_id = config.format_number(self.staff_type, config.next_number)
+                config.next_number += 1
+                config.save(update_fields=["next_number", "updated_at"])
+                return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class Teacher(TenantAwareModel):
@@ -11,9 +105,19 @@ class Teacher(TenantAwareModel):
     Profil enseignant — lié au compte utilisateur (rôle teacher).
     Les affectations sont liées à l'année scolaire via TeacherAssignment.
     """
+    personnel = models.OneToOneField(
+        Personnel,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="teacher_profile",
+        verbose_name="Dossier personnel",
+    )
     user = models.OneToOneField(
         "accounts.User",
-        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
         related_name="teacher_profile",
         verbose_name="Compte utilisateur"
     )
@@ -52,15 +156,28 @@ class Teacher(TenantAwareModel):
         ordering = ["user__last_name", "user__first_name"]
 
     def __str__(self):
-        return f"Prof. {self.user.get_full_name()}"
+        return f"Prof. {self.full_name}"
 
     @property
     def full_name(self):
-        return self.user.get_full_name()
+        if self.personnel_id:
+            return self.personnel.full_name
+        return self.user.get_full_name() if self.user_id else "Enseignant"
 
     @property
     def email(self):
-        return self.user.email
+        if self.personnel_id and self.personnel.email:
+            return self.personnel.email
+        return self.user.email if self.user_id else ""
+
+    def save(self, *args, **kwargs):
+        if self.personnel_id:
+            self.employee_id = self.personnel.employee_id
+            if not self.specialization:
+                self.specialization = self.personnel.specialization
+            if not self.phone:
+                self.phone = self.personnel.phone
+        return super().save(*args, **kwargs)
 
 
 class TeacherSubject(TenantAwareModel):

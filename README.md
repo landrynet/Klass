@@ -53,6 +53,26 @@ Documentation : `docs/modules/phase-3-1-inscriptions.md`
 
 ---
 
+### Phase 3.2 — Enseignants et personnel
+**Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
+
+**Fonctionnalités implémentées :**
+
+- ✅ Dossier personnel tenant-isolé, indépendant d'un compte de connexion
+- ✅ Types : enseignants, administratif, direction, technique et autre
+- ✅ Statuts : actif, inactif, en congé, suspendu et archivé
+- ✅ Matricules professionnels générés côté backend (`ENS-AAAA-0001` / `PER-AAAA-0001`)
+- ✅ Liste du personnel et page dédiée aux enseignants
+- ✅ Création, consultation, modification, activation/désactivation et archivage logique
+- ✅ Recherche et filtres par identité, matricule, téléphone, type, statut et spécialité
+- ✅ Préparation des relations futures avec matières, classes et emploi du temps
+- ✅ Seed idempotent avec 4 profils de personnel et enseignants de démonstration
+- ✅ Tests de génération, stabilité, unicité, statut, profil sans compte et accès tenant
+
+Documentation : `docs/modules/phase-3-2-enseignants-et-personnel.md`
+
+---
+
 ### Phase 2.1 — Classes et salles
 **Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
 

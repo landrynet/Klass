@@ -42,7 +42,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "DJANGO_SETTINGS_MODULE=config.settings.development python manage.py migrate_schemas --shared && DJANGO_SETTINGS_MODULE=config.settings.development python manage.py migrate_schemas && DJANGO_SETTINGS_MODULE=config.settings.development python manage.py runserver 0.0.0.0:5000"
+args = "PORT=5000 ./run.sh --skip-git --skip-celery"
 waitForPort = 5000
 
 [[ports]]

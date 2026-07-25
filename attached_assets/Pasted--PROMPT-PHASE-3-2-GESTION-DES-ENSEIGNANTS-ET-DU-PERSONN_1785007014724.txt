@@ -1,0 +1,974 @@
+# PROMPT — PHASE 3.2 : GESTION DES ENSEIGNANTS ET DU PERSONNEL SCOLAIRE
+
+## CONTEXTE
+
+Les phases suivantes ont été développées :
+
+### Phase 1 ✅
+
+Fondations du système :
+
+* Super Admin ;
+* écoles ;
+* tenants ;
+* domaines ;
+* Admin École ;
+* première connexion ;
+* assistant de configuration ;
+* permissions ;
+* isolation multi-tenant.
+
+### Phase 2.0 ✅
+
+Structure académique :
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+### Phase 2.1 ✅
+
+Organisation académique :
+
+* classes ;
+* salles.
+
+### Phase 3.0 ✅
+
+Gestion des personnes :
+
+* élèves ;
+* parents/tuteurs ;
+* matricules automatiques ;
+* configuration des matricules.
+
+### Phase 3.1 ✅
+
+Gestion des inscriptions :
+
+* inscriptions ;
+* affectation des élèves aux classes ;
+* historique scolaire ;
+* statuts ;
+* changement de classe.
+
+L'architecture actuelle est :
+
+```text
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Élève
+    ↓
+Parent / Tuteur
+```
+
+La Phase 3.2 doit maintenant introduire la gestion du personnel scolaire, principalement les enseignants.
+
+---
+
+# PARTIE A — AUDIT OBLIGATOIRE AVANT TOUT DÉVELOPPEMENT
+
+Avant de développer la Phase 3.2 :
+
+1. Lire toute la documentation du projet.
+2. Lire `docs/Klass_Document_Projet.docx`.
+3. Lire les documentations des Phases 1, 2.0, 2.1, 3.0 et 3.1.
+4. Analyser les modèles existants.
+5. Analyser les relations existantes.
+6. Analyser les permissions.
+7. Analyser le système multi-tenant.
+8. Analyser le système de données de test.
+9. Vérifier les routes et URLs.
+10. Vérifier les templates et formulaires.
+11. Vérifier les migrations.
+12. Vérifier les services et les composants réutilisables.
+
+Ne pas créer une architecture parallèle.
+
+Réutiliser l'architecture existante.
+
+Ne pas recréer les fonctionnalités déjà présentes.
+
+---
+
+# PARTIE B — AUDIT COMPLET DES PHASES PRÉCÉDENTES
+
+Avant de commencer la Phase 3.2, vérifier que les modules suivants fonctionnent réellement.
+
+## Phase 2.0
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+## Phase 2.1
+
+* classes ;
+* salles.
+
+## Phase 3.0
+
+* élèves ;
+* parents ;
+* matricules ;
+* configuration des matricules.
+
+## Phase 3.1
+
+* inscriptions ;
+* historique ;
+* affectation aux classes ;
+* statuts ;
+* changement de classe.
+
+Pour chaque module, vérifier :
+
+* tous les fichiers ;
+* toutes les URLs ;
+* toutes les pages ;
+* tous les boutons ;
+* tous les formulaires ;
+* les recherches ;
+* les filtres ;
+* les permissions ;
+* l'isolation multi-tenant ;
+* les liens entre les pages ;
+* les messages de succès et d'erreur.
+
+Vérifier que chaque fonctionnalité est réellement fonctionnelle.
+
+Une page qui s'affiche mais dont les boutons ne fonctionnent pas doit être considérée comme non fonctionnelle.
+
+Corriger les problèmes trouvés avant de continuer.
+
+---
+
+# PARTIE C — OBJECTIF DE LA PHASE 3.2
+
+Créer une gestion complète du personnel scolaire.
+
+La structure principale sera :
+
+```text
+École
+    ↓
+Personnel
+    ├── Enseignants
+    ├── Personnel administratif
+    └── Autres personnels
+```
+
+La Phase 3.2 doit principalement mettre en place :
+
+* le personnel ;
+* les enseignants ;
+* les informations professionnelles ;
+* les statuts ;
+* les matricules du personnel ;
+* les bases nécessaires aux futures affectations académiques.
+
+---
+
+# PARTIE D — ARCHITECTURE DU PERSONNEL
+
+Créer une architecture suffisamment flexible et cohérente avec l'architecture actuelle.
+
+Un membre du personnel doit être lié à :
+
+* une école ;
+* un tenant ;
+* un profil utilisateur si nécessaire ;
+* un type de personnel ;
+* un statut.
+
+Exemples de types :
+
+```text
+Enseignant
+Personnel administratif
+Personnel de direction
+Personnel technique
+Autre
+```
+
+Les types exacts doivent respecter la documentation du projet.
+
+Ne pas créer de rôles inutiles.
+
+---
+
+# PARTIE E — GESTION DES ENSEIGNANTS
+
+Créer une gestion complète des enseignants.
+
+Prévoir les informations nécessaires :
+
+* nom ;
+* prénom ;
+* sexe si prévu ;
+* date de naissance si nécessaire ;
+* téléphone ;
+* email ;
+* adresse si nécessaire ;
+* photo si prévue ;
+* matricule du personnel ;
+* spécialité ;
+* statut ;
+* école ;
+* tenant.
+
+Les champs exacts doivent être cohérents avec :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Ne pas créer de données personnelles inutiles.
+
+---
+
+# PARTIE F — MATRICULE DU PERSONNEL
+
+Le personnel doit disposer d'un identifiant professionnel unique.
+
+Prévoir un système de matricule du personnel.
+
+Exemple :
+
+```text
+ENS-2026-0001
+ENS-2026-0002
+```
+
+Le système doit garantir :
+
+* unicité ;
+* génération côté backend ;
+* non-réutilisation ;
+* stabilité ;
+* isolation par école selon l'architecture retenue.
+
+Si le système de configuration des matricules de la Phase 3.0 peut être réutilisé proprement, le réutiliser.
+
+Ne pas dupliquer inutilement la logique de génération.
+
+Le matricule ne doit pas être saisi manuellement par l'utilisateur lors de la création.
+
+---
+
+# PARTIE G — STATUT DU PERSONNEL
+
+Prévoir une gestion des statuts.
+
+Exemples :
+
+```text
+Actif
+Inactif
+En congé
+Suspendu
+Archivé
+```
+
+Les statuts exacts doivent être adaptés aux règles métier du projet.
+
+Un personnel archivé ne doit pas être supprimé de manière irréversible si son historique est nécessaire.
+
+---
+
+# PARTIE H — PROFIL PROFESSIONNEL
+
+Prévoir un profil professionnel pour l'enseignant.
+
+Selon le projet, cela peut contenir :
+
+* niveau d'étude ;
+* diplôme ;
+* spécialité ;
+* expérience ;
+* date d'embauche ;
+* statut professionnel.
+
+Ne pas développer dans cette phase un système complet de ressources humaines.
+
+La Phase 3.2 doit préparer les informations nécessaires aux futures fonctionnalités académiques.
+
+---
+
+# PARTIE I — RELATION AVEC LES MATIÈRES
+
+Préparer l'architecture pour les futures relations :
+
+```text
+Enseignant
+    ↓
+Matière
+```
+
+et :
+
+```text
+Enseignant
+    ↓
+Matière
+    ↓
+Classe
+```
+
+Ne pas développer entièrement le module des matières dans cette phase.
+
+Ne pas développer encore :
+
+* emploi du temps ;
+* évaluations ;
+* notes ;
+* présence.
+
+Préparer uniquement une architecture propre et extensible.
+
+---
+
+# PARTIE J — COMPTE UTILISATEUR ET ENSEIGNANT
+
+Analyser l'architecture existante des utilisateurs.
+
+Ne pas créer automatiquement un compte utilisateur pour chaque enseignant sans vérifier les besoins du projet.
+
+Le système doit permettre de distinguer :
+
+```text
+Profil Enseignant
+        ≠
+Compte de connexion
+```
+
+Un enseignant peut avoir :
+
+* un profil dans le système ;
+* un compte de connexion si nécessaire ;
+* des permissions spécifiques.
+
+Ne pas mélanger inutilement les informations personnelles et les identifiants de connexion.
+
+Respecter l'architecture utilisateur existante.
+
+---
+
+# PARTIE K — INTERFACE DU PERSONNEL
+
+Créer une interface personnalisée KLASS.
+
+Ne pas utiliser Django Admin.
+
+Prévoir :
+
+* liste du personnel ;
+* création ;
+* consultation ;
+* modification ;
+* activation ;
+* désactivation ;
+* archivage ;
+* recherche ;
+* filtres.
+
+Afficher clairement :
+
+* nom ;
+* prénom ;
+* type de personnel ;
+* matricule ;
+* statut ;
+* informations principales.
+
+---
+
+# PARTIE L — INTERFACE DES ENSEIGNANTS
+
+Créer une page dédiée aux enseignants.
+
+Prévoir :
+
+* liste ;
+* recherche ;
+* filtres ;
+* détail ;
+* modification ;
+* statut.
+
+La fiche détaillée doit pouvoir afficher :
+
+```text
+Informations personnelles
+        ↓
+Informations professionnelles
+        ↓
+Matricule
+        ↓
+Statut
+        ↓
+École
+```
+
+Préparer la fiche pour l'ajout futur de :
+
+```text
+Matières
+    ↓
+Classes
+    ↓
+Emploi du temps
+```
+
+---
+
+# PARTIE M — RECHERCHE ET FILTRES
+
+## Personnel
+
+Prévoir une recherche par :
+
+* nom ;
+* prénom ;
+* matricule ;
+* téléphone.
+
+Filtres :
+
+* type ;
+* statut.
+
+## Enseignants
+
+Prévoir une recherche par :
+
+* nom ;
+* prénom ;
+* matricule ;
+* spécialité.
+
+Filtres :
+
+* statut ;
+* spécialité.
+
+Tous les résultats doivent être strictement limités à l'école et au tenant courants.
+
+---
+
+# PARTIE N — PERMISSIONS
+
+Respecter le système de permissions existant.
+
+Un utilisateur ne doit jamais pouvoir :
+
+* voir le personnel d'une autre école ;
+* modifier le personnel d'une autre école ;
+* supprimer le personnel d'une autre école ;
+* consulter les informations privées d'un autre tenant ;
+* créer un enseignant pour une autre école.
+
+Tester également :
+
+* URLs directes ;
+* identifiants modifiés ;
+* requêtes POST ;
+* formulaires ;
+* services ;
+* API éventuelle.
+
+Toutes les protections doivent être faites côté backend.
+
+---
+
+# PARTIE O — ISOLATION MULTI-TENANT
+
+Tester explicitement :
+
+```text
+École A ≠ École B
+```
+
+Vérifier que :
+
+```text
+Personnel École A
+```
+
+ne peut jamais être consulté ou modifié par un utilisateur non autorisé de :
+
+```text
+École B
+```
+
+Tester :
+
+* listes ;
+* détails ;
+* modifications ;
+* recherches ;
+* filtres ;
+* accès directs.
+
+---
+
+# PARTIE P — DONNÉES DE TEST
+
+Mettre à jour le système de données de test existant.
+
+Ne pas créer un système concurrent.
+
+Créer des données réalistes.
+
+## Enseignants
+
+Créer plusieurs enseignants avec :
+
+* des spécialités différentes ;
+* des statuts différents ;
+* des matricules différents.
+
+## Personnel
+
+Créer également plusieurs types de personnel si cela correspond au modèle.
+
+Vérifier :
+
+* relations avec l'école ;
+* tenant ;
+* matricules ;
+* statuts.
+
+Le système doit être idempotent.
+
+Exécuter plusieurs fois le script et vérifier l'absence de doublons.
+
+---
+
+# PARTIE Q — TESTS OBLIGATOIRES
+
+## Personnel
+
+Tester :
+
+* création ;
+* consultation ;
+* modification ;
+* recherche ;
+* filtres ;
+* changement de statut ;
+* archivage.
+
+## Enseignants
+
+Tester :
+
+* création ;
+* consultation ;
+* modification ;
+* recherche ;
+* spécialité ;
+* matricule ;
+* statut.
+
+## Matricules
+
+Tester :
+
+* génération ;
+* unicité ;
+* stabilité ;
+* non-réutilisation ;
+* isolation.
+
+## Sécurité
+
+Tester :
+
+* isolation multi-tenant ;
+* accès direct ;
+* modification d'identifiant ;
+* requêtes POST interdites.
+
+---
+
+# PARTIE R — TESTS DE RÉGRESSION
+
+Exécuter les tests de :
+
+* Phase 1 ;
+* Phase 2.0 ;
+* Phase 2.1 ;
+* Phase 3.0 ;
+* Phase 3.1 ;
+* Phase 3.2.
+
+Vérifier que toutes les anciennes fonctionnalités restent fonctionnelles.
+
+Aucune page existante ne doit être cassée.
+
+---
+
+# PARTIE S — AUDIT COMPLET DES URLS ET DES PAGES
+
+Après le développement, parcourir réellement toutes les pages :
+
+## Phase 2.0
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+## Phase 2.1
+
+* classes ;
+* salles.
+
+## Phase 3.0
+
+* élèves ;
+* parents ;
+* matricules.
+
+## Phase 3.1
+
+* inscriptions ;
+* historique.
+
+## Phase 3.2
+
+* personnel ;
+* enseignants ;
+* détails ;
+* création ;
+* modification.
+
+Pour chaque page vérifier :
+
+* affichage ;
+* navigation ;
+* boutons ;
+* formulaires ;
+* validations ;
+* recherche ;
+* filtres ;
+* messages de succès ;
+* messages d'erreur ;
+* permissions ;
+* responsive design.
+
+Chaque bouton visible doit fonctionner correctement.
+
+Chaque URL doit être fonctionnelle.
+
+Chaque lien doit pointer vers une route valide.
+
+---
+
+# PARTIE T — VÉRIFICATIONS TECHNIQUES
+
+Exécuter :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si pytest est utilisé :
+
+```bash
+pytest
+```
+
+Vérifier :
+
+* migrations ;
+* imports ;
+* modèles ;
+* URLs ;
+* templates ;
+* formulaires ;
+* services ;
+* permissions ;
+* tests.
+
+Corriger les erreurs réelles.
+
+Ne pas désactiver les tests.
+
+Ne pas masquer les erreurs.
+
+---
+
+# PARTIE U — DOCUMENTATION
+
+Créer ou mettre à jour :
+
+```text
+docs/modules/phase-3-2-enseignants-et-personnel.md
+```
+
+Documenter :
+
+* objectif ;
+* modèles ;
+* relations ;
+* types de personnel ;
+* enseignants ;
+* matricules ;
+* statuts ;
+* permissions ;
+* sécurité ;
+* isolation ;
+* routes ;
+* interfaces ;
+* tests ;
+* données de test ;
+* préparation des futures matières.
+
+La documentation doit refléter exactement le code réel.
+
+---
+
+# PARTIE V — README.md
+
+Pendant le développement :
+
+```text
+Phase 3.2 — Enseignants et personnel
+Statut : ⏳ EN COURS
+```
+
+Après validation complète :
+
+```text
+Phase 3.2 — Enseignants et personnel
+Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Mettre à jour la liste des modules terminés.
+
+---
+
+# PARTIE W — VERSIONNEMENT ET PUSH GITHUB OBLIGATOIRE
+
+Après avoir terminé :
+
+* le développement ;
+* les corrections ;
+* les tests ;
+* l'audit ;
+* la documentation ;
+* la mise à jour du README.md ;
+
+vérifier le dépôt Git.
+
+## 1. Vérifier l'état du dépôt
+
+```bash
+git status
+```
+
+## 2. Vérifier les modifications
+
+```bash
+git diff
+```
+
+Vérifier qu'aucun fichier important ou modification nécessaire n'a été oublié.
+
+## 3. Ajouter les modifications
+
+```bash
+git add .
+```
+
+## 4. Créer un commit clair
+
+Utiliser un message explicite, par exemple :
+
+```bash
+git commit -m "Complete Phase 3.2 - Teachers and staff management"
+```
+
+## 5. Pousser obligatoirement vers GitHub
+
+```bash
+git push origin main
+```
+
+## 6. Vérifier que le push a réussi
+
+Puis exécuter :
+
+```bash
+git status
+```
+
+Le dépôt doit être propre et synchronisé avec GitHub.
+
+Résultat attendu :
+
+```text
+Your branch is up to date with 'origin/main'
+working tree clean
+```
+
+Ne pas déclarer la Phase 3.2 complètement terminée tant que :
+
+* les modifications ne sont pas commitées ;
+* le commit n'a pas réussi ;
+* le push GitHub n'a pas réussi ;
+* le dépôt local n'est pas vérifié.
+
+Si `git push` échoue :
+
+1. identifier la cause ;
+2. corriger le problème ;
+3. réessayer ;
+4. vérifier la synchronisation avec GitHub.
+
+Ne pas ignorer une erreur de push.
+
+---
+
+# PARTIE X — RAPPORT FINAL
+
+À la fin, fournir un rapport clair contenant :
+
+## Audit
+
+* fichiers vérifiés ;
+* pages vérifiées ;
+* URLs vérifiées ;
+* problèmes trouvés ;
+* corrections effectuées.
+
+## Personnel
+
+* fonctionnalités ;
+* types ;
+* statuts ;
+* permissions.
+
+## Enseignants
+
+* informations ;
+* matricules ;
+* spécialités ;
+* statuts.
+
+## Sécurité
+
+* isolation ;
+* permissions ;
+* accès interdits testés.
+
+## Tests
+
+Résultats de :
+
+* Phase 1 ;
+* Phase 2.0 ;
+* Phase 2.1 ;
+* Phase 3.0 ;
+* Phase 3.1 ;
+* Phase 3.2.
+
+## Documentation
+
+Fichiers créés et mis à jour.
+
+## GitHub
+
+Indiquer :
+
+```text
+Git Commit : [message du commit]
+Git Push : ✅ RÉUSSI
+Branche : main
+Dépôt : synchronisé
+Working tree : clean
+```
+
+---
+
+# STATUT FINAL
+
+Si tout fonctionne réellement :
+
+```text
+PHASE 3.2 — ENSEIGNANTS ET PERSONNEL
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text
+PHASE 3.2 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+Ne pas considérer cette phase terminée simplement parce que les modèles et les pages existent.
+
+La Phase 3.2 est terminée uniquement si :
+
+* les fonctionnalités fonctionnent ;
+* les pages fonctionnent ;
+* toutes les URLs fonctionnent ;
+* les boutons fonctionnent ;
+* les formulaires fonctionnent ;
+* les permissions fonctionnent ;
+* l'isolation multi-tenant est validée ;
+* les phases précédentes ont été auditées ;
+* les tests passent ;
+* les migrations sont valides ;
+* les données de test sont fonctionnelles ;
+* la documentation est à jour ;
+* le README est à jour ;
+* les modifications sont commitées ;
+* le projet est poussé sur GitHub ;
+* le dépôt local est synchronisé.
+
+Ne pas développer dans cette phase :
+
+* matières complètes ;
+* affectation complète des matières ;
+* emploi du temps ;
+* évaluations ;
+* notes ;
+* présence.
+
+Préparer uniquement une architecture propre pour les futures phases.
+
+La structure attendue après cette phase est :
+
+```text
+École
+    ├── Élèves
+    │      ↓
+    │   Inscriptions
+    │
+    ├── Parents
+    │
+    └── Personnel
+           ↓
+       Enseignants
+```
+
+Ne déclarer la Phase 3.2 terminée que si elle est réellement stable, testée, sécurisée, documentée, poussée sur GitHub et compatible avec toutes les phases précédentes.

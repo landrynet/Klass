@@ -69,6 +69,49 @@ class Gender:
 
 
 # ---------------------------------------------------------------------------
+# Personnel scolaire (Phase 3.2)
+# ---------------------------------------------------------------------------
+class StaffType:
+    TEACHER = "teacher"
+    ADMINISTRATIVE = "administrative"
+    MANAGEMENT = "management"
+    TECHNICAL = "technical"
+    OTHER = "other"
+
+    CHOICES = [
+        (TEACHER, "Enseignant"),
+        (ADMINISTRATIVE, "Personnel administratif"),
+        (MANAGEMENT, "Personnel de direction"),
+        (TECHNICAL, "Personnel technique"),
+        (OTHER, "Autre"),
+    ]
+
+
+class StaffStatus:
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    ON_LEAVE = "on_leave"
+    SUSPENDED = "suspended"
+    ARCHIVED = "archived"
+
+    CHOICES = [
+        (ACTIVE, "Actif"),
+        (INACTIVE, "Inactif"),
+        (ON_LEAVE, "En congé"),
+        (SUSPENDED, "Suspendu"),
+        (ARCHIVED, "Archivé"),
+    ]
+
+    BADGE_CLASSES = {
+        ACTIVE: "bg-success-subtle text-success",
+        INACTIVE: "bg-secondary-subtle text-secondary",
+        ON_LEAVE: "bg-warning-subtle text-warning",
+        SUSPENDED: "bg-danger-subtle text-danger",
+        ARCHIVED: "bg-dark-subtle text-dark",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Types de paiement
 # ---------------------------------------------------------------------------
 class PaymentMethod:

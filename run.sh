@@ -2,7 +2,7 @@
 # =============================================================================
 # KLASS — Script principal de lancement (Universel)
 # Idempotent : peut être relancé sans risque.
-# Usage : ./run.sh [--skip-git] [--skip-celery]
+# Usage : ./run.sh [--skip-git] [--skip-celery] [--skip-seed]
 # =============================================================================
 set -euo pipefail
 
@@ -94,10 +94,12 @@ fi
 # =============================================================================
 SKIP_GIT=false
 SKIP_CELERY=false
+SKIP_SEED=false
 for arg in "$@"; do
     case "$arg" in
         --skip-git)    SKIP_GIT=true ;;
         --skip-celery) SKIP_CELERY=true ;;
+        --skip-seed)   SKIP_SEED=true ;;
     esac
 done
 
@@ -139,7 +141,7 @@ print_summary() {
     echo "══════════════════════════════════════════════"
     echo "  OS détecté : $OS"
     echo ""
-    for key in "Python" "Venv" "Dépendances" "Variables" "PostgreSQL" "Base" "Redis" "Celery" "Migrations" "Django"; do
+    for key in "Python" "Venv" "Dépendances" "Variables" "PostgreSQL" "Base" "Redis" "Celery" "Migrations" "Seed" "Django"; do
         val="${STATUS[$key]:-⬜ inconnu}"
         echo "  $val  $key"
     done
@@ -224,8 +226,8 @@ else
     fail "Fichier requirements introuvable."
 fi
 
-pip install --quiet --upgrade pip
-if pip install --quiet -r "$REQ_FILE"; then
+python -m pip install --quiet --upgrade pip --no-user
+if python -m pip install --quiet --no-user -r "$REQ_FILE"; then
     ok "Dépendances installées ($REQ_FILE)"
     STATUS["Dépendances"]="✅"
 else
@@ -237,16 +239,6 @@ fi
 # ÉTAPE 4 — VARIABLES D'ENVIRONNEMENT
 # =============================================================================
 section "Variables d'environnement"
-
-if [ ! -f ".env" ]; then
-    if [ -f ".env.example" ]; then
-        cp .env.example .env
-        warn ".env créé depuis .env.example — remplissez les valeurs sensibles avant de continuer."
-        info "Éditez .env avec vos identifiants (DATABASE_URL, SECRET_KEY, etc.)"
-    else
-        fail ".env manquant et .env.example introuvable."
-    fi
-fi
 
 # Charger .env (compatible tous OS)
 set -a
@@ -269,6 +261,10 @@ if [ -f ".env" ]; then
     }
 fi
 set +a
+
+if [ ! -f ".env" ]; then
+    info "Aucun fichier .env : utilisation des variables d'environnement du système/Replit."
+fi
 
 # Vérifier les variables requises
 REQUIRED_VARS=("SECRET_KEY" "DATABASE_URL")
@@ -436,7 +432,24 @@ else
 fi
 
 # =============================================================================
-# ÉTAPE 9 — FICHIERS STATIQUES
+# ÉTAPE 9 — DONNÉES DE DÉMONSTRATION
+# =============================================================================
+if [ "$SKIP_SEED" = false ]; then
+    section "Données de démonstration"
+    if python scripts/seed_data.py; then
+        ok "Données de test créées/vérifiées (idempotent)"
+        STATUS["Seed"]="✅"
+    else
+        STATUS["Seed"]="❌"
+        fail "Le seed des données de test a échoué."
+    fi
+else
+    STATUS["Seed"]="⏭️"
+    info "Seed ignoré (--skip-seed)"
+fi
+
+# =============================================================================
+# ÉTAPE 10 — FICHIERS STATIQUES
 # =============================================================================
 section "Fichiers statiques"
 if python manage.py collectstatic --noinput --clear -v 0 2>/dev/null; then
@@ -446,7 +459,7 @@ else
 fi
 
 # =============================================================================
-# ÉTAPE 10 — SANTÉ GLOBALE
+# ÉTAPE 11 — SANTÉ GLOBALE
 # =============================================================================
 section "Tests de santé"
 

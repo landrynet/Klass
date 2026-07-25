@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3 mb-1">{{ title }}</h1><p class="text-muted mb-0">Le matricule est généré automatiquement et ne peut pas être saisi.</p></div><a href="{% url 'teachers:personnel_list' %}" class="btn btn-outline-secondary">Retour</a></div>
+<form method="post" class="card shadow-sm"><div class="card-body">
+{% csrf_token %}
+{% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+<div class="row g-3">
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.first_name %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.last_name %}</div>
+  <div class="col-md-4">{% include "components/form_field.html" with field=form.gender %}</div>
+  <div class="col-md-4">{% include "components/form_field.html" with field=form.date_of_birth %}</div>
+  <div class="col-md-4">{% include "components/form_field.html" with field=form.staff_type %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.phone %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.email %}</div>
+  <div class="col-12">{% include "components/form_field.html" with field=form.address %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.specialization %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.education_level %}</div>
+  <div class="col-md-6">{% include "components/form_field.html" with field=form.diploma %}</div>
+  <div class="col-md-3">{% include "components/form_field.html" with field=form.experience_years %}</div>
+  <div class="col-md-3">{% include "components/form_field.html" with field=form.hire_date %}</div>
+  <div class="col-md-4">{% include "components/form_field.html" with field=form.contract_type %}</div>
+  <div class="col-md-4">{% include "components/form_field.html" with field=form.status %}</div>
+  <div class="col-12">{% include "components/form_field.html" with field=form.notes %}</div>
+</div></div><div class="card-footer d-flex justify-content-end gap-2"><a href="{% url 'teachers:personnel_list' %}" class="btn btn-light">Annuler</a><button class="btn btn-primary">Enregistrer</button></div></form>
+{% endblock %}

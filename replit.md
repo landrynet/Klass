@@ -5,7 +5,7 @@ Multi-tenant school management platform built with Django 5.1 + django-tenants (
 
 ## How to run
 ```bash
-DJANGO_SETTINGS_MODULE=config.settings.development python manage.py runserver 0.0.0.0:5000
+PORT=5000 ./run.sh --skip-git --skip-celery
 ```
 Or use the **Start application** workflow.
 
@@ -21,7 +21,7 @@ Or use the **Start application** workflow.
 ```bash
 python scripts/seed_data.py
 ```
-Creates a demo school with 6 levels and 3 options per level (idempotent).
+Creates a demo school with the academic structure, students, enrollments, and Phase 3.2 personnel/teachers (idempotent).
 
 ## Architecture
 - `config/` — Django settings (base / development / production / testing)
@@ -51,6 +51,7 @@ Creates a demo school with 6 levels and 3 options per level (idempotent).
 - **Phase 2.1** ✅ Classrooms and rooms — CRUD, status lifecycle, tenant isolation
 - **Phase 3.0** ✅ Students, parents, matricules
 - **Phase 3.1** ✅ Enrollments — student → school year → classroom, history, class change
+- **Phase 3.2** ✅ Personnel scolaire et enseignants — profils, statuts, matricules, recherche, filtres
 
 ## User preferences
 - Language: French (project is in French)

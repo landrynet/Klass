@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Enseignants{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div><h1 class="h3 mb-1">Enseignants</h1><p class="text-muted mb-0">Profils professionnels et spécialités.</p></div>
+  {% if user.is_school_admin %}<a class="btn btn-primary" href="{% url 'teachers:create' %}"><i class="bi bi-plus-lg"></i> Nouvel enseignant</a>{% endif %}
+</div>
+<form class="card card-body mb-4" method="get">
+  <div class="row g-2">
+    <div class="col-md-5"><label class="form-label">Recherche</label><input class="form-control" name="q" value="{{ q }}" placeholder="Nom, prénom, matricule ou spécialité"></div>
+    <div class="col-md-4"><label class="form-label">Spécialité</label><input class="form-control" name="specialization" value="{{ specialization }}" placeholder="Mathématiques, Français..."></div>
+    <div class="col-md-2"><label class="form-label">Statut</label><select class="form-select" name="status"><option value="">Tous</option>{% for value,label in StaffStatus.CHOICES %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-outline-primary w-100"><i class="bi bi-search"></i></button></div>
+  </div>
+</form>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+<thead><tr><th>Matricule</th><th>Enseignant</th><th>Spécialité</th><th>Contrat</th><th>Statut</th><th></th></tr></thead>
+<tbody>{% for person in teachers %}<tr>
+  <td><code>{{ person.employee_id }}</code></td>
+  <td><a class="fw-semibold text-decoration-none" href="{% url 'teachers:teacher_detail' person.pk %}">{{ person.full_name }}</a><br><small class="text-muted">{{ person.email|default:"Email non renseigné" }}</small></td>
+  <td>{{ person.specialization|default:"—" }}</td><td>{{ person.get_contract_type_display }}</td>
+  <td><span class="badge {{ person.status_badge_class }}">{{ person.get_status_display }}</span></td>
+  <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{% url 'teachers:teacher_detail' person.pk %}">Voir</a></td>
+</tr>{% empty %}<tr><td colspan="6" class="text-center py-5 text-muted">Aucun enseignant trouvé.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}
