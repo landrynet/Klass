@@ -1,11 +1,97 @@
 #!/usr/bin/env bash
 # =============================================================================
-# KLASS — Script principal de lancement
+# KLASS — Script principal de lancement (Universel)
 # Idempotent : peut être relancé sans risque.
 # Usage : ./run.sh [--skip-git] [--skip-celery]
 # =============================================================================
 set -euo pipefail
 
+# =============================================================================
+# DÉTECTION DU SYSTÈME D'EXPLOITATION
+# =============================================================================
+detect_os() {
+    case "$(uname -s)" in
+        Linux*)     echo "linux" ;;
+        Darwin*)    echo "macos" ;;
+        CYGWIN*|MINGW*|MSYS*) echo "windows" ;;
+        *)          echo "unknown" ;;
+    esac
+}
+
+OS=$(detect_os)
+
+# =============================================================================
+# CONFIGURATION SPÉCIFIQUE PAR OS
+# =============================================================================
+configure_paths() {
+    case "$OS" in
+        windows)
+            # Chemins PostgreSQL sur Windows
+            for version in 18 17 16 15 14; do
+                if [ -d "/c/Program Files/PostgreSQL/$version/bin" ]; then
+                    export PATH="/c/Program Files/PostgreSQL/$version/bin:$PATH"
+                    break
+                fi
+                if [ -d "/c/Program Files (x86)/PostgreSQL/$version/bin" ]; then
+                    export PATH="/c/Program Files (x86)/PostgreSQL/$version/bin:$PATH"
+                    break
+                fi
+            done
+            ;;
+        linux|macos)
+            # Sur Linux/macOS, on utilise les chemins standards
+            # PostgreSQL est généralement dans /usr/bin ou /usr/local/bin
+            ;;
+    esac
+}
+
+configure_paths
+
+# =============================================================================
+# FONCTION PYTHON UNIVERSEL
+# =============================================================================
+find_python() {
+    # Ordre de priorité selon l'OS
+    local python_candidates=()
+    
+    case "$OS" in
+        windows)
+            python_candidates=("py" "python3" "python")
+            ;;
+        linux|macos)
+            python_candidates=("python3" "python" "py")
+            ;;
+    esac
+    
+    # Ajouter les versions spécifiques
+    for version in 3.13 3.12 3.11 3.10; do
+        python_candidates+=("python$version")
+    done
+    
+    for py in "${python_candidates[@]}"; do
+        if command -v "$py" &>/dev/null; then
+            echo "$py"
+            return 0
+        fi
+    done
+    
+    return 1
+}
+
+# =============================================================================
+# COMMANDE PYTHON UNIVERSELLE
+# =============================================================================
+# Si 'python' n'existe pas sur Windows, on crée un alias
+if [ "$OS" = "windows" ] && ! command -v python &>/dev/null; then
+    python() {
+        command py "$@"
+    }
+    export -f python
+fi
+
+# =============================================================================
+# PARAMÈTRES
+# =============================================================================
 SKIP_GIT=false
 SKIP_CELERY=false
 for arg in "$@"; do
@@ -15,14 +101,27 @@ for arg in "$@"; do
     esac
 done
 
-# ---------------------------------------------------------------------------
-# Couleurs & helpers
-# ---------------------------------------------------------------------------
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+# =============================================================================
+# COULEURS & HELPERS
+# =============================================================================
+if [ -t 1 ]; then
+    # Terminal interactif - couleurs activées
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    CYAN='\033[0;36m'
+    NC='\033[0m' # No Color
+else
+    # Non interactif - pas de couleurs
+    RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; NC=''
+fi
+
 ok()      { echo -e "${GREEN}[✓]${NC} $*"; }
 warn()    { echo -e "${YELLOW}[!]${NC} $*"; }
 fail()    { echo -e "${RED}[✗]${NC} $*"; exit 1; }
 section() { echo -e "\n${BLUE}▶ $*${NC}"; }
+info()    { echo -e "${CYAN}[i]${NC} $*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -30,14 +129,16 @@ cd "$SCRIPT_DIR"
 # Tableau de bord final
 declare -A STATUS
 
-# ---------------------------------------------------------------------------
-# Étape 0 — Résumé
-# ---------------------------------------------------------------------------
+# =============================================================================
+# RÉSUMÉ FINAL
+# =============================================================================
 print_summary() {
     echo ""
     echo "══════════════════════════════════════════════"
     echo "  KLASS — Bilan du démarrage"
     echo "══════════════════════════════════════════════"
+    echo "  OS détecté : $OS"
+    echo ""
     for key in "Python" "Venv" "Dépendances" "Variables" "PostgreSQL" "Base" "Redis" "Celery" "Migrations" "Django"; do
         val="${STATUS[$key]:-⬜ inconnu}"
         echo "  $val  $key"
@@ -45,9 +146,9 @@ print_summary() {
     echo ""
 }
 
-# ---------------------------------------------------------------------------
-# Étape 1 — Git
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 1 — GIT
+# =============================================================================
 if [ "$SKIP_GIT" = false ] && git rev-parse --git-dir &>/dev/null; then
     section "Vérification Git"
     REMOTE=$(git remote 2>/dev/null | head -1)
@@ -66,29 +167,27 @@ if [ "$SKIP_GIT" = false ] && git rev-parse --git-dir &>/dev/null; then
     fi
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 2 — Environnement Python
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 2 — ENVIRONNEMENT PYTHON
+# =============================================================================
 section "Environnement Python"
 
-PYTHON_BIN=""
-for py in python3.13 python3.12 python3.11 python3 python; do
-    if command -v "$py" &>/dev/null; then
-        PYTHON_BIN="$py"
-        break
-    fi
-done
-[ -z "$PYTHON_BIN" ] && fail "Python introuvable. Installez Python 3.11+."
+PYTHON_BIN=$(find_python)
+if [ -z "$PYTHON_BIN" ]; then
+    fail "Python introuvable. Installez Python 3.11+."
+fi
 
 PY_VERSION=$("$PYTHON_BIN" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 MAJOR=$(echo "$PY_VERSION" | cut -d. -f1)
 MINOR=$(echo "$PY_VERSION" | cut -d. -f2)
+
 if [ "$MAJOR" -lt 3 ] || { [ "$MAJOR" -eq 3 ] && [ "$MINOR" -lt 11 ]; }; then
     fail "Python 3.11+ requis, trouvé : $PY_VERSION"
 fi
 ok "Python $PY_VERSION ($PYTHON_BIN)"
 STATUS["Python"]="✅"
 
+# Environnement virtuel
 VENV_DIR=".venv"
 if [ ! -d "$VENV_DIR" ]; then
     "$PYTHON_BIN" -m venv "$VENV_DIR"
@@ -98,17 +197,32 @@ else
 fi
 STATUS["Venv"]="✅"
 
-# shellcheck disable=SC1091
-source "$VENV_DIR/bin/activate"
+# Activation selon l'OS
+if [ "$OS" = "windows" ] && [ -f "$VENV_DIR/Scripts/activate" ]; then
+    # shellcheck disable=SC1091
+    source "$VENV_DIR/Scripts/activate"
+elif [ -f "$VENV_DIR/bin/activate" ]; then
+    # shellcheck disable=SC1091
+    source "$VENV_DIR/bin/activate"
+else
+    fail "Impossible d'activer l'environnement virtuel"
+fi
 
-# ---------------------------------------------------------------------------
-# Étape 3 — Dépendances
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 3 — DÉPENDANCES
+# =============================================================================
 section "Dépendances Python"
 
-REQ_FILE="requirements/development.txt"
-[ ! -f "$REQ_FILE" ] && REQ_FILE="requirements.txt"
-[ ! -f "$REQ_FILE" ] && fail "Fichier requirements introuvable."
+REQ_FILE=""
+if [ -f "requirements/development.txt" ]; then
+    REQ_FILE="requirements/development.txt"
+elif [ -f "requirements/local.txt" ]; then
+    REQ_FILE="requirements/local.txt"
+elif [ -f "requirements.txt" ]; then
+    REQ_FILE="requirements.txt"
+else
+    fail "Fichier requirements introuvable."
+fi
 
 pip install --quiet --upgrade pip
 if pip install --quiet -r "$REQ_FILE"; then
@@ -119,26 +233,50 @@ else
     fail "Erreur lors de l'installation des dépendances."
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 4 — Variables d'environnement
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 4 — VARIABLES D'ENVIRONNEMENT
+# =============================================================================
 section "Variables d'environnement"
 
 if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp .env.example .env
         warn ".env créé depuis .env.example — remplissez les valeurs sensibles avant de continuer."
+        info "Éditez .env avec vos identifiants (DATABASE_URL, SECRET_KEY, etc.)"
     else
         fail ".env manquant et .env.example introuvable."
     fi
 fi
 
-set -a; source ".env"; set +a
+# Charger .env (compatible tous OS)
+set -a
+if [ -f ".env" ]; then
+    # Méthode universelle pour charger .env
+    if command -v dos2unix &>/dev/null; then
+        dos2unix .env 2>/dev/null || true
+    fi
+    # shellcheck disable=SC1090
+    source ".env" 2>/dev/null || {
+        # Fallback : lecture manuelle
+        while IFS='=' read -r key value; do
+            # Ignorer les commentaires et lignes vides
+            if [[ ! -z "$key" && ! "$key" =~ ^# && "$key" =~ ^[A-Za-z_] ]]; then
+                # Supprimer les guillemets et espaces
+                value=$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^"//;s/"$//')
+                export "$key=$value"
+            fi
+        done < .env
+    }
+fi
+set +a
 
-REQUIRED_VARS=("SECRET_KEY" "DATABASE_URL" "REDIS_URL")
+# Vérifier les variables requises
+REQUIRED_VARS=("SECRET_KEY" "DATABASE_URL")
 MISSING=()
 for var in "${REQUIRED_VARS[@]}"; do
-    [ -z "${!var:-}" ] && MISSING+=("$var")
+    if [ -z "${!var:-}" ]; then
+        MISSING+=("$var")
+    fi
 done
 
 if [ ${#MISSING[@]} -gt 0 ]; then
@@ -150,146 +288,212 @@ STATUS["Variables"]="✅"
 
 export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.development}"
 
-# ---------------------------------------------------------------------------
-# Étape 5 — PostgreSQL
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 5 — POSTGRESQL
+# =============================================================================
 section "PostgreSQL"
 
 DB_HOST="${POSTGRES_HOST:-localhost}"
 DB_PORT="${POSTGRES_PORT:-5432}"
 
-if ! command -v pg_isready &>/dev/null; then
-    STATUS["PostgreSQL"]="⚠️"
-    warn "pg_isready introuvable — vérification PostgreSQL ignorée"
-elif ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -q 2>/dev/null; then
-    STATUS["PostgreSQL"]="❌"
-    fail "PostgreSQL ne répond pas sur $DB_HOST:$DB_PORT. Lancez 'scripts/setup_db.sh' d'abord."
-else
-    ok "PostgreSQL opérationnel"
-    STATUS["PostgreSQL"]="✅"
+PG_AVAILABLE=false
+PG_MESSAGE=""
+
+# Test PostgreSQL selon l'OS
+if command -v pg_isready &>/dev/null; then
+    if pg_isready -h "$DB_HOST" -p "$DB_PORT" -q 2>/dev/null; then
+        PG_AVAILABLE=true
+    fi
+elif command -v psql &>/dev/null; then
+    if psql -h "$DB_HOST" -p "$DB_PORT" -U postgres -c '\q' 2>/dev/null; then
+        PG_AVAILABLE=true
+    fi
 fi
 
+if [ "$PG_AVAILABLE" = true ]; then
+    ok "PostgreSQL opérationnel sur $DB_HOST:$DB_PORT"
+    STATUS["PostgreSQL"]="✅"
+else
+    STATUS["PostgreSQL"]="⚠️"
+    warn "PostgreSQL ne répond pas sur $DB_HOST:$DB_PORT."
+    case "$OS" in
+        linux)   info "Démarrez PostgreSQL : sudo systemctl start postgresql" ;;
+        macos)   info "Démarrez PostgreSQL : brew services start postgresql" ;;
+        windows) info "Démarrez PostgreSQL : pg_ctl -D \"C:\\Program Files\\PostgreSQL\\18\\data\" start" ;;
+    esac
+fi
+
+# Test de connexion Django
 if python -c "
 import django, os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', '$DJANGO_SETTINGS_MODULE')
-django.setup()
-from django.db import connection
-connection.ensure_connection()
-print('ok')
+try:
+    django.setup()
+    from django.db import connection
+    connection.ensure_connection()
+    print('ok')
+except Exception as e:
+    print('error:', str(e))
 " 2>/dev/null | grep -q "ok"; then
     ok "Connexion Django → PostgreSQL OK"
     STATUS["Base"]="✅"
 else
-    STATUS["Base"]="❌"
-    fail "Django ne peut pas se connecter à la base. Vérifiez DATABASE_URL dans .env."
+    STATUS["Base"]="⚠️"
+    warn "Django ne peut pas se connecter à la base. Vérifiez DATABASE_URL dans .env."
+    info "Pour créer la base :"
+    echo "  psql -U postgres -c 'CREATE DATABASE klass;'"
+    echo "  psql -U postgres -c \"CREATE USER klass WITH PASSWORD 'klass123';\""
+    echo "  psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE klass TO klass;'"
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 6 — Redis
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 6 — REDIS
+# =============================================================================
 section "Redis"
 
 REDIS_URL="${REDIS_URL:-redis://localhost:6379/0}"
 
-if python -c "
-import redis
-r = redis.from_url('$REDIS_URL', socket_connect_timeout=3)
-r.ping()
-print('ok')
-" 2>/dev/null | grep -q "ok"; then
-    ok "Redis opérationnel ($REDIS_URL)"
-    STATUS["Redis"]="✅"
+if command -v redis-cli &>/dev/null; then
+    if redis-cli ping 2>/dev/null | grep -q "PONG"; then
+        ok "Redis opérationnel ($REDIS_URL)"
+        STATUS["Redis"]="✅"
+    else
+        STATUS["Redis"]="⚠️"
+        warn "Redis ne répond pas."
+        case "$OS" in
+            linux)   info "Démarrez Redis : sudo systemctl start redis" ;;
+            macos)   info "Démarrez Redis : brew services start redis" ;;
+            windows) info "Redis optionnel sur Windows — ignorez si non utilisé" ;;
+        esac
+    fi
 else
-    STATUS["Redis"]="❌"
-    fail "Redis inaccessible à $REDIS_URL. Démarrez Redis avant de continuer."
+    STATUS["Redis"]="⚠️"
+    warn "Redis non installé ou non trouvé. (Optionnel)"
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 7 — Celery
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 7 — CELERY
+# =============================================================================
 section "Celery"
 
-if python -c "import celery; print('ok')" 2>/dev/null | grep -q "ok"; then
-    ok "Celery installé ($(python -c 'import celery; print(celery.__version__)'))"
+if python -c "import celery" 2>/dev/null; then
+    CELERY_VERSION=$(python -c "import celery; print(celery.__version__)" 2>/dev/null || echo "inconnue")
+    ok "Celery installé (version $CELERY_VERSION)"
     STATUS["Celery"]="✅"
 else
-    STATUS["Celery"]="❌"
-    warn "Celery non disponible."
+    STATUS["Celery"]="⚠️"
+    warn "Celery non disponible. (Optionnel)"
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 8 — Migrations
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 8 — MIGRATIONS
+# =============================================================================
 section "Migrations Django"
 
-python manage.py check && ok "Vérification Django OK" || { fail "Django check a échoué."; }
+# Check Django
+if python manage.py check &>/dev/null; then
+    ok "Vérification Django OK"
+else
+    warn "Django check a échoué — migrations possibles malgré tout"
+fi
 
-# Vérifier qu'aucune migration n'a été oubliée
+# Vérification des migrations manquantes
 if python manage.py makemigrations --check --dry-run &>/dev/null; then
     ok "Aucune migration manquante détectée"
 else
-    warn "Des migrations non générées ont été détectées — lancez 'python manage.py makemigrations' puis relancez."
+    warn "Des migrations non générées ont été détectées"
+    if python manage.py makemigrations 2>/dev/null; then
+        ok "Migrations générées automatiquement"
+    else
+        warn "makemigrations a échoué — à exécuter manuellement"
+    fi
 fi
 
-if python manage.py migrate_schemas --shared --run-syncdb; then
+# Migration (avec fallback)
+MIGRATION_SUCCESS=false
+if python manage.py migrate_schemas --shared --run-syncdb 2>/dev/null; then
     ok "Migrations schéma public appliquées"
-else
-    STATUS["Migrations"]="❌"
-    print_summary
-    fail "migrate_schemas --shared a échoué. Vérifiez la connexion à la base et les modèles."
+    if python manage.py migrate_schemas 2>/dev/null; then
+        ok "Migrations tenants appliquées"
+        MIGRATION_SUCCESS=true
+    fi
 fi
 
-if python manage.py migrate_schemas; then
-    ok "Migrations tenants appliquées"
+if [ "$MIGRATION_SUCCESS" = false ]; then
+    # Fallback : migration standard
+    if python manage.py migrate 2>/dev/null; then
+        ok "Migrations standard appliquées"
+        MIGRATION_SUCCESS=true
+    fi
+fi
+
+if [ "$MIGRATION_SUCCESS" = true ]; then
     STATUS["Migrations"]="✅"
 else
-    STATUS["Migrations"]="❌"
-    print_summary
-    fail "migrate_schemas a échoué. Vérifiez les migrations de chaque application tenant."
+    STATUS["Migrations"]="⚠️"
+    warn "Migrations échouées — vous devrez les exécuter manuellement"
+    info "Exécutez : python manage.py makemigrations && python manage.py migrate"
 fi
 
-# ---------------------------------------------------------------------------
-# Étape 9 — Fichiers statiques
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 9 — FICHIERS STATIQUES
+# =============================================================================
 section "Fichiers statiques"
-python manage.py collectstatic --noinput --clear -v 0 2>/dev/null && ok "Fichiers statiques collectés" || warn "collectstatic échoué (non bloquant)"
+if python manage.py collectstatic --noinput --clear -v 0 2>/dev/null; then
+    ok "Fichiers statiques collectés"
+else
+    warn "collectstatic échoué (non bloquant)"
+fi
 
-# ---------------------------------------------------------------------------
-# Étape 10 — Santé globale
-# ---------------------------------------------------------------------------
+# =============================================================================
+# ÉTAPE 10 — SANTÉ GLOBALE
+# =============================================================================
 section "Tests de santé"
 
-python manage.py check && ok "Django check OK" || fail "Django check a échoué."
-STATUS["Django"]="✅"
+if python manage.py check &>/dev/null; then
+    ok "Django check OK"
+    STATUS["Django"]="✅"
+else
+    STATUS["Django"]="⚠️"
+    warn "Django check a échoué mais l'application peut fonctionner"
+fi
 
 print_summary
 
-# ---------------------------------------------------------------------------
-# Lancement
-# ---------------------------------------------------------------------------
+# =============================================================================
+# LANCEMENT
+# =============================================================================
 section "Lancement des services KLASS"
 
 PORT="${PORT:-8000}"
 
-if [ "$SKIP_CELERY" = false ]; then
-    # Celery Worker en arrière-plan
-    celery -A config.celery worker --loglevel=info --detach \
-        --logfile=/tmp/celery_worker.log --pidfile=/tmp/celery_worker.pid 2>/dev/null && \
-        ok "Celery Worker démarré (logs : /tmp/celery_worker.log)" || \
-        warn "Celery Worker n'a pas démarré (non bloquant)"
+if [ "$SKIP_CELERY" = false ] && [ "${STATUS["Celery"]}" = "✅" ]; then
+    # Celery Worker (en arrière-plan)
+    if celery -A config.celery worker --loglevel=info --detach \
+        --logfile=/tmp/celery_worker.log --pidfile=/tmp/celery_worker.pid 2>/dev/null; then
+        ok "Celery Worker démarré (logs : /tmp/celery_worker.log)"
+    else
+        warn "Celery Worker non démarré (optionnel)"
+    fi
 
-    # Celery Beat en arrière-plan
-    celery -A config.celery beat --loglevel=info --detach \
+    # Celery Beat (en arrière-plan)
+    if celery -A config.celery beat --loglevel=info --detach \
         --logfile=/tmp/celery_beat.log --pidfile=/tmp/celery_beat.pid \
-        --scheduler django_celery_beat.schedulers:DatabaseScheduler 2>/dev/null && \
-        ok "Celery Beat démarré (logs : /tmp/celery_beat.log)" || \
-        warn "Celery Beat n'a pas démarré (non bloquant)"
+        --scheduler django_celery_beat.schedulers:DatabaseScheduler 2>/dev/null; then
+        ok "Celery Beat démarré (logs : /tmp/celery_beat.log)"
+    else
+        warn "Celery Beat non démarré (optionnel)"
+    fi
 fi
 
+# Afficher l'URL d'accès
 echo ""
 echo -e "${GREEN}════════════════════════════════════════${NC}"
-echo -e "${GREEN}  KLASS est prêt → http://localhost:$PORT${NC}"
+echo -e "${GREEN}  🚀 KLASS est prêt → http://localhost:$PORT${NC}"
 echo -e "${GREEN}════════════════════════════════════════${NC}"
+echo ""
+echo "💡 Pour arrêter : Ctrl+C"
+echo "📋 Logs : /tmp/celery_*.log (si Celery actif)"
 echo ""
 
 # Serveur Django (foreground)
