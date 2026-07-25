@@ -537,6 +537,18 @@ wheels = [
 ]
 
 [[package]]
+name = "gunicorn"
+version = "23.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/34/72/9614c465dc206155d93eff0ca20d42e1e35afc533971379482de953521a4/gunicorn-23.0.0.tar.gz", hash = "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec", size = 375031, upload-time = "2024-08-10T20:25:27.378Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/7d/6dac2a6e1eba33ee43f318edbed4ff29151a49b5d37f080aad1e6469bca4/gunicorn-23.0.0-py3-none-any.whl", hash = "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d", size = 85029, upload-time = "2024-08-10T20:25:24.996Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1023,6 +1035,7 @@ dependencies = [
     { name = "factory-boy" },
     { name = "faker" },
     { name = "flake8" },
+    { name = "gunicorn" },
     { name = "ipython" },
     { name = "isort" },
     { name = "mypy" },
@@ -1037,6 +1050,7 @@ dependencies = [
     { name = "reportlab" },
     { name = "sentry-sdk" },
     { name = "werkzeug" },
+    { name = "whitenoise" },
 ]
 
 [package.metadata]
@@ -1060,6 +1074,7 @@ requires-dist = [
     { name = "factory-boy", specifier = "==3.3.1" },
     { name = "faker", specifier = "==33.3.0" },
     { name = "flake8", specifier = "==7.1.1" },
+    { name = "gunicorn", specifier = "==23.0.0" },
     { name = "ipython", specifier = "==8.31.0" },
     { name = "isort", specifier = "==5.13.2" },
     { name = "mypy", specifier = "==1.14.1" },
@@ -1074,6 +1089,7 @@ requires-dist = [
     { name = "reportlab", specifier = "==4.2.5" },
     { name = "sentry-sdk", specifier = "==2.19.2" },
     { name = "werkzeug", specifier = "==3.1.3" },
+    { name = "whitenoise", specifier = "==6.8.2" },
 ]
 
 [[package]]
@@ -1219,4 +1235,13 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/9f/69/83029f1f6300c5fb2471d621ab06f6ec6b3324685a2ce0f9777fd4a8b71e/werkzeug-3.1.3.tar.gz", hash = "sha256:60723ce945c19328679790e3282cc758aa4a6040e4bb330f53d30fa546d44746", size = 806925, upload-time = "2024-11-08T15:52:18.093Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/24/ab44c871b0f07f491e5d2ad12c9bd7358e527510618cb1b803a88e986db1/werkzeug-3.1.3-py3-none-any.whl", hash = "sha256:54b78bf3716d19a65be4fceccc0d1d7b89e608834989dfae50ea87564639213e", size = 224498, upload-time = "2024-11-08T15:52:16.132Z" },
+]
+
+[[package]]
+name = "whitenoise"
+version = "6.8.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/68/49/c21ebb5b911888c349a849ec7d1ead2dffbbcc4e2be0f6af2a7dbac03393/whitenoise-6.8.2.tar.gz", hash = "sha256:486bd7267a375fa9650b136daaec156ac572971acc8bf99add90817a530dd1d4", size = 25892, upload-time = "2024-10-29T23:04:39.888Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/3a/8d22513e1942899270dcdbd47f9886309836442cd7ede4b0d00be79715f5/whitenoise-6.8.2-py3-none-any.whl", hash = "sha256:df12dce147a043d1956d81d288c6f0044147c6d2ab9726e5772ac50fb45d2280", size = 20158, upload-time = "2024-10-29T23:04:38.415Z" },
 ]
