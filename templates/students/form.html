@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:820px">
+  <div class="d-flex align-items-center gap-3 mb-4"><a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a><div><h1 class="h4 fw-bold mb-0">{{ title }}</h1><p class="text-muted mb-0 small">Le matricule est attribué automatiquement et ne peut pas être saisi.</p></div></div>
+  <div class="card"><div class="card-body p-4"><form method="post" novalidate>{% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row g-3">{% for field in form %}
+      {% if field.name == "primary_parent" %}<div class="col-12"><div class="d-flex justify-content-between align-items-center"><label class="form-label fw-semibold">{{ field.label }}</label><a href="{% url 'students:parent_create' %}" class="small">Créer un parent</a></div>{{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+      {% else %}<div class="{% if field.name == 'first_name' or field.name == 'last_name' or field.name == 'date_of_birth' or field.name == 'gender' or field.name == 'status' %}col-md-6{% else %}col-12{% endif %}">{% if field.field.widget.input_type == "checkbox" %}<div class="form-check mt-2">{{ field }}<label class="form-check-label">{{ field.label }}</label></div>{% else %}<label class="form-label fw-semibold">{{ field.label }}</label>{{ field }}{% endif %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endif %}
+    {% endfor %}</div>
+    <div class="d-flex gap-2 mt-4"><button class="btn btn-primary flex-grow-1">Enregistrer</button><a href="{% url 'students:list' %}" class="btn btn-outline-secondary">Annuler</a></div>
+  </form></div></div>
+</div>
+{% endblock %}

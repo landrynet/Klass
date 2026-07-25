@@ -98,6 +98,9 @@ DATABASES = {
         "ENGINE": "django_tenants.postgresql_backend",  # Backend multi-tenant OBLIGATOIRE
     }
 }
+# Keep PostgreSQL bindings client-side. Named server-side cursors can outlive
+# the tenant schema_context that created them and fail during template render.
+DATABASES["default"].setdefault("OPTIONS", {})["server_side_binding"] = False
 
 # ---------------------------------------------------------------------------
 # Modèle utilisateur personnalisé

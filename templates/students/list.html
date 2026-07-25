@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Élèves{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div><h1 class="h4 fw-bold mb-0">Élèves</h1><p class="text-muted mb-0" style="font-size:.85rem;">Dossiers permanents et matricules de votre école.</p></div>
+    {% if user.is_school_admin %}<a href="{% url 'students:create' %}" class="btn btn-primary fw-semibold" style="border-radius:10px;"><i class="bi bi-plus-lg me-1"></i>Nouvel élève</a>{% endif %}
+  </div>
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    <a href="{% url 'students:parents' %}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;"><i class="bi bi-people me-1"></i>Parents / tuteurs</a>
+    {% if user.is_school_admin %}<a href="{% url 'students:matricule_config' %}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;"><i class="bi bi-gear me-1"></i>Format des matricules</a>{% endif %}
+  </div>
+  <div class="card mb-4"><div class="card-body py-3">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-7"><label class="form-label small fw-semibold">Recherche</label><input name="q" value="{{ q }}" class="form-control" placeholder="Matricule, nom ou prénom…"></div>
+      <div class="col-md-3"><label class="form-label small fw-semibold">Statut</label><select name="status" class="form-select"><option value="">Tous</option><option value="active" {% if status == "active" %}selected{% endif %}>Actifs</option><option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactifs</option><option value="archived" {% if status == "archived" %}selected{% endif %}>Archivés</option></select></div>
+      <div class="col-md-2"><button class="btn btn-outline-primary w-100">Filtrer</button></div>
+    </form>
+  </div></div>
+  <div class="card"><div class="table-responsive"><table class="table table-hover mb-0 align-middle">
+    <thead><tr><th>Matricule</th><th>Élève</th><th>Parent principal</th><th>Statut</th><th></th></tr></thead>
+    <tbody>{% for student in students %}<tr>
+      <td><code>{{ student.matricule }}</code></td><td><a class="fw-semibold text-decoration-none" href="{% url 'students:detail' student.pk %}">{{ student.last_name }} {{ student.first_name }}</a><div class="small text-muted">{{ student.date_of_birth|date:"d/m/Y" }}</div></td>
+      <td>{% if student.primary_parent %}{{ student.primary_parent }}<div class="small text-muted">{{ student.primary_parent.phone }}</div>{% else %}<span class="text-danger">Non renseigné</span>{% endif %}</td>
+      <td><span class="badge {% if student.status == 'active' %}bg-success-subtle text-success{% elif student.status == 'archived' %}bg-dark-subtle text-secondary{% else %}bg-secondary-subtle text-secondary{% endif %}">{{ student.get_status_display }}</span></td>
+      <td class="text-end">{% if user.is_school_admin %}<a href="{% url 'students:edit' student.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>{% endif %}</td>
+    </tr>{% empty %}<tr><td colspan="5" class="text-center text-muted py-5">Aucun élève trouvé.</td></tr>{% endfor %}</tbody>
+  </table></div></div>
+</div>
+{% endblock %}

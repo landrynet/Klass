@@ -1,12 +1,12 @@
 """
-Module 1 — Inscription & Dossier Élève.
-Modèles pour les élèves, leur inscription, les parents et tuteurs.
+Phase 3.0 — Élèves, parents et matricules.
+Le dossier élève est permanent; les inscriptions restent prêtes pour la phase 3.1.
 """
-from django.db import models
+from django.db import models, transaction
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from apps.core.models import TenantAwareModel
 from apps.core.constants import Gender, EnrollmentStatus
-from apps.core.utils import generate_matricule
 
 
 class Student(TenantAwareModel):
@@ -20,7 +20,7 @@ class Student(TenantAwareModel):
         max_length=30,
         unique=True,
         verbose_name="Matricule",
-        help_text="Généré automatiquement à l'inscription."
+        help_text="Généré automatiquement par KLASS."
     )
 
     # Identité
@@ -32,6 +32,25 @@ class Student(TenantAwareModel):
         max_length=1,
         choices=Gender.CHOICES,
         verbose_name="Genre"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("active", "Actif"),
+            ("inactive", "Inactif"),
+            ("archived", "Archivé"),
+        ],
+        default="active",
+        verbose_name="Statut",
+    )
+    primary_parent = models.ForeignKey(
+        "Parent",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="primary_students",
+        verbose_name="Parent / tuteur principal",
+        help_text="Obligatoire lors de la création d'un élève.",
     )
     nationality = models.CharField(max_length=100, default="Congolaise", verbose_name="Nationalité")
     photo = models.ImageField(
@@ -66,12 +85,23 @@ class Student(TenantAwareModel):
         return f"{self.last_name} {self.first_name} ({self.matricule})"
 
     def save(self, *args, **kwargs):
-        # Générer le matricule automatiquement à la création
+        if not self.primary_parent_id:
+            raise ValidationError("Un élève doit avoir un parent ou tuteur principal.")
+        # Le matricule est réservé sous verrou afin de rester unique lors de
+        # créations simultanées. Les anciens matricules ne sont jamais réutilisés.
         if not self.matricule:
-            self.matricule = generate_matricule()
-            # S'assurer de l'unicité (collision très rare mais possible)
-            while Student.objects.filter(matricule=self.matricule).exists():
-                self.matricule = generate_matricule()
+            with transaction.atomic():
+                config, _ = MatriculeConfiguration.objects.get_or_create(pk=1)
+                config = MatriculeConfiguration.objects.select_for_update().get(pk=config.pk)
+                while True:
+                    number = config.next_number
+                    self.matricule = config.format_number(number)
+                    config.next_number = number + 1
+                    if not Student.objects.filter(matricule=self.matricule).exists():
+                        config.save(update_fields=["next_number", "updated_at"])
+                        super().save(*args, **kwargs)
+                        break
+            return
         super().save(*args, **kwargs)
 
     def get_full_name(self):
@@ -207,3 +237,29 @@ class ParentStudent(TenantAwareModel):
 
     def __str__(self):
         return f"{self.parent} → {self.student} ({self.get_relationship_display()})"
+
+
+class MatriculeConfiguration(TenantAwareModel):
+    """Configuration du format et compteur des matricules d'une école."""
+    prefix = models.CharField(max_length=10, default="KLS", verbose_name="Préfixe")
+    include_year = models.BooleanField(default=True, verbose_name="Inclure l'année")
+    separator = models.CharField(max_length=1, default="-", verbose_name="Séparateur")
+    number_digits = models.PositiveSmallIntegerField(default=4, verbose_name="Nombre de chiffres")
+    next_number = models.PositiveIntegerField(default=1, verbose_name="Prochain numéro")
+
+    class Meta:
+        verbose_name = "Configuration des matricules"
+        verbose_name_plural = "Configuration des matricules"
+
+    def __str__(self):
+        return self.preview()
+
+    def format_number(self, number):
+        parts = [self.prefix.upper()]
+        if self.include_year:
+            parts.append(str(timezone.now().year))
+        parts.append(str(number).zfill(self.number_digits))
+        return self.separator.join(parts)
+
+    def preview(self):
+        return self.format_number(self.next_number)

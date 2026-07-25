@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ parent }}{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:900px"><div class="d-flex justify-content-between align-items-start mb-4"><div><a href="{% url 'students:parents' %}" class="small text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Parents / tuteurs</a><h1 class="h4 fw-bold mt-2 mb-1">{{ parent }}</h1><div class="text-muted small">{{ parent.phone }}{% if parent.email %} · {{ parent.email }}{% endif %}</div></div>{% if user.is_school_admin %}<a href="{% url 'students:parent_edit' parent.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Modifier</a>{% endif %}</div>
+  <div class="card"><div class="card-body"><h6 class="text-muted text-uppercase small">Élèves associés</h6>{% for student in students %}<div class="d-flex justify-content-between align-items-center border-bottom py-3"><a href="{% url 'students:detail' student.pk %}" class="fw-semibold">{{ student.last_name }} {{ student.first_name }}</a><code>{{ student.matricule }}</code></div>{% empty %}<p class="text-muted mb-0">Aucun élève associé.</p>{% endfor %}</div></div>
+</div>
+{% endblock %}

@@ -760,6 +760,10 @@ class ClassroomCreateView(SchoolAdminRequiredMixin, View):
                 option_qs = Option.objects.none()
 
             room_qs = Room.objects.filter(is_archived=False, is_available=True).order_by("name")
+            # Populate the queryset cache while the tenant schema is active.
+            # Django ModelChoiceFields are rendered later, outside this block.
+            list(option_qs)
+            list(room_qs)
 
         return {
             "years": years,

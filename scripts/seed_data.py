@@ -234,7 +234,17 @@ def seed():
 
         # ---- 9. Élève de test ----
         print("\n9. Élève de test...")
-        from apps.students.models import Student, StudentEnrollment
+        from apps.students.models import Parent, ParentStudent, Student, StudentEnrollment
+        demo_parent, parent_created = Parent.objects.get_or_create(
+            first_name="Marie",
+            last_name="Mukendi [SEED]",
+            defaults={
+                "phone": "+243900000001",
+                "email": "marie.mukendi.seed@example.com",
+                "profession": "Parent",
+            },
+        )
+        print(f"   ✅ Parent : {demo_parent} ({'créé' if parent_created else 'existant'})")
         student, created = Student.objects.get_or_create(
             first_name="Jean",
             last_name="Kabila [SEED]",
@@ -242,8 +252,13 @@ def seed():
                 "date_of_birth": datetime.date(2010, 3, 15),
                 "gender": "M",
                 "nationality": "Congolaise",
+                "primary_parent": demo_parent,
             }
         )
+        if student.primary_parent_id != demo_parent.pk:
+            student.primary_parent = demo_parent
+            student.save(update_fields=["primary_parent", "updated_at"])
+        ParentStudent.objects.get_or_create(parent=demo_parent, student=student)
         # Chercher la classe 6ème Scientifique A pour l'enrollment
         demo_classroom = Classroom.objects.filter(
             school_year=year_2526,

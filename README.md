@@ -70,6 +70,21 @@ Documentation : `docs/modules/phase-2-0-fondations-structure-academique.md`
 
 ---
 
+### Phase 3.0 — Élèves, parents et matricules
+**Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
+
+Documentation : `docs/modules/phase-3-0-eleves-parents-matricules.md`
+
+- ✅ Dossiers élèves et statuts
+- ✅ Parents / tuteurs et association à plusieurs élèves
+- ✅ Parent principal obligatoire à la création d'un élève
+- ✅ Matricules automatiques, uniques et stables
+- ✅ Format de matricule configurable par école
+- ✅ Recherche, filtres, consultation et interfaces personnalisées
+- ✅ Isolation tenant et permissions backend
+
+---
+
 ### Phase 0 — Socle architectural
 **Statut : ✅ TERMINÉE ET VALIDÉE**
 
