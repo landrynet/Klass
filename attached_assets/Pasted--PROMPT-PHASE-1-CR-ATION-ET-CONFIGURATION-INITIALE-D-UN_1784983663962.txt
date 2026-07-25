@@ -1,0 +1,928 @@
+# PROMPT — PHASE 1 : CRÉATION ET CONFIGURATION INITIALE D'UNE ÉCOLE
+
+## CONTEXTE
+
+L'architecture de base de la plateforme **KLASS** a été créée et validée.
+
+Tu dois maintenant développer la **Phase 1 : Fondation d'une école**.
+
+Cette phase doit permettre au Super-Admin de créer une école et à l'Admin École de configurer son établissement avant d'utiliser les autres fonctionnalités du système.
+
+Respecte l'architecture existante et ne réorganise pas inutilement le projet.
+
+---
+
+# 1. DOCUMENTATION DU PROJET — RÈGLE ABSOLUE
+
+Le dossier :
+
+```text
+docs/
+```
+
+est la **référence documentaire officielle et évolutive du projet KLASS**.
+
+Le document principal du projet se trouve ici :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Tu dois impérativement lire et analyser ce document avant de commencer le développement.
+
+Ce document constitue la référence principale pour comprendre :
+
+* la vision globale du projet ;
+* l'architecture du système ;
+* les modules ;
+* les rôles ;
+* le fonctionnement multi-tenant ;
+* les règles métier ;
+* les exigences techniques.
+
+---
+
+## RÈGLE DE DOCUMENTATION CONTINUE
+
+Tout ce qui est développé dans le projet doit être documenté dans le dossier :
+
+```text
+docs/
+```
+
+La documentation ne doit pas être créée uniquement à la fin du projet.
+
+Elle doit être mise à jour au fur et à mesure du développement.
+
+Chaque phase et chaque module doivent posséder une documentation complète et à jour.
+
+---
+
+## DOCUMENTATION PAR MODULE
+
+Pour chaque module développé, créer ou mettre à jour un document dédié dans :
+
+```text
+docs/
+```
+
+Par exemple :
+
+```text
+docs/
+├── Klass_Document_Projet.docx
+├── modules/
+│   ├── phase-1-fondation-ecole.md
+│   ├── structure-academique.md
+│   ├── gestion-eleves.md
+│   ├── enseignants.md
+│   ├── emploi-du-temps.md
+│   ├── finance.md
+│   ├── ressources-pedagogiques.md
+│   └── portail.md
+```
+
+L'organisation exacte peut être adaptée à l'architecture existante, mais toute documentation doit rester clairement organisée dans `docs/`.
+
+---
+
+## CONTENU OBLIGATOIRE DE LA DOCUMENTATION DE CHAQUE MODULE
+
+Chaque documentation de module doit expliquer au minimum :
+
+### 1. Objectif du module
+
+À quoi sert le module.
+
+### 2. Périmètre fonctionnel
+
+Ce que le module contient.
+
+### 3. Fonctionnalités
+
+La liste complète des fonctionnalités prévues.
+
+### 4. Fonctionnalités développées
+
+Ce qui a réellement été implémenté.
+
+### 5. Rôles et permissions
+
+Quels rôles peuvent :
+
+* consulter ;
+* créer ;
+* modifier ;
+* supprimer ;
+* valider.
+
+### 6. Modèles et données
+
+Les principaux modèles utilisés et leurs relations.
+
+### 7. Architecture technique
+
+Les applications, services, vues, formulaires, permissions et composants concernés.
+
+### 8. Flux métier
+
+Le fonctionnement étape par étape des processus importants.
+
+### 9. Routes et interfaces
+
+Les routes principales et les interfaces personnalisées concernées.
+
+### 10. Sécurité
+
+Les règles d'accès et d'isolation des données.
+
+### 11. Tests
+
+Les tests réalisés et leurs résultats.
+
+### 12. État du module
+
+Le statut réel :
+
+```text
+⏳ EN COURS
+⚠️ PARTIELLEMENT TERMINÉ
+✅ TERMINÉ ET VALIDÉ
+❌ NON VALIDÉ
+```
+
+### 13. Fonctionnalités restantes
+
+Ce qui n'est pas encore développé.
+
+### 14. Problèmes connus
+
+Les problèmes ou limitations éventuels.
+
+---
+
+## MISE À JOUR DE LA DOCUMENTATION
+
+À chaque modification importante d'un module :
+
+1. Mettre à jour son document dans `docs/`.
+2. Vérifier que la documentation correspond au code réellement présent.
+3. Mettre à jour les fonctionnalités développées.
+4. Mettre à jour les tests.
+5. Mettre à jour le statut.
+6. Documenter les changements importants.
+
+La documentation ne doit jamais décrire des fonctionnalités qui n'existent pas réellement.
+
+Le code et la documentation doivent rester cohérents.
+
+---
+
+# 2. OBJECTIF DE LA PHASE
+
+À la fin de cette phase, le flux suivant doit fonctionner complètement :
+
+```text
+Super-Admin
+    ↓
+Création d'une école
+    ↓
+Création du tenant
+    ↓
+Création du schéma isolé de l'école
+    ↓
+Création du compte Admin École
+    ↓
+Génération des identifiants temporaires
+    ↓
+Accès à l'espace de connexion de l'école
+    ↓
+Première connexion
+    ↓
+Changement obligatoire du mot de passe
+    ↓
+Assistant de configuration initiale
+    ↓
+Configuration des informations de l'école
+    ↓
+Configuration de l'année scolaire initiale
+    ↓
+Validation
+    ↓
+École prête à être utilisée
+```
+
+---
+
+# 3. ANALYSER L'ARCHITECTURE EXISTANTE
+
+Avant toute modification :
+
+1. Inspecte l'architecture actuelle.
+2. Vérifie les applications déjà créées.
+3. Vérifie la configuration multi-tenant.
+4. Vérifie la configuration PostgreSQL.
+5. Vérifie le modèle utilisateur existant.
+6. Vérifie le système de rôles et permissions.
+7. Vérifie les URLs et dashboards existants.
+8. Vérifie les migrations existantes.
+9. Vérifie les tests existants.
+10. Vérifie le `README.md`.
+11. Lis `docs/Klass_Document_Projet.docx`.
+12. Vérifie la documentation déjà présente dans `docs/`.
+
+Ne détruis pas le travail déjà réalisé.
+
+Si une structure existe déjà, réutilise-la et améliore-la proprement.
+
+---
+
+# 4. CRÉATION D'UNE ÉCOLE PAR LE SUPER-ADMIN
+
+Créer une interface personnalisée KLASS pour le Super-Admin.
+
+**Ne pas utiliser Django Admin.**
+
+Le Super-Admin doit pouvoir créer une école à travers une interface personnalisée.
+
+Le formulaire doit prévoir au minimum :
+
+* nom de l'école ;
+* code unique de l'école ;
+* adresse ;
+* ville ;
+* pays ;
+* email de contact ;
+* téléphone de contact ;
+* nom de l'Admin École ;
+* email ou identifiant de l'Admin École.
+
+Les informations doivent être validées.
+
+Le code de l'école doit être unique.
+
+Le système doit empêcher la création de doublons.
+
+---
+
+# 5. CRÉATION DU TENANT
+
+Lors de la création d'une école :
+
+```text
+Création de l'école
+        ↓
+Création du tenant
+        ↓
+Création du schéma PostgreSQL dédié
+        ↓
+Configuration du domaine ou sous-domaine
+        ↓
+Création de l'Admin École
+```
+
+Le tenant doit être correctement associé à l'école.
+
+Le système doit garantir l'isolation des données.
+
+Une école ne doit jamais pouvoir accéder aux données d'une autre école.
+
+Tester réellement cette isolation.
+
+---
+
+# 6. SOUS-DOMAINE OU DOMAINE DE L'ÉCOLE
+
+Préparer le système pour qu'une école dispose d'une adresse personnalisée.
+
+Exemple :
+
+```text
+ecole-a.klass.app
+ecole-b.klass.app
+```
+
+Le sous-domaine doit permettre d'identifier le tenant courant.
+
+Si l'environnement de développement ne permet pas de créer de vrais sous-domaines, prévoir une configuration de développement documentée permettant de simuler correctement ce fonctionnement.
+
+Le système doit être conçu pour fonctionner avec de vrais sous-domaines en production.
+
+Documenter cette configuration dans la documentation de la Phase 1.
+
+---
+
+# 7. CRÉATION DE L'ADMIN ÉCOLE
+
+Lors de la création d'une école, le système doit créer automatiquement son Admin École.
+
+L'Admin École doit être associé uniquement à son établissement.
+
+Il ne doit pas être un utilisateur global capable d'accéder à toutes les écoles.
+
+Le compte doit avoir le rôle :
+
+```text
+school_admin
+```
+
+ou le nom de rôle déjà utilisé par l'architecture existante.
+
+Documenter le fonctionnement de ce rôle dans la documentation du module.
+
+---
+
+# 8. IDENTIFIANTS TEMPORAIRES
+
+Lors de la création de l'école :
+
+```text
+Login ou email
+        +
+Mot de passe temporaire
+```
+
+doivent être générés ou configurés.
+
+Le mot de passe temporaire doit être sécurisé.
+
+Ne jamais stocker le mot de passe en clair dans la base de données.
+
+Le système doit enregistrer un état indiquant que l'utilisateur doit effectuer sa première configuration.
+
+Exemple :
+
+```text
+first_login_required = True
+```
+
+ou une logique équivalente adaptée au modèle existant.
+
+Les identifiants temporaires doivent être communiqués de manière sécurisée selon l'architecture prévue.
+
+Documenter le processus dans `docs/`.
+
+---
+
+# 9. PREMIÈRE CONNEXION
+
+Lorsque l'Admin École se connecte pour la première fois, il ne doit pas accéder directement au dashboard normal.
+
+Il doit être redirigé obligatoirement vers le processus de première configuration.
+
+```text
+Connexion réussie
+        ↓
+Vérification première connexion
+        ↓
+Configuration obligatoire
+```
+
+Tant que cette configuration n'est pas terminée :
+
+* l'accès aux autres modules doit être bloqué ;
+* l'utilisateur ne doit pas pouvoir contourner l'assistant en modifiant l'URL ;
+* les routes sensibles doivent également vérifier cet état côté serveur.
+
+Documenter ce flux dans la documentation du module.
+
+---
+
+# 10. CHANGEMENT OBLIGATOIRE DU MOT DE PASSE
+
+La première étape de la configuration doit obliger l'Admin École à modifier son mot de passe temporaire.
+
+Le nouveau mot de passe doit respecter les règles de sécurité configurées dans le projet.
+
+Après changement réussi :
+
+```text
+Mot de passe temporaire
+        ↓
+Nouveau mot de passe sécurisé
+```
+
+Le mot de passe temporaire ne doit plus être utilisable.
+
+---
+
+# 11. INFORMATIONS DE L'ÉCOLE
+
+Créer une étape permettant de compléter ou modifier les informations de l'établissement.
+
+Prévoir notamment :
+
+* nom officiel ;
+* logo ;
+* adresse ;
+* ville ;
+* pays ;
+* email ;
+* téléphone ;
+* autres informations nécessaires au fonctionnement de l'école.
+
+Les fichiers doivent utiliser le système de stockage configuré par l'architecture du projet.
+
+Ne pas créer une logique de stockage incompatible avec la configuration existante.
+
+---
+
+# 12. ANNÉE SCOLAIRE INITIALE
+
+L'Admin École doit pouvoir définir l'année scolaire initiale de son établissement.
+
+Exemple :
+
+```text
+2026-2027
+```
+
+Cette année doit être enregistrée comme année scolaire active.
+
+Préparer proprement l'architecture pour le futur module de gestion des années scolaires.
+
+Ne pas développer encore toute la logique complète de changement d'année scolaire.
+
+---
+
+# 13. ASSISTANT DE CONFIGURATION INITIALE
+
+Créer un assistant de configuration clair et progressif.
+
+Exemple :
+
+```text
+Étape 1 — Changement du mot de passe
+        ↓
+Étape 2 — Informations de l'école
+        ↓
+Étape 3 — Logo et coordonnées
+        ↓
+Étape 4 — Année scolaire initiale
+        ↓
+Étape 5 — Vérification
+        ↓
+Configuration terminée
+```
+
+L'utilisateur doit pouvoir voir clairement :
+
+* l'étape actuelle ;
+* les étapes restantes ;
+* les erreurs éventuelles ;
+* l'état d'avancement.
+
+La configuration doit être enregistrée de manière fiable.
+
+Si l'utilisateur quitte l'assistant avant la fin, il doit pouvoir reprendre la configuration sans perdre les données déjà enregistrées.
+
+---
+
+# 14. CONFIGURATION INITIALE TERMINÉE
+
+À la fin de l'assistant, l'école doit avoir un état clair :
+
+```text
+Configuration en cours
+        ↓
+Configuration validée
+        ↓
+École opérationnelle
+```
+
+L'Admin École ne doit accéder au dashboard complet qu'après validation de la configuration initiale obligatoire.
+
+---
+
+# 15. DASHBOARD PERSONNALISÉ
+
+Créer ou utiliser le dashboard personnalisé de KLASS.
+
+**Ne pas utiliser Django Admin.**
+
+Après la configuration initiale, l'Admin École doit être redirigé vers son dashboard personnalisé.
+
+Le dashboard peut être simple à cette étape.
+
+Il doit au minimum afficher :
+
+* nom de l'école ;
+* année scolaire active ;
+* état de configuration ;
+* accès aux modules disponibles ou à venir.
+
+Les modules non encore développés peuvent apparaître comme indisponibles ou ne pas apparaître selon l'architecture prévue.
+
+---
+
+# 16. SÉCURITÉ ET PERMISSIONS
+
+Vérifier strictement :
+
+* qu'un Admin École ne peut accéder qu'à son propre tenant ;
+* qu'un Admin École ne peut pas accéder à une autre école ;
+* qu'un utilisateur non autorisé ne peut pas accéder à l'assistant ;
+* qu'un utilisateur ne peut pas contourner la première configuration ;
+* que les routes sensibles sont protégées côté serveur ;
+* que les permissions sont vérifiées à chaque requête importante.
+
+Ne pas se contenter de masquer les boutons dans l'interface.
+
+La sécurité doit être appliquée dans le backend.
+
+---
+
+# 17. GESTION DES ERREURS
+
+Prévoir une gestion propre des erreurs :
+
+* code école déjà existant ;
+* tenant déjà existant ;
+* erreur de création du schéma ;
+* erreur de connexion à la base ;
+* erreur de création de l'utilisateur ;
+* erreur de sauvegarde des informations ;
+* configuration interrompue.
+
+En cas d'erreur lors de la création d'une école, éviter de laisser des données incomplètes ou incohérentes.
+
+Utiliser une logique transactionnelle lorsque cela est possible.
+
+Documenter les erreurs importantes et leurs solutions dans `docs/`.
+
+---
+
+# 18. TESTS OBLIGATOIRES
+
+Créer et exécuter des tests pour vérifier :
+
+## Création d'une école
+
+* création réussie ;
+* code unique ;
+* prévention des doublons.
+
+## Tenant
+
+* création du tenant ;
+* association correcte à l'école ;
+* isolation des données.
+
+## Admin École
+
+* création automatique ;
+* rôle correct ;
+* association au bon tenant.
+
+## Première connexion
+
+* redirection vers la configuration ;
+* blocage du dashboard avant configuration ;
+* impossibilité de contourner la configuration.
+
+## Mot de passe
+
+* changement obligatoire ;
+* ancien mot de passe temporaire invalidé.
+
+## Configuration
+
+* informations de l'école ;
+* année scolaire active ;
+* validation finale.
+
+## Isolation
+
+Créer au minimum deux écoles de test :
+
+```text
+École A
+École B
+```
+
+Vérifier que :
+
+```text
+Admin A ≠ accès aux données de B
+Admin B ≠ accès aux données de A
+```
+
+Les tests doivent réellement être exécutés et réussir.
+
+Documenter les tests et leurs résultats dans la documentation de la Phase 1.
+
+---
+
+# 19. MIGRATIONS ET VÉRIFICATIONS
+
+Après le développement, exécuter les vérifications nécessaires :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+```
+
+Puis exécuter les tests.
+
+Corriger toutes les erreurs réellement rencontrées.
+
+Ne pas déclarer la phase terminée si les tests essentiels échouent.
+
+---
+
+# 20. DONNÉES DE TEST
+
+Si un système de données de test existe déjà, l'utiliser.
+
+Sinon, créer des données de test contrôlées permettant de tester :
+
+* deux écoles ;
+* deux tenants ;
+* deux Admin École ;
+* les connexions ;
+* l'isolation.
+
+Les données de test ne doivent pas être dupliquées à chaque exécution.
+
+Elles doivent être facilement identifiables comme données de développement.
+
+---
+
+# 21. DOCUMENTATION COMPLÈTE DE LA PHASE 1
+
+Créer ou mettre à jour la documentation dédiée à cette phase dans :
+
+```text
+docs/
+```
+
+La documentation doit contenir au minimum :
+
+## Objectif
+
+Le rôle de la Phase 1.
+
+## Fonctionnalités prévues
+
+La liste complète des fonctionnalités de la phase.
+
+## Fonctionnalités développées
+
+Ce qui a réellement été implémenté.
+
+## Architecture
+
+Les applications, modèles, services, vues et composants utilisés.
+
+## Flux fonctionnels
+
+Le processus complet :
+
+```text
+Super-Admin
+    ↓
+Création de l'école
+    ↓
+Tenant
+    ↓
+Admin École
+    ↓
+Première connexion
+    ↓
+Configuration
+    ↓
+École opérationnelle
+```
+
+## Rôles et permissions
+
+Les accès de chaque rôle concerné.
+
+## Sécurité et isolation
+
+La manière dont l'isolation des écoles est assurée.
+
+## Routes et interfaces
+
+Les routes et interfaces personnalisées créées.
+
+## Base de données
+
+Les modèles et relations ajoutés ou modifiés.
+
+## Tests
+
+Les tests exécutés et leurs résultats.
+
+## Problèmes connus
+
+Les problèmes éventuels.
+
+## Fonctionnalités restantes
+
+Les fonctionnalités qui ne sont pas encore développées.
+
+## Statut
+
+Le statut réel de la Phase 1.
+
+La documentation doit rester cohérente avec le code.
+
+---
+
+# 22. MISE À JOUR OBLIGATOIRE DU README.md
+
+À la fin de la Phase 1, mettre obligatoirement à jour :
+
+```text
+README.md
+```
+
+Le README.md doit refléter l'état réel du projet.
+
+Ajouter une section claire sur l'état d'avancement des modules et phases.
+
+Exemple :
+
+```text
+## État d'avancement du projet
+
+### Phase 1 — Fondation de l'école
+Statut : ✅ TERMINÉE ET VALIDÉE
+
+Documentation :
+docs/modules/phase-1-fondation-ecole.md
+
+Fonctionnalités :
+
+- Création d'une école par le Super-Admin
+- Création du tenant
+- Isolation des données de l'école
+- Création de l'Admin École
+- Génération des identifiants temporaires
+- Première connexion obligatoire
+- Changement obligatoire du mot de passe
+- Assistant de configuration initiale
+- Configuration des informations de l'école
+- Configuration de l'année scolaire initiale
+- Accès au dashboard personnalisé
+- Tests de sécurité et d'isolation
+
+Validation :
+
+- Tests automatisés réussis
+- Tests d'isolation multi-tenant réussis
+- Tests de première connexion réussis
+- Migrations validées
+- Vérifications système réussies
+- Documentation complète créée et à jour
+```
+
+Le README doit également lister les autres modules du projet et leur statut réel.
+
+Utiliser uniquement des statuts clairs :
+
+```text
+⏳ EN COURS
+⚠️ PARTIELLEMENT TERMINÉ
+✅ TERMINÉ ET VALIDÉ
+❌ NON VALIDÉ
+```
+
+Pour chaque module ou phase, indiquer :
+
+1. Le nom du module ou de la phase.
+2. Son statut actuel.
+3. La liste des fonctionnalités prévues.
+4. Les fonctionnalités réellement développées.
+5. La documentation associée.
+6. Les tests effectués.
+7. Les fonctionnalités restantes.
+8. Les problèmes connus éventuels.
+
+Ne jamais indiquer qu'un module est terminé uniquement parce que du code existe.
+
+Un module ou une phase peut être marqué :
+
+```text
+✅ TERMINÉ ET VALIDÉ
+```
+
+uniquement lorsque :
+
+* toutes les fonctionnalités prévues pour la phase sont développées ;
+* les fonctionnalités fonctionnent réellement ;
+* les tests importants ont été exécutés ;
+* les erreurs critiques sont corrigées ;
+* les migrations sont valides ;
+* l'isolation et la sécurité sont vérifiées lorsque nécessaire ;
+* la documentation complète du module est créée et à jour.
+
+---
+
+# 23. RAPPORT FINAL
+
+À la fin du travail, fournir un rapport contenant :
+
+## Architecture utilisée
+
+Quels fichiers et applications ont été utilisés.
+
+## Création d'école
+
+Comment fonctionne le processus.
+
+## Multi-tenant
+
+Comment l'isolation est assurée.
+
+## Authentification
+
+Comment fonctionne la première connexion.
+
+## Configuration initiale
+
+Quelles étapes sont obligatoires.
+
+## Tests
+
+Quels tests ont été exécutés et leurs résultats réels.
+
+## Documentation
+
+Quels documents ont été créés ou mis à jour dans `docs/`.
+
+## README.md
+
+Confirmer que le README a été mis à jour avec :
+
+* le statut de la Phase 1 ;
+* la liste des fonctionnalités ;
+* les tests effectués ;
+* la documentation associée ;
+* les fonctionnalités restantes éventuelles.
+
+## Problèmes
+
+Les problèmes rencontrés et les corrections apportées.
+
+## État final
+
+Indiquer clairement :
+
+```text
+PHASE 1 VALIDÉE
+```
+
+uniquement si les tests sont réellement réussis et que la documentation est complète.
+
+Sinon :
+
+```text
+PHASE 1 NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+Ne commence pas encore le développement complet des modules :
+
+* élèves ;
+* paiements ;
+* emploi du temps ;
+* enseignants ;
+* ressources pédagogiques ;
+* portail complet.
+
+Cette phase doit se concentrer uniquement sur :
+
+```text
+École
+    ↓
+Tenant
+    ↓
+Admin École
+    ↓
+Première connexion
+    ↓
+Configuration obligatoire
+    ↓
+École opérationnelle
+```
+
+Construis cette fondation proprement, teste-la complètement et documente précisément tout ce qui a été développé dans le dossier `docs/`.
+
+Le dossier `docs/` doit rester la référence documentaire officielle de tout le projet KLASS.
+
+Chaque nouveau module développé dans les phases suivantes devra également posséder sa documentation complète et à jour dans `docs/`.
+
+Ne marque jamais une phase ou un module comme terminé et validé si :
+
+* le code n'est pas complet ;
+* les tests importants ne passent pas ;
+* la sécurité n'est pas vérifiée ;
+* la documentation n'est pas à jour.
