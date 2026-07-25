@@ -25,7 +25,7 @@ class CreateSchoolForm(forms.Form):
         label="Nom de l'établissement",
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "ex: École Saint-Joseph de Lubumbashi",
+            "placeholder": "Institut Sainte-Marie de Kinshasa",
         }),
     )
     email = forms.EmailField(
@@ -59,7 +59,7 @@ class CreateSchoolForm(forms.Form):
         label="Ville",
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "ex: Lubumbashi",
+            "placeholder": "Lubumbashi",
         }),
     )
     country = forms.CharField(
@@ -90,10 +90,9 @@ class CreateSchoolForm(forms.Form):
     )
     admin_email = forms.EmailField(
         label="Email de l'Admin École",
-        help_text="Cet email sera utilisé comme identifiant de connexion de l'Admin École.",
         widget=forms.EmailInput(attrs={
             "class": "form-control",
-            "placeholder": "admin@ecole.cd",
+            "placeholder": "directeur@ecole.cd",
         }),
     )
 
