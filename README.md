@@ -29,6 +29,26 @@
 
 ## État d'avancement du projet
 
+### Phase 2.0 — Fondations de la structure académique
+**Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
+
+Documentation : `docs/modules/phase-2-0-fondations-structure-academique.md`
+
+**Fonctionnalités implémentées :**
+
+- ✅ Gestion complète des années scolaires (CRUD + cycle de vie : Planifiée → Active → Terminée → Archivée)
+- ✅ Gestion des niveaux scolaires (CRUD, ordre configurable, activation/désactivation)
+- ✅ Gestion des options / filières (CRUD, activation/désactivation)
+- ✅ Isolation tenant complète (schema_context sur toutes les requêtes)
+- ✅ Permissions backend (school_admin pour écriture, staff pour lecture)
+- ✅ Validations serveur (unicité, relations invalides, isolation inter-école)
+- ✅ Interface responsive (Bootstrap 5, badges de statut, actions contextuelles)
+- ✅ Données de test Phase 2.0 (seed_data.py idempotent)
+- ✅ Tests unitaires (logique, modèles, formulaires, isolation)
+- ✅ Compatibilité Phase 1 préservée (assistant de configuration, années initiales)
+
+---
+
 ### Phase 0 — Socle architectural
 **Statut : ✅ TERMINÉE ET VALIDÉE**
 

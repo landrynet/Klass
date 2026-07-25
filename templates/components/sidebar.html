@@ -105,9 +105,26 @@
           <i class="bi bi-person-badge-fill"></i>Enseignants
         </a>
       </li>
+    </ul>
+
+    <p class="sidebar-section-title">Structure académique</p>
+    <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'academics:classrooms' %}">
-          <i class="bi bi-diagram-3-fill"></i>Structure académique
+        <a class="nav-link {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'school_years' %}active{% endif %}"
+           href="{% url 'school_years:list' %}">
+          <i class="bi bi-calendar-event-fill"></i>Années scolaires
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'level' in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'academics:levels' %}">
+          <i class="bi bi-bookmark-fill"></i>Niveaux
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'option' in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'academics:options' %}">
+          <i class="bi bi-diagram-2-fill"></i>Options / Filières
         </a>
       </li>
     </ul>
@@ -117,11 +134,6 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'communications:list' %}">
           <i class="bi bi-megaphone-fill"></i>Communications
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'school_years:list' %}">
-          <i class="bi bi-calendar-event-fill"></i>Années scolaires
         </a>
       </li>
     </ul>

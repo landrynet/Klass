@@ -25,6 +25,11 @@ class Level(TenantAwareModel):
         verbose_name="Ordre d'affichage",
         help_text="0 = premier niveau, croissant"
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Actif",
+        help_text="Un niveau inactif ne peut pas être utilisé pour créer des classes."
+    )
 
     class Meta:
         verbose_name = "Niveau"
@@ -49,6 +54,11 @@ class Option(TenantAwareModel):
     name = models.CharField(max_length=100, verbose_name="Nom de l'option")
     code = models.CharField(max_length=10, blank=True, verbose_name="Code")
     description = models.TextField(blank=True, verbose_name="Description")
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active",
+        help_text="Une option inactive ne peut pas être utilisée pour créer des classes."
+    )
 
     class Meta:
         verbose_name = "Option / Filière"

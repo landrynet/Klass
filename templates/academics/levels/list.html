@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Niveaux scolaires{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- En-tête -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-0">Niveaux scolaires</h1>
+      <p class="text-muted mb-0" style="font-size:0.85rem;">Gérez les niveaux d'étude de votre établissement.</p>
+    </div>
+    {% if user.is_school_admin %}
+    <a href="{% url 'academics:level_create' %}{% if selected_year %}?year_id={{ selected_year.pk }}{% endif %}"
+       class="btn btn-primary fw-semibold" style="border-radius:10px;height:40px;display:flex;align-items:center;gap:6px;">
+      <i class="bi bi-plus-lg"></i>Nouveau niveau
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Filtres par année scolaire -->
+  {% if years %}
+  <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+    <span class="text-muted" style="font-size:0.82rem;white-space:nowrap;">
+      <i class="bi bi-funnel me-1"></i>Année :
+    </span>
+    {% for year in years %}
+    <a href="{% url 'academics:levels' %}?year_id={{ year.pk }}"
+       class="btn btn-sm {% if selected_year and selected_year.pk == year.pk %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">
+      {{ year.name }}
+      {% if year.is_active %}<i class="bi bi-circle-fill ms-1" style="font-size:0.5rem;color:currentColor;vertical-align:middle;"></i>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if selected_year %}
+  <!-- Info sur l'année sélectionnée -->
+  <div class="d-flex align-items-center gap-2 mb-3 p-3 rounded-3" style="background:var(--klass-bg-secondary);border:1px solid var(--klass-border);">
+    <i class="bi bi-calendar-event" style="color:var(--klass-primary);"></i>
+    <span style="font-size:0.85rem;">
+      Affichage des niveaux pour <strong>{{ selected_year.name }}</strong>
+      <span class="badge {{ selected_year.status_badge_class }} ms-1">{{ selected_year.status_display }}</span>
+    </span>
+  </div>
+  {% endif %}
+
+  {% if not levels and selected_year %}
+  <!-- État vide -->
+  <div class="card text-center py-5">
+    <div class="card-body">
+      <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:16px;background:var(--klass-bg-secondary);display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-diagram-3" style="font-size:1.8rem;color:var(--klass-text-muted);"></i>
+      </div>
+      <h5 class="fw-semibold mb-1">Aucun niveau pour cette année</h5>
+      <p class="text-muted mb-4" style="font-size:0.88rem;">
+        Ajoutez les niveaux scolaires (ex : 1ère secondaire, 2ème secondaire…).
+      </p>
+      {% if user.is_school_admin %}
+      <a href="{% url 'academics:level_create' %}?year_id={{ selected_year.pk }}"
+         class="btn btn-primary" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-2"></i>Créer le premier niveau
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% elif not selected_year %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    Aucune année scolaire disponible. <a href="{% url 'school_years:create' %}" class="alert-link">Créer une année scolaire</a>.
+  </div>
+
+  {% else %}
+  <!-- Table des niveaux -->
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead style="background:var(--klass-bg-secondary);border-bottom:1px solid var(--klass-border);">
+          <tr>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Ordre</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Niveau</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Code</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Options</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Statut</th>
+            {% if user.is_school_admin %}<th style="padding:0.9rem 1.25rem;"></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for level in levels %}
+          <tr style="{% if not level.is_active %}opacity:0.55;{% endif %}">
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size:0.75rem;min-width:32px;">{{ level.order }}</span>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="stat-card-icon blue" style="width:36px;height:36px;border-radius:9px;font-size:0.8rem;flex-shrink:0;">
+                  <i class="bi bi-bookmark-fill"></i>
+                </div>
+                <span class="fw-semibold">{{ level.name }}</span>
+              </div>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              {% if level.code %}
+              <code style="font-size:0.8rem;background:var(--klass-bg-secondary);padding:3px 8px;border-radius:6px;">{{ level.code }}</code>
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <a href="{% url 'academics:options' %}?level_id={{ level.pk }}"
+                 class="text-decoration-none" style="font-size:0.82rem;color:var(--klass-primary);">
+                <i class="bi bi-diagram-2 me-1"></i>{{ level.options.count }} option{{ level.options.count|pluralize }}
+              </a>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              {% if level.is_active %}
+              <span class="badge bg-success-subtle text-success rounded-pill" style="font-size:0.75rem;">
+                <i class="bi bi-check2 me-1"></i>Actif
+              </span>
+              {% else %}
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size:0.75rem;">
+                Inactif
+              </span>
+              {% endif %}
+            </td>
+            {% if user.is_school_admin %}
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;text-align:right;">
+              <div class="d-flex align-items-center gap-1 justify-content-end">
+                <a href="{% url 'academics:level_edit' level.pk %}"
+                   class="btn btn-sm btn-outline-secondary" style="border-radius:7px;" title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form method="post" action="{% url 'academics:level_toggle' level.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm {% if level.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                          style="border-radius:7px;"
+                          title="{% if level.is_active %}Désactiver{% else %}Activer{% endif %}"
+                          onclick="return confirm('{% if level.is_active %}Désactiver{% else %}Activer{% endif %} le niveau {{ level.name|escapejs }} ?');">
+                    <i class="bi bi-{% if level.is_active %}pause{% else %}play{% endif %}"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-muted mt-2" style="font-size:0.78rem;">
+    <i class="bi bi-info-circle me-1"></i>{{ levels|length }} niveau{{ levels|length|pluralize }} — modifiez l'ordre via le bouton Modifier.
+  </p>
+  {% endif %}
+
+</div>
+{% endblock %}

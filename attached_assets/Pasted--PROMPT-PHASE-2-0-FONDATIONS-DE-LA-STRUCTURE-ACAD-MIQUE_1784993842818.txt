@@ -1,0 +1,790 @@
+# PROMPT — PHASE 2.0 : FONDATIONS DE LA STRUCTURE ACADÉMIQUE + AJUSTEMENTS FINAUX DE LA PHASE 1
+
+## CONTEXTE
+
+La Phase 1 — Fondation de l'école — a été développée, stabilisée, testée et validée.
+
+Elle comprend notamment :
+
+* Interface Super Admin personnalisée ;
+* Dashboard Super Admin ;
+* Liste et création des écoles ;
+* Formulaire de création d'école ;
+* Création du tenant PostgreSQL isolé par école ;
+* Création du domaine principal de l'école ;
+* Création automatique de l'Admin École ;
+* Génération d'un mot de passe temporaire sécurisé ;
+* Changement obligatoire du mot de passe à la première connexion ;
+* Assistant de configuration initiale ;
+* Création de l'année scolaire initiale ;
+* Middleware de configuration ;
+* Dashboard Admin École ;
+* Tests d'isolation, permissions et flux.
+
+Avant de commencer le développement de la Phase 2.0, effectuer d'abord les ajustements nécessaires ci-dessous.
+
+---
+
+# PARTIE A — AJUSTEMENT FINAL DE LA PHASE 1
+
+## 1. INFORMATIONS D'ACCÈS APRÈS LA CRÉATION D'UNE ÉCOLE
+
+Actuellement, lorsque le Super Admin crée une école, l'Admin École est créé automatiquement, mais les informations nécessaires pour permettre à cet Admin École de se connecter ne sont pas correctement affichées au Super Admin.
+
+Corriger ce flux.
+
+Après la création réussie d'une école, le Super Admin doit recevoir une confirmation claire contenant les informations nécessaires pour transmettre l'accès à l'Admin École.
+
+Le flux attendu est :
+
+```text
+Super Admin
+    ↓
+Crée l'école
+    ↓
+L'école est créée
+    ↓
+Le tenant est créé
+    ↓
+Le domaine est créé
+    ↓
+L'Admin École est créé
+    ↓
+Les informations d'accès temporaires sont générées
+    ↓
+Page de confirmation
+    ↓
+Le Super Admin peut transmettre les informations à l'Admin École
+```
+
+La page de confirmation doit afficher clairement :
+
+* le nom de l'école ;
+* l'identifiant ou email de connexion de l'Admin École ;
+* le lien personnalisé de connexion ;
+* le lien d'accès approprié ;
+* les informations nécessaires à la première connexion.
+
+Le Super Admin doit pouvoir facilement :
+
+* copier l'identifiant ;
+* copier le lien ;
+* copier les informations nécessaires à transmettre ;
+* utiliser une action de copie claire et pratique.
+
+---
+
+## 2. GESTION DU MOT DE PASSE TEMPORAIRE
+
+Le mot de passe temporaire doit être géré de manière sécurisée.
+
+Le système doit permettre au Super Admin de transmettre les informations nécessaires à l'Admin École lors de la création.
+
+Cependant :
+
+* ne pas exposer inutilement le mot de passe après cette étape ;
+* ne pas afficher le mot de passe dans la liste des écoles ;
+* ne pas afficher le mot de passe dans le profil de l'école ;
+* ne pas stocker le mot de passe en clair ;
+* ne jamais permettre au Super Admin de consulter ultérieurement le mot de passe.
+
+Si l'architecture de sécurité existante ne permet pas d'afficher le mot de passe temporaire de manière appropriée, mettre en place un mécanisme sécurisé adapté, par exemple :
+
+* affichage unique après création ;
+* téléchargement sécurisé des informations d'accès ;
+* copie immédiate ;
+* ou mécanisme équivalent conforme aux règles de sécurité.
+
+L'objectif est simple :
+
+> Le Super Admin doit pouvoir transmettre l'accès initial à l'Admin École, sans que le système expose ensuite le mot de passe.
+
+---
+
+## 3. PREMIÈRE CONNEXION
+
+Vérifier que le flux suivant fonctionne correctement :
+
+```text
+Admin École reçoit :
+    ↓
+Lien de connexion
+    ↓
+Identifiant
+    ↓
+Mot de passe temporaire
+    ↓
+Première connexion
+    ↓
+Changement obligatoire du mot de passe
+    ↓
+Assistant de configuration
+    ↓
+Dashboard
+```
+
+Le mot de passe temporaire doit être invalidé ou remplacé après le changement obligatoire du mot de passe.
+
+Tester entièrement ce flux.
+
+---
+
+# PARTIE B — ADAPTATION DU DESIGN
+
+Un lien de référence de design a été fourni.
+
+Analyser ce lien et utiliser ses références pour améliorer l'interface de KLASS.
+
+Ne pas copier aveuglément le design.
+
+S'en inspirer pour améliorer :
+
+* la page de création d'école ;
+* la page de confirmation après création ;
+* l'affichage des informations d'accès ;
+* les cartes ;
+* les boutons ;
+* les espacements ;
+* la hiérarchie visuelle ;
+* la typographie ;
+* les états de succès ;
+* les messages d'erreur ;
+* la responsivité ;
+* l'expérience globale.
+
+Le design final doit rester cohérent avec :
+
+* l'identité de KLASS ;
+* l'architecture existante ;
+* les composants déjà créés ;
+* le système de design déjà présent.
+
+Le design doit être moderne, professionnel, clair et adapté à une application SaaS de gestion scolaire.
+
+---
+
+# PARTIE C — PHASE 2.0
+
+Après avoir terminé et testé les ajustements de la Phase 1, commencer la Phase 2.0.
+
+La Phase 2.0 doit construire les fondations de la structure académique :
+
+```text
+École
+    ↓
+Année scolaire
+    ↓
+Niveau d'étude
+    ↓
+Option / Filière
+```
+
+La gestion complète des classes et des salles sera développée dans la Phase 2.1.
+
+Ne pas développer complètement les classes et les salles dans cette phase.
+
+---
+
+# 1. DOCUMENTATION OBLIGATOIRE
+
+Avant toute modification :
+
+Lire :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Lire toute la documentation existante dans :
+
+```text
+docs/
+```
+
+Lire :
+
+```text
+README.md
+```
+
+Analyser également :
+
+* l'architecture actuelle ;
+* les applications existantes ;
+* les modèles ;
+* les migrations ;
+* les services ;
+* les permissions ;
+* les composants UI ;
+* les tests ;
+* le système de tenant ;
+* le système de configuration initiale.
+
+La documentation de `docs/` doit rester la référence officielle du projet.
+
+---
+
+# 2. RÈGLE ABSOLUE : NE PAS RECRÉER CE QUI EXISTE DÉJÀ
+
+La Phase 1 possède déjà une logique de création de l'année scolaire initiale dans l'assistant de configuration.
+
+La Phase 2.0 ne doit donc pas créer un deuxième système indépendant.
+
+Avant toute modification :
+
+1. Identifier le modèle existant utilisé pour l'année scolaire.
+2. Identifier la logique de création existante.
+3. Identifier les relations avec l'école, le tenant et la configuration initiale.
+4. Réutiliser cette architecture.
+5. Étendre proprement la fonctionnalité.
+6. Préserver totalement la compatibilité avec la Phase 1.
+
+Ne jamais créer de modèle concurrent ou de deuxième logique pour les années scolaires sans nécessité absolue.
+
+La Phase 2.0 doit être une extension cohérente de la Phase 1.
+
+---
+
+# 3. GESTION COMPLÈTE DES ANNÉES SCOLAIRES
+
+Réutiliser le système d'année scolaire créé en Phase 1.
+
+Permettre à l'Admin École de :
+
+* consulter les années scolaires ;
+* créer une nouvelle année scolaire ;
+* modifier les informations autorisées ;
+* définir l'année active ;
+* terminer une année ;
+* archiver une année lorsque cela est prévu.
+
+Prévoir des états cohérents :
+
+```text
+Planifiée
+Active
+Terminée
+Archivée
+```
+
+Une école ne doit avoir qu'une seule année active à la fois.
+
+La création de l'année scolaire initiale dans l'assistant doit continuer à fonctionner.
+
+Ne pas casser le flux :
+
+```text
+École créée
+    ↓
+Assistant de configuration
+    ↓
+Création de l'année scolaire initiale
+    ↓
+Validation
+    ↓
+Dashboard
+```
+
+Toutes les années scolaires doivent être isolées par école et tenant.
+
+---
+
+# 4. NIVEAUX D'ÉTUDES
+
+Créer la gestion des niveaux d'études.
+
+Exemples :
+
+```text
+1ère secondaire
+2ème secondaire
+3ème secondaire
+4ème secondaire
+5ème secondaire
+6ème secondaire
+```
+
+Un niveau doit être lié à l'école et au tenant appropriés.
+
+Prévoir :
+
+* nom ;
+* code éventuel ;
+* ordre d'affichage ;
+* statut actif/inactif.
+
+L'ordre doit être configurable.
+
+Une école ne doit jamais pouvoir consulter ou modifier les niveaux d'une autre école.
+
+---
+
+# 5. OPTIONS / FILIÈRES
+
+Créer la gestion des options ou filières.
+
+Exemples :
+
+```text
+Scientifique
+Littéraire
+Commerciale
+Technique
+Pédagogique
+```
+
+Une option doit être liée à l'école et au tenant appropriés.
+
+Prévoir une structure flexible permettant l'association d'une option à un ou plusieurs niveaux lorsque nécessaire.
+
+Ne pas imposer une structure trop rigide.
+
+---
+
+# 6. RELATIONS ACADÉMIQUES
+
+Mettre en place des relations cohérentes :
+
+```text
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+```
+
+Il doit être impossible :
+
+* d'associer un niveau d'une école à une autre école ;
+* d'associer une option d'une école à un niveau d'une autre école ;
+* d'utiliser une année scolaire d'un autre tenant ;
+* de contourner les restrictions en modifiant une URL ou une requête.
+
+Toutes les validations importantes doivent être effectuées côté backend.
+
+---
+
+# 7. PERMISSIONS
+
+Respecter le système de rôles existant.
+
+L'Admin École doit pouvoir gérer les éléments autorisés de la structure académique de son école.
+
+Un utilisateur ne doit jamais pouvoir accéder aux données d'une autre école.
+
+Les permissions doivent être vérifiées dans :
+
+* les vues ;
+* les services ;
+* les requêtes ;
+* les actions sensibles.
+
+Ne pas simplement cacher les boutons.
+
+---
+
+# 8. INTERFACE UTILISATEUR
+
+Créer une interface personnalisée KLASS.
+
+Ne pas utiliser Django Admin.
+
+Prévoir des interfaces pour :
+
+* années scolaires ;
+* niveaux ;
+* options/filières.
+
+L'interface doit être :
+
+* moderne ;
+* claire ;
+* responsive ;
+* cohérente avec le design existant ;
+* adaptée aux ordinateurs et mobiles.
+
+Prévoir :
+
+* listes ;
+* création ;
+* modification ;
+* consultation ;
+* états vides ;
+* états de chargement ;
+* messages de succès ;
+* messages d'erreur ;
+* confirmations pour les actions sensibles.
+
+Réutiliser les composants existants.
+
+Éviter les doublons.
+
+---
+
+# 9. CRUD ET VALIDATIONS
+
+Implémenter proprement :
+
+```text
+Créer
+    ↓
+Consulter
+    ↓
+Modifier
+    ↓
+Désactiver / Archiver
+```
+
+Valider :
+
+* doublons ;
+* données obligatoires ;
+* relations invalides ;
+* données d'une autre école ;
+* années incohérentes ;
+* niveaux inexistants ;
+* options inexistantes.
+
+Ne pas supprimer aveuglément des données pouvant être utilisées par les futurs modules.
+
+---
+
+# 10. RECHERCHE ET FILTRES
+
+Prévoir :
+
+### Années scolaires
+
+* année ;
+* statut.
+
+### Niveaux
+
+* nom ;
+* code ;
+* statut.
+
+### Options / Filières
+
+* nom ;
+* code ;
+* statut.
+
+Les résultats doivent être strictement limités à l'école et au tenant courants.
+
+---
+
+# 11. DONNÉES DE TEST
+
+Le projet possède déjà un système de données de test.
+
+Analyser et mettre à jour ce système.
+
+Ne pas créer un système concurrent.
+
+Le système doit être idempotent.
+
+Ajouter les données de test de la Phase 2.0 :
+
+### Années scolaires
+
+```text
+2025-2026
+2026-2027
+```
+
+### Niveaux
+
+```text
+1ère secondaire
+2ème secondaire
+3ème secondaire
+4ème secondaire
+5ème secondaire
+6ème secondaire
+```
+
+### Options / Filières
+
+```text
+Scientifique
+Littéraire
+Commerciale
+```
+
+Toutes les données doivent être correctement associées à leurs écoles de test.
+
+Le script doit :
+
+* vérifier l'existence ;
+* réutiliser les données existantes ;
+* éviter les doublons ;
+* respecter l'isolation ;
+* ne pas modifier les données réelles.
+
+Exécuter le script plusieurs fois et vérifier qu'aucun doublon n'est créé.
+
+---
+
+# 12. TESTS OBLIGATOIRES
+
+Tester :
+
+## Années scolaires
+
+* création ;
+* consultation ;
+* modification ;
+* activation ;
+* une seule année active ;
+* changement d'état ;
+* isolation.
+
+## Niveaux
+
+* création ;
+* modification ;
+* ordre ;
+* activation/désactivation ;
+* isolation.
+
+## Options
+
+* création ;
+* modification ;
+* association avec les niveaux ;
+* isolation.
+
+## Sécurité
+
+Tester explicitement :
+
+```text
+École A ≠ École B
+```
+
+Vérifier qu'un utilisateur de l'École A ne peut jamais :
+
+* consulter les données de l'École B ;
+* modifier les données de l'École B ;
+* supprimer les données de l'École B ;
+* utiliser une année scolaire de l'École B ;
+* utiliser un niveau de l'École B ;
+* utiliser une option de l'École B.
+
+Tester les accès directs aux URLs et la modification des identifiants.
+
+---
+
+# 13. TESTS DE RÉGRESSION DE LA PHASE 1
+
+Après le développement de la Phase 2.0, exécuter tous les tests de la Phase 1.
+
+Vérifier :
+
+* interface Super Admin ;
+* création d'école ;
+* tenant ;
+* domaine ;
+* création de l'Admin École ;
+* première connexion ;
+* changement de mot de passe ;
+* assistant ;
+* année scolaire initiale ;
+* middleware ;
+* dashboard ;
+* permissions ;
+* isolation ;
+* affichage des informations d'accès après création de l'école.
+
+La Phase 1 doit rester entièrement fonctionnelle.
+
+---
+
+# 14. VÉRIFICATIONS TECHNIQUES
+
+Exécuter :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si le projet utilise pytest, exécuter également les tests appropriés.
+
+Vérifier :
+
+* migrations ;
+* imports ;
+* routes ;
+* templates ;
+* formulaires ;
+* permissions ;
+* requêtes ;
+* composants.
+
+Corriger les erreurs réelles.
+
+Ne pas masquer les erreurs.
+
+---
+
+# 15. DOCUMENTATION
+
+Créer ou mettre à jour :
+
+```text
+docs/modules/phase-2-0-fondations-structure-academique.md
+```
+
+Documenter :
+
+* objectif ;
+* fonctionnalités prévues ;
+* fonctionnalités réellement développées ;
+* modèles ;
+* relations ;
+* permissions ;
+* sécurité ;
+* isolation ;
+* routes ;
+* interfaces ;
+* recherche ;
+* filtres ;
+* données de test ;
+* tests ;
+* problèmes connus ;
+* éléments préparés pour la Phase 2.1.
+
+Documenter également l'ajustement de la Phase 1 concernant les informations d'accès de l'Admin École.
+
+---
+
+# 16. MISE À JOUR DU README.md
+
+Pendant le développement :
+
+```text
+Phase 2.0 — Fondations de la structure académique
+Statut : ⏳ EN COURS
+```
+
+Après validation complète :
+
+```text
+Phase 2.0 — Fondations de la structure académique
+Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Ne déclarer la Phase 2.0 terminée que si :
+
+* les fonctionnalités sont terminées ;
+* les tests passent ;
+* les migrations sont valides ;
+* la sécurité est vérifiée ;
+* l'isolation est validée ;
+* les tests de régression de la Phase 1 passent ;
+* les données de test fonctionnent sans doublons ;
+* la documentation est complète.
+
+---
+
+# 17. RAPPORT FINAL
+
+À la fin, fournir un rapport clair contenant :
+
+## Ajustements Phase 1
+
+* informations d'accès ;
+* flux de première connexion ;
+* sécurité du mot de passe ;
+* design adapté.
+
+## Phase 2.0
+
+* fonctionnalités développées ;
+* architecture ;
+* modèles ;
+* relations ;
+* permissions ;
+* tests ;
+* sécurité ;
+* données de test ;
+* documentation.
+
+## Compatibilité Phase 1
+
+Expliquer comment les fonctionnalités existantes ont été préservées.
+
+## Phase 2.1
+
+Indiquer ce qui est préparé pour :
+
+* classes ;
+* salles ;
+* relations futures.
+
+## Statut final
+
+Si tout est réellement terminé :
+
+```text
+PHASE 2.0 — FONDATIONS DE LA STRUCTURE ACADÉMIQUE
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text
+PHASE 2.0 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+La Phase 2.0 doit :
+
+1. corriger et finaliser l'ajustement nécessaire de la Phase 1 ;
+2. préserver toutes les fonctionnalités existantes ;
+3. réutiliser l'année scolaire déjà créée dans la Phase 1 ;
+4. construire les niveaux ;
+5. construire les options/filières ;
+6. préparer la structure pour les classes et les salles ;
+7. mettre à jour les données de test ;
+8. tester réellement le système ;
+9. documenter tout le travail.
+
+Ne pas développer complètement :
+
+* classes ;
+* salles ;
+* élèves ;
+* inscriptions ;
+* enseignants ;
+* matières ;
+* emplois du temps ;
+* évaluations ;
+* paiements.
+
+La Phase 2.0 doit construire une base académique propre et extensible :
+
+```text
+École
+    ↓
+Années scolaires
+    ↓
+Niveaux
+    ↓
+Options / Filières
+    ↓
+Phase 2.1 : Classes et Salles
+```
+
+Ne déclarer la phase terminée que si elle est réellement stable, testée, sécurisée et documentée.
