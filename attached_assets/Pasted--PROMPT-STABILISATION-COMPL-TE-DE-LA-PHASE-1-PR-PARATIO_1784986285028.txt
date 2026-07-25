@@ -1,0 +1,566 @@
+# PROMPT — STABILISATION COMPLÈTE DE LA PHASE 1 + PRÉPARATION DE LA PHASE 2
+
+La Phase 1 a été développée.
+
+Tu dois maintenant effectuer une **phase complète de stabilisation, d'audit, de vérification et d'amélioration** avant de commencer le développement fonctionnel de la Phase 2.
+
+L'objectif est de rendre la Phase 1 réellement fiable, cohérente, professionnelle et prête à servir de fondation pour la suite du projet KLASS.
+
+---
+
+# 1. LIRE LA DOCUMENTATION AVANT TOUTE MODIFICATION
+
+Avant de commencer :
+
+1. Lire `docs/Klass_Document_Projet.docx`.
+2. Lire toute la documentation présente dans `docs/`.
+3. Lire le `README.md`.
+4. Vérifier l'état déclaré de la Phase 1.
+5. Inspecter toute l'architecture actuelle.
+6. Vérifier les fichiers réellement présents dans le projet.
+
+La documentation et le code doivent être comparés.
+
+Si la documentation indique qu'une fonctionnalité existe mais que le code est incomplet, corriger le code ou mettre à jour correctement la documentation.
+
+Ne jamais considérer une fonctionnalité comme terminée simplement parce qu'elle est mentionnée dans un document.
+
+---
+
+# 2. AUDIT COMPLET DU PROJET
+
+Effectuer un audit complet de la Phase 1.
+
+Vérifier :
+
+* tous les fichiers ;
+* toutes les applications ;
+* tous les modèles ;
+* toutes les migrations ;
+* toutes les vues ;
+* toutes les URLs ;
+* tous les formulaires ;
+* tous les services ;
+* toutes les permissions ;
+* tous les templates ;
+* tous les composants ;
+* tous les fichiers JavaScript ;
+* tous les fichiers CSS ;
+* les configurations ;
+* les variables d'environnement ;
+* les tests.
+
+Rechercher notamment :
+
+* fichiers incomplets ;
+* fichiers coupés ou tronqués ;
+* fonctions incomplètes ;
+* classes incomplètes ;
+* imports inutilisés ou manquants ;
+* références vers des fichiers inexistants ;
+* routes cassées ;
+* templates incomplets ;
+* composants inutilisés ;
+* doublons ;
+* code temporaire ;
+* TODO non traité ;
+* logique contradictoire ;
+* erreurs silencieuses ;
+* erreurs de sécurité.
+
+---
+
+# 3. VÉRIFICATION DE L'INTÉGRITÉ DES FICHIERS
+
+Vérifier que chaque fichier est complet.
+
+Aucun fichier ne doit être :
+
+* coupé ;
+* partiellement généré ;
+* vide sans raison ;
+* dupliqué ;
+* incohérent avec son rôle ;
+* interrompu au milieu d'une fonction ;
+* interrompu au milieu d'une classe ;
+* incomplet au niveau HTML, CSS ou JavaScript.
+
+Vérifier particulièrement :
+
+```text
+models.py
+views.py
+forms.py
+services.py
+permissions.py
+urls.py
+settings.py
+templates
+JavaScript
+CSS
+tests
+migrations
+```
+
+Corriger les fichiers incomplets.
+
+Ne pas simplement masquer les erreurs.
+
+---
+
+# 4. TESTS COMPLETS
+
+Exécuter réellement tous les tests disponibles.
+
+Vérifier :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si le projet utilise pytest, exécuter également la commande appropriée.
+
+Vérifier aussi manuellement les principaux flux.
+
+---
+
+# 5. TESTS FONCTIONNELS DE LA PHASE 1
+
+Tester réellement le flux complet :
+
+```text
+Super-Admin
+    ↓
+Création d'une école
+    ↓
+Création du tenant
+    ↓
+Création de l'Admin École
+    ↓
+Identifiants temporaires
+    ↓
+Connexion
+    ↓
+Première connexion
+    ↓
+Changement du mot de passe
+    ↓
+Assistant de configuration
+    ↓
+Informations de l'école
+    ↓
+Logo
+    ↓
+Année scolaire
+    ↓
+Validation
+    ↓
+Dashboard
+```
+
+Vérifier chaque étape individuellement et dans le flux complet.
+
+Tester également :
+
+* actualisation de la page ;
+* retour en arrière du navigateur ;
+* fermeture du navigateur ;
+* reprise d'une configuration interrompue ;
+* soumission de formulaires invalides ;
+* double soumission ;
+* perte de connexion ;
+* accès direct à une URL protégée.
+
+Le système doit se comporter de manière responsable dans tous ces cas.
+
+---
+
+# 6. VÉRIFICATION DE LA SÉCURITÉ
+
+Tester réellement :
+
+* l'accès sans authentification ;
+* l'accès avec un mauvais rôle ;
+* l'accès à un autre tenant ;
+* l'accès à une autre école ;
+* la modification d'un identifiant dans l'URL ;
+* l'accès direct aux étapes de l'assistant ;
+* le contournement de la première configuration ;
+* les accès après déconnexion.
+
+Un utilisateur ne doit jamais pouvoir accéder à des données qui ne lui appartiennent pas.
+
+Les permissions doivent être appliquées côté backend.
+
+Ne jamais se limiter à cacher un bouton dans l'interface.
+
+---
+
+# 7. AMÉLIORATION DE LA PAGE DE CONNEXION
+
+Les pages de connexion doivent être améliorées et avoir un design professionnel.
+
+La page de connexion doit :
+
+* être claire ;
+* être moderne ;
+* être responsive ;
+* être rapide ;
+* être accessible ;
+* afficher clairement les erreurs ;
+* ne pas révéler d'informations sensibles ;
+* gérer correctement les mauvaises informations de connexion ;
+* permettre une expérience cohérente avec le tenant ou l'école.
+
+Prévoir une identité visuelle cohérente avec KLASS.
+
+La page de connexion doit être pensée comme une véritable interface produit et non comme une simple page technique.
+
+---
+
+# 8. AMÉLIORATION DE L'ASSISTANT DE CONFIGURATION
+
+L'assistant de configuration initiale doit être amélioré afin d'offrir une expérience professionnelle.
+
+Il doit :
+
+* afficher clairement la progression ;
+* indiquer l'étape actuelle ;
+* indiquer les étapes restantes ;
+* permettre de reprendre une configuration interrompue ;
+* afficher des messages d'erreur compréhensibles ;
+* valider les données correctement ;
+* empêcher les étapes incohérentes ;
+* éviter la perte de données ;
+* gérer correctement les erreurs réseau ;
+* fonctionner sur ordinateur et mobile.
+
+L'expérience doit être fluide.
+
+Éviter les formulaires longs et confus.
+
+L'assistant doit guider l'utilisateur de manière progressive.
+
+---
+
+# 9. RECHERCHE D'INSPIRATION DESIGN
+
+Avant d'améliorer définitivement les interfaces, rechercher des références de design modernes sur Figma et dans les ressources de design pertinentes.
+
+Rechercher notamment des inspirations pour :
+
+* SaaS multi-tenant ;
+* school management system ;
+* education platform ;
+* admin dashboard ;
+* onboarding wizard ;
+* login page ;
+* setup wizard ;
+* education dashboard.
+
+L'objectif n'est pas de copier un design existant.
+
+Il faut analyser les meilleures pratiques de design pour créer une interface KLASS cohérente, moderne et professionnelle.
+
+Le design doit rester cohérent avec :
+
+* la vision de KLASS ;
+* la simplicité d'utilisation ;
+* la responsivité ;
+* l'accessibilité ;
+* l'identité visuelle du produit.
+
+Si des outils de recherche ou de design sont disponibles dans l'environnement, les utiliser pour rechercher des références pertinentes.
+
+Documenter les principales décisions de design dans `docs/`.
+
+---
+
+# 10. RESPONSABILITÉ ET ROBUSTESSE DU SYSTÈME
+
+Le système doit être conçu de manière responsable.
+
+Cela signifie notamment :
+
+* ne jamais perdre silencieusement des données ;
+* ne jamais supprimer des données sans confirmation appropriée ;
+* ne jamais créer de doublons inutilement ;
+* ne jamais exposer de mots de passe ;
+* ne jamais exposer de données d'un autre tenant ;
+* ne jamais ignorer silencieusement une erreur ;
+* toujours afficher un état clair à l'utilisateur ;
+* gérer correctement les erreurs ;
+* prévoir des validations côté client et côté serveur ;
+* utiliser des transactions lorsque cela est nécessaire ;
+* protéger les opérations sensibles.
+
+Chaque opération importante doit avoir un résultat clair :
+
+```text
+Succès
+Erreur
+En cours
+À reprendre
+Non autorisé
+```
+
+---
+
+# 11. STABILITÉ DES MIGRATIONS ET DE LA BASE DE DONNÉES
+
+Vérifier :
+
+* que toutes les migrations sont présentes ;
+* qu'elles sont cohérentes ;
+* qu'elles peuvent être appliquées sur une base vierge ;
+* qu'elles peuvent être appliquées sur une base existante ;
+* qu'elles ne créent pas de doublons ;
+* qu'elles ne détruisent pas de données existantes sans raison.
+
+Tester le processus sur une base de test lorsque cela est possible.
+
+---
+
+# 12. PRÉPARATION DU TERRAIN POUR LA PHASE 2
+
+Après stabilisation de la Phase 1, préparer l'architecture nécessaire pour la Phase 2.
+
+La préparation ne signifie pas développer entièrement la Phase 2.
+
+Elle consiste à vérifier que l'architecture actuelle permet proprement de construire les futurs modules.
+
+Préparer et vérifier notamment :
+
+* l'année scolaire ;
+* le tenant ;
+* les relations avec l'école ;
+* les permissions ;
+* les rôles ;
+* les layouts ;
+* les dashboards ;
+* les composants réutilisables ;
+* les systèmes de recherche ;
+* les systèmes de filtres ;
+* les formulaires ;
+* les tables ;
+* les modales ;
+* les notifications ;
+* les états vides ;
+* les états de chargement.
+
+Les composants génériques réutilisables peuvent être créés s'ils sont nécessaires à la Phase 2.
+
+Ne pas développer les fonctionnalités métier complètes de la Phase 2 avant la validation de la Phase 1.
+
+---
+
+# 13. PRÉPARATION DE LA STRUCTURE ACADÉMIQUE
+
+Préparer proprement le terrain pour le prochain module :
+
+```text
+STRUCTURE ACADÉMIQUE
+```
+
+Analyser les besoins décrits dans :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Identifier précisément :
+
+* les niveaux ;
+* les options ou filières ;
+* les classes ;
+* les salles ;
+* les relations entre ces éléments ;
+* les liens avec l'année scolaire ;
+* les règles d'isolation par école.
+
+Ne pas développer tout le module maintenant si la Phase 1 n'est pas encore validée.
+
+Préparer uniquement l'architecture nécessaire et documenter les recommandations pour la Phase 2.
+
+---
+
+# 14. TESTS DE RÉGRESSION
+
+Après toutes les améliorations, refaire tous les tests de la Phase 1.
+
+Il est obligatoire de vérifier qu'aucune amélioration visuelle ou technique n'a cassé une fonctionnalité existante.
+
+Tester à nouveau :
+
+* création d'une école ;
+* création du tenant ;
+* création de l'Admin École ;
+* première connexion ;
+* changement de mot de passe ;
+* assistant ;
+* configuration ;
+* année scolaire ;
+* dashboard ;
+* isolation multi-tenant.
+
+---
+
+# 15. DOCUMENTATION
+
+Mettre à jour la documentation dans :
+
+```text
+docs/
+```
+
+La documentation de la Phase 1 doit contenir :
+
+* les fonctionnalités finales ;
+* l'architecture finale ;
+* les flux ;
+* les rôles ;
+* les permissions ;
+* la sécurité ;
+* les routes ;
+* les modèles ;
+* les tests ;
+* les corrections effectuées ;
+* les améliorations UX/UI ;
+* les décisions de design ;
+* la préparation de la Phase 2.
+
+Documenter également les problèmes rencontrés et leurs solutions.
+
+---
+
+# 16. MISE À JOUR DU README.md
+
+Mettre à jour le `README.md`.
+
+La Phase 1 ne doit être déclarée :
+
+```text
+✅ TERMINÉE ET VALIDÉE
+```
+
+que si :
+
+* tous les fichiers sont complets ;
+* l'architecture est cohérente ;
+* les tests passent ;
+* les migrations sont valides ;
+* la sécurité est vérifiée ;
+* l'isolation multi-tenant fonctionne ;
+* les pages principales sont fonctionnelles ;
+* l'assistant fonctionne correctement ;
+* la documentation est complète ;
+* aucune erreur critique ne reste.
+
+Le README doit contenir :
+
+```text
+## Phase 1 — Fondation de l'école
+
+Statut : ✅ TERMINÉE ET VALIDÉE
+
+### Fonctionnalités
+...
+
+### Tests
+...
+
+### Stabilisation
+...
+
+### Améliorations UX/UI
+...
+
+### Documentation
+...
+
+### Phase suivante
+Structure académique
+```
+
+---
+
+# 17. RAPPORT FINAL OBLIGATOIRE
+
+À la fin du travail, fournir un rapport clair indiquant :
+
+## Audit
+
+Quels fichiers et composants ont été vérifiés.
+
+## Corrections
+
+Quels problèmes ont été trouvés et corrigés.
+
+## Tests
+
+Quels tests ont été exécutés et leurs résultats réels.
+
+## Sécurité
+
+Quels tests d'accès et d'isolation ont été effectués.
+
+## UX/UI
+
+Quelles améliorations ont été réalisées.
+
+## Design
+
+Quelles références et décisions de design ont été étudiées.
+
+## Documentation
+
+Quels fichiers dans `docs/` ont été créés ou mis à jour.
+
+## Phase 2
+
+Comment l'architecture a été préparée pour la structure académique.
+
+## État final
+
+Si tout est réellement validé :
+
+```text
+PHASE 1 — STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text
+PHASE 1 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE ABSOLUE
+
+Ne jamais déclarer la Phase 1 terminée simplement parce que les fonctionnalités principales existent.
+
+La Phase 1 doit être :
+
+```text
+Développée
+    ↓
+Auditée
+    ↓
+Testée
+    ↓
+Sécurisée
+    ↓
+Stabilisée
+    ↓
+Documentée
+    ↓
+Préparée pour la Phase 2
+```
+
+Ne commence pas le développement complet de la Phase 2 tant que la Phase 1 n'est pas réellement stable et validée.
