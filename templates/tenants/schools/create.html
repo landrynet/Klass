@@ -3,135 +3,20 @@
 
 {% block title %}Créer une école{% endblock %}
 
-{% block extra_css %}
-<style>
-  .form-section {
-    border-radius: 14px;
-    border: 1px solid #e8edf5;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-  }
-  .form-section-header {
-    padding: 1.25rem 1.5rem 1rem;
-    border-bottom: 1px solid #f1f5f9;
-    background: #fafbff;
-  }
-  .form-section-body {
-    padding: 1.5rem;
-  }
-  .form-section-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(26, 86, 219, 0.1);
-    flex-shrink: 0;
-  }
-  .form-control, .form-select {
-    border-radius: 8px;
-    border: 1px solid #d1d9e6;
-    font-size: 0.925rem;
-    padding: 0.5rem 0.75rem;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .form-control:focus, .form-select:focus {
-    border-color: #1a56db;
-    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
-  }
-  .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.375rem;
-  }
-  .form-text {
-    font-size: 0.8rem;
-    color: #94a3b8;
-  }
-  .info-panel {
-    border-radius: 14px;
-    border: 1px solid #e8edf5;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    overflow: hidden;
-    position: sticky;
-    top: 1rem;
-  }
-  .info-panel-section {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .info-panel-section:last-child {
-    border-bottom: none;
-  }
-  .checklist-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.625rem;
-    font-size: 0.875rem;
-    color: #374151;
-    padding: 0.25rem 0;
-  }
-  .checklist-item .bi-check-circle-fill {
-    color: #22c55e;
-    font-size: 0.9rem;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-  .submit-btn {
-    height: 46px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 10px;
-    letter-spacing: 0.01em;
-  }
-  .page-header-back {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    color: #64748b;
-    transition: all 0.15s;
-    text-decoration: none;
-  }
-  .page-header-back:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #374151;
-  }
-  .slug-preview {
-    display: inline-block;
-    background: #f1f5f9;
-    border: 1px dashed #cbd5e1;
-    border-radius: 6px;
-    padding: 0.2rem 0.6rem;
-    font-family: monospace;
-    font-size: 0.82rem;
-    color: #475569;
-    transition: all 0.2s;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid" style="max-width: 1140px;">
+<div class="container-fluid" style="max-width:1140px;">
 
   <!-- En-tête -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'tenants:super_admin_dashboard' %}" class="page-header-back">
+    <a href="{% url 'tenants:super_admin_dashboard' %}"
+       class="btn btn-sm btn-outline-secondary rounded-3 d-flex align-items-center gap-1">
       <i class="bi bi-arrow-left"></i>
     </a>
     <div>
-      <h1 class="h4 fw-bold mb-0">Créer une nouvelle école</h1>
-      <p class="text-muted small mb-0">Tenant PostgreSQL isolé + compte Admin École généré automatiquement</p>
+      <h1 class="h5 fw-bold mb-0" style="color:var(--klass-text-primary);">Créer une nouvelle école</h1>
+      <p class="mb-0" style="font-size:0.82rem;color:var(--klass-text-secondary);">
+        Tenant PostgreSQL isolé · Schéma dédié · Compte Admin École
+      </p>
     </div>
   </div>
 
@@ -139,34 +24,41 @@
 
   <div class="row g-4 align-items-start">
 
-    <!-- Formulaire -->
+    <!-- Formulaire principal -->
     <div class="col-lg-8">
       <form method="post" novalidate id="create-school-form">
         {% csrf_token %}
 
         <!-- Section 1 : Établissement -->
-        <div class="form-section">
-          <div class="form-section-header d-flex align-items-center gap-3">
-            <span class="form-section-icon">
-              <i class="bi bi-building text-primary" style="font-size:1.1rem;"></i>
-            </span>
-            <div>
-              <h2 class="h6 fw-bold mb-0">Informations de l'établissement</h2>
-              <p class="text-muted small mb-0">Identité officielle et coordonnées de l'école</p>
+        <div class="card mb-4">
+          <div class="card-header px-4 pt-4 pb-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-card-icon blue" style="width:40px;height:40px;border-radius:10px;font-size:1rem;">
+                <i class="bi bi-buildings-fill"></i>
+              </div>
+              <div>
+                <h2 class="h6 fw-bold mb-0">Informations de l'établissement</h2>
+                <p class="mb-0" style="font-size:0.78rem;color:var(--klass-text-secondary);">
+                  Identité officielle et coordonnées
+                </p>
+              </div>
             </div>
           </div>
-          <div class="form-section-body">
+          <div class="card-body p-4">
 
             <!-- Nom -->
             <div class="mb-4">
               <label class="form-label">{{ form.name.label }} <span class="text-danger">*</span></label>
               {{ form.name }}
               {% if form.name.errors %}
-              <div class="text-danger small mt-1">{{ form.name.errors|join:", " }}</div>
+              <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.name.errors|join:", " }}</div>
               {% endif %}
-              <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
-                <span class="text-muted" style="font-size:0.8rem;">Sous-domaine :</span>
-                <span class="slug-preview" id="slug-preview">exemple.klass.app</span>
+              <div class="mt-2 d-flex align-items-center gap-2">
+                <span style="font-size:0.78rem;color:var(--klass-text-muted);">Sous-domaine :</span>
+                <code id="slug-preview"
+                      style="background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:6px;padding:2px 8px;font-size:0.8rem;color:#475569;">
+                  exemple.klass.app
+                </code>
               </div>
             </div>
 
@@ -176,14 +68,14 @@
                 <label class="form-label">{{ form.email.label }} <span class="text-danger">*</span></label>
                 {{ form.email }}
                 {% if form.email.errors %}
-                <div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.email.errors|join:", " }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
                 <label class="form-label">{{ form.phone.label }}</label>
                 {{ form.phone }}
                 {% if form.phone.errors %}
-                <div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.phone.errors|join:", " }}</div>
                 {% endif %}
               </div>
             </div>
@@ -192,9 +84,6 @@
             <div class="mb-3">
               <label class="form-label">{{ form.address.label }}</label>
               {{ form.address }}
-              {% if form.address.errors %}
-              <div class="text-danger small mt-1">{{ form.address.errors|join:", " }}</div>
-              {% endif %}
             </div>
 
             <!-- Ville + Pays -->
@@ -202,16 +91,10 @@
               <div class="col-md-6">
                 <label class="form-label">{{ form.city.label }}</label>
                 {{ form.city }}
-                {% if form.city.errors %}
-                <div class="text-danger small mt-1">{{ form.city.errors|join:", " }}</div>
-                {% endif %}
               </div>
               <div class="col-md-6">
                 <label class="form-label">{{ form.country.label }}</label>
                 {{ form.country }}
-                {% if form.country.errors %}
-                <div class="text-danger small mt-1">{{ form.country.errors|join:", " }}</div>
-                {% endif %}
               </div>
             </div>
 
@@ -219,42 +102,44 @@
         </div>
 
         <!-- Section 2 : Admin École -->
-        <div class="form-section">
-          <div class="form-section-header d-flex align-items-center gap-3">
-            <span class="form-section-icon">
-              <i class="bi bi-person-badge text-primary" style="font-size:1.1rem;"></i>
-            </span>
-            <div>
-              <h2 class="h6 fw-bold mb-0">Compte Admin École</h2>
-              <p class="text-muted small mb-0">Un mot de passe temporaire sera généré automatiquement</p>
+        <div class="card mb-4">
+          <div class="card-header px-4 pt-4 pb-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-card-icon purple" style="width:40px;height:40px;border-radius:10px;font-size:1rem;">
+                <i class="bi bi-person-badge-fill"></i>
+              </div>
+              <div>
+                <h2 class="h6 fw-bold mb-0">Compte Admin École</h2>
+                <p class="mb-0" style="font-size:0.78rem;color:var(--klass-text-secondary);">
+                  Mot de passe temporaire généré automatiquement — affiché une seule fois
+                </p>
+              </div>
             </div>
           </div>
-          <div class="form-section-body">
+          <div class="card-body p-4">
 
-            <!-- Prénom + Nom -->
             <div class="row g-3 mb-3">
               <div class="col-md-6">
                 <label class="form-label">{{ form.admin_first_name.label }} <span class="text-danger">*</span></label>
                 {{ form.admin_first_name }}
                 {% if form.admin_first_name.errors %}
-                <div class="text-danger small mt-1">{{ form.admin_first_name.errors|join:", " }}</div>
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.admin_first_name.errors|join:", " }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
                 <label class="form-label">{{ form.admin_last_name.label }} <span class="text-danger">*</span></label>
                 {{ form.admin_last_name }}
                 {% if form.admin_last_name.errors %}
-                <div class="text-danger small mt-1">{{ form.admin_last_name.errors|join:", " }}</div>
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.admin_last_name.errors|join:", " }}</div>
                 {% endif %}
               </div>
             </div>
 
-            <!-- Email admin -->
             <div>
               <label class="form-label">{{ form.admin_email.label }} <span class="text-danger">*</span></label>
               {{ form.admin_email }}
               {% if form.admin_email.errors %}
-              <div class="text-danger small mt-1">{{ form.admin_email.errors|join:", " }}</div>
+              <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.admin_email.errors|join:", " }}</div>
               {% endif %}
               {% if form.admin_email.help_text %}
               <div class="form-text mt-1">{{ form.admin_email.help_text }}</div>
@@ -267,17 +152,19 @@
         <!-- Erreurs globales -->
         {% if form.non_field_errors %}
         <div class="alert alert-danger rounded-3 d-flex gap-2 align-items-start mb-3">
-          <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+          <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
           <div>{{ form.non_field_errors|join:"<br>" }}</div>
         </div>
         {% endif %}
 
         <!-- Actions -->
         <div class="d-flex align-items-center gap-3">
-          <button type="submit" class="btn btn-primary submit-btn px-5" id="submit-btn">
+          <button type="submit" class="btn btn-primary px-5 fw-semibold" id="submit-btn"
+                  style="height:44px;border-radius:10px;">
             <i class="bi bi-building-check me-2"></i>Créer l'école
           </button>
-          <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-link text-muted text-decoration-none">
+          <a href="{% url 'tenants:super_admin_dashboard' %}"
+             class="btn btn-link text-decoration-none" style="color:var(--klass-text-secondary);">
             Annuler
           </a>
         </div>
@@ -285,72 +172,79 @@
       </form>
     </div>
 
-    <!-- Panneau d'information -->
+    <!-- Panneau latéral -->
     <div class="col-lg-4">
-      <div class="info-panel">
 
-        <!-- Ce qui sera créé -->
-        <div class="info-panel-section">
+      <!-- Ce qui sera créé -->
+      <div class="card mb-3">
+        <div class="card-body p-4">
           <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
-            <i class="bi bi-layers text-primary"></i>
+            <i class="bi bi-layers-fill" style="color:var(--klass-primary);"></i>
             Ce qui sera créé
           </h3>
-          <div class="d-flex flex-column gap-1">
-            <div class="checklist-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Un <strong>schéma PostgreSQL</strong> isolé pour l'école</span>
-            </div>
-            <div class="checklist-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Un <strong>sous-domaine</strong> dédié (<em>slug</em>.klass.app)</span>
-            </div>
-            <div class="checklist-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Un <strong>compte Admin École</strong> avec mot de passe temporaire</span>
-            </div>
-            <div class="checklist-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Un accès immédiat à l'assistant de configuration</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sécurité -->
-        <div class="info-panel-section">
-          <h3 class="h6 fw-bold mb-2 d-flex align-items-center gap-2">
-            <i class="bi bi-shield-check text-warning"></i>
-            Sécurité des identifiants
-          </h3>
-          <p class="text-muted small mb-0">
-            Le mot de passe temporaire vous sera affiché <strong>une seule fois</strong> après la création.
-            Il ne sera pas stocké en clair. L'Admin École devra le changer dès sa première connexion.
-          </p>
-        </div>
-
-        <!-- Flux -->
-        <div class="info-panel-section">
-          <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
-            <i class="bi bi-signpost-2 text-primary"></i>
-            Flux après création
-          </h3>
           <div class="d-flex flex-column gap-2">
-            {% for step in "123"|make_list %}
-            <div class="d-flex align-items-center gap-2">
-              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                   style="width:22px;height:22px;background:rgba(26,86,219,0.1);color:#1a56db;font-size:0.72rem;font-weight:700;">
-                {{ step }}
-              </div>
-              <span class="small text-muted">
-                {% if step == "1" %}Identifiants affichés au Super Admin{% endif %}
-                {% if step == "2" %}Admin se connecte, change son mot de passe{% endif %}
-                {% if step == "3" %}Assistant de configuration en 3 étapes{% endif %}
+            {% for item in "1234"|make_list %}
+            <div class="d-flex align-items-start gap-2" style="font-size:0.85rem;">
+              <i class="bi bi-check-circle-fill mt-1 flex-shrink-0" style="color:var(--klass-green);font-size:0.8rem;"></i>
+              <span style="color:var(--klass-text-secondary);">
+                {% if item == "1" %}Un <strong>schéma PostgreSQL</strong> isolé{% endif %}
+                {% if item == "2" %}Un <strong>sous-domaine</strong> (<em>slug</em>.klass.app){% endif %}
+                {% if item == "3" %}Un <strong>compte Admin École</strong> sécurisé{% endif %}
+                {% if item == "4" %}Un accès à l'assistant de configuration{% endif %}
               </span>
             </div>
             {% endfor %}
           </div>
         </div>
-
       </div>
+
+      <!-- Sécurité -->
+      <div class="card mb-3" style="border-color:#FCD34D!important;background:#FFFBEB;">
+        <div class="card-body p-4">
+          <h3 class="h6 fw-bold mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-shield-lock-fill" style="color:var(--klass-yellow);"></i>
+            Identifiants temporaires
+          </h3>
+          <p class="mb-0" style="font-size:0.82rem;color:var(--klass-text-secondary);">
+            Le mot de passe sera affiché <strong>une seule fois</strong> après création.
+            Transmettez-le uniquement par canal sécurisé.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick links style Figma : flux -->
+      <div class="card">
+        <div class="card-body p-4">
+          <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-signpost-2-fill" style="color:var(--klass-primary);"></i>
+            Flux après création
+          </h3>
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-start gap-3">
+              <span class="step-badge">1</span>
+              <div style="font-size:0.82rem;">
+                <p class="fw-semibold mb-0">Identifiants affichés</p>
+                <p class="mb-0" style="color:var(--klass-text-secondary);">Email + mot de passe temporaire + lien</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <span class="step-badge">2</span>
+              <div style="font-size:0.82rem;">
+                <p class="fw-semibold mb-0">Première connexion</p>
+                <p class="mb-0" style="color:var(--klass-text-secondary);">Changement obligatoire du mot de passe</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+              <span class="step-badge">3</span>
+              <div style="font-size:0.82rem;">
+                <p class="fw-semibold mb-0">Configuration en 3 étapes</p>
+                <p class="mb-0" style="color:var(--klass-text-secondary);">École, année scolaire, activation</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -359,38 +253,31 @@
 
 {% block extra_js %}
 <script>
-  // Prévisualisation du slug en temps réel
+  // Prévisualisation slug en temps réel
   const nameInput = document.getElementById('{{ form.name.auto_id }}');
   const slugPreview = document.getElementById('slug-preview');
 
   function toSlug(str) {
-    return str
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // accents
-      .replace(/[^a-z0-9\s-]/g, '')
-      .trim()
-      .replace(/[\s_]+/g, '-')
-      .replace(/-+/g, '-')
+    return str.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '').trim()
+      .replace(/[\s_]+/g, '-').replace(/-+/g, '-')
       .slice(0, 50) || 'exemple';
   }
 
   if (nameInput && slugPreview) {
-    function updateSlug() {
-      const slug = toSlug(nameInput.value);
-      slugPreview.textContent = slug + '.klass.app';
-    }
-    nameInput.addEventListener('input', updateSlug);
-    updateSlug();
+    nameInput.addEventListener('input', () => {
+      slugPreview.textContent = toSlug(nameInput.value) + '.klass.app';
+    });
   }
 
-  // Désactiver le bouton pendant la soumission
+  // Spinner sur soumission
   const form = document.getElementById('create-school-form');
-  const submitBtn = document.getElementById('submit-btn');
-  if (form && submitBtn) {
-    form.addEventListener('submit', function () {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Création en cours…';
+  const btn = document.getElementById('submit-btn');
+  if (form && btn) {
+    form.addEventListener('submit', () => {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Création en cours…';
     });
   }
 </script>

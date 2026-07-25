@@ -1,103 +1,123 @@
 {% load static %}
-<nav class="sidebar bg-white border-end shadow-sm d-none d-lg-flex flex-column" id="klass-sidebar" style="min-width:220px;max-width:220px;min-height:calc(100vh - 56px)">
-  <div class="p-3 pt-4">
+<nav id="klass-sidebar" class="d-none d-lg-flex flex-column flex-shrink-0">
+
+  <!-- Navigation -->
+  <div class="flex-grow-1 overflow-auto py-2">
 
     {% if is_super_admin %}
-    <!-- Super Admin Navigation — dashboards personnalisés (Django Admin désactivé) -->
-    <p class="text-muted text-uppercase small fw-semibold px-2 mb-1">Administration</p>
+    <!-- Super Admin -->
+    <p class="sidebar-section-title">Administration</p>
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'tenants:super_admin_dashboard' %}">
-          <i class="bi bi-grid me-2"></i>Dashboard
+        <a class="nav-link {% if request.resolver_match.url_name == 'super_admin_dashboard' %}active{% endif %}"
+           href="{% url 'tenants:super_admin_dashboard' %}">
+          <i class="bi bi-grid-1x2-fill"></i>Dashboard
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'tenants:super_admin_dashboard' %}">
-          <i class="bi bi-building me-2"></i>Écoles
+        <a class="nav-link {% if request.resolver_match.url_name == 'school_create' %}active{% endif %}"
+           href="{% url 'tenants:school_create' %}">
+          <i class="bi bi-building-add"></i>Créer une école
         </a>
       </li>
+    </ul>
+
+    <p class="sidebar-section-title mt-2">Gestion</p>
+    <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'tenants:school_create' %}">
-          <i class="bi bi-plus-circle me-2"></i>Créer une école
+        <a class="nav-link {% if request.resolver_match.url_name == 'super_admin_dashboard' %}active{% endif %}"
+           href="{% url 'tenants:super_admin_dashboard' %}">
+          <i class="bi bi-buildings"></i>Écoles
         </a>
       </li>
     </ul>
 
     {% else %}
-    <!-- Navigation École (Admin, Secrétariat, Comptable, Enseignant) -->
-    <p class="text-muted text-uppercase small fw-semibold px-2 mb-1">Navigation</p>
-    <ul class="nav flex-column mb-3">
+    <!-- Navigation École -->
+    <p class="sidebar-section-title">Navigation</p>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+           href="{% url 'academics:dashboard' %}">
+          <i class="bi bi-house-fill"></i>Tableau de bord
+        </a>
+      </li>
+    </ul>
 
-      <!-- Toujours visible -->
+    {% if is_school_admin or user.is_secretary %}
+    <p class="sidebar-section-title">Élèves</p>
+    <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'academics:dashboard' %}">
-          <i class="bi bi-house me-2"></i>Tableau de bord
+        <a class="nav-link" href="{% url 'students:list' %}">
+          <i class="bi bi-people-fill"></i>Élèves
         </a>
       </li>
-
-      <!-- Admin + Secrétariat -->
-      {% if is_school_admin or user.is_secretary %}
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'students:list' %}">
-          <i class="bi bi-people me-2"></i>Élèves
-        </a>
-      </li>
-      {% endif %}
-
-      <!-- Admin + Comptable -->
-      {% if is_school_admin or user.is_accountant %}
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'finance:dashboard' %}">
-          <i class="bi bi-cash-coin me-2"></i>Paiements
-        </a>
-      </li>
-      {% endif %}
-
-      <!-- Admin + Enseignant -->
-      {% if is_school_admin or user.is_teacher %}
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'scheduling:view' %}">
-          <i class="bi bi-calendar3 me-2"></i>Emploi du temps
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'resources:list' %}">
-          <i class="bi bi-folder2-open me-2"></i>Ressources
-        </a>
-      </li>
-      {% endif %}
-
-      <!-- Admin uniquement -->
-      {% if is_school_admin %}
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'teachers:list' %}">
-          <i class="bi bi-person-badge me-2"></i>Enseignants
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'academics:classrooms' %}">
-          <i class="bi bi-diagram-3 me-2"></i>Structure académique
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'communications:list' %}">
-          <i class="bi bi-megaphone me-2"></i>Communications
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="{% url 'school_years:list' %}">
-          <i class="bi bi-calendar-event me-2"></i>Années scolaires
-        </a>
-      </li>
-      {% endif %}
-
     </ul>
     {% endif %}
 
+    {% if is_school_admin or user.is_accountant %}
+    <p class="sidebar-section-title">Finance</p>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'finance:dashboard' %}">
+          <i class="bi bi-cash-coin"></i>Paiements
+        </a>
+      </li>
+    </ul>
+    {% endif %}
+
+    {% if is_school_admin or user.is_teacher %}
+    <p class="sidebar-section-title">Académique</p>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'scheduling:view' %}">
+          <i class="bi bi-calendar3"></i>Emploi du temps
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'resources:list' %}">
+          <i class="bi bi-folder2-open"></i>Ressources
+        </a>
+      </li>
+    </ul>
+    {% endif %}
+
+    {% if is_school_admin %}
+    <p class="sidebar-section-title">Personnel</p>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'teachers:list' %}">
+          <i class="bi bi-person-badge-fill"></i>Enseignants
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'academics:classrooms' %}">
+          <i class="bi bi-diagram-3-fill"></i>Structure académique
+        </a>
+      </li>
+    </ul>
+
+    <p class="sidebar-section-title">Communication</p>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'communications:list' %}">
+          <i class="bi bi-megaphone-fill"></i>Communications
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'school_years:list' %}">
+          <i class="bi bi-calendar-event-fill"></i>Années scolaires
+        </a>
+      </li>
+    </ul>
+    {% endif %}
+
+    {% endif %}
   </div>
 
-  <!-- Version en bas -->
-  <div class="mt-auto p-3 border-top">
-    <small class="text-muted">KLASS v1.0 — Phase 1</small>
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <small>KLASS v1.0 — Phase 1</small>
   </div>
+
 </nav>

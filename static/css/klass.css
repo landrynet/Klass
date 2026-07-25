@@ -1,70 +1,508 @@
 /* ============================================================
-   KLASS — Styles personnalisés
-   Base CSS pour la plateforme de gestion scolaire
+   KLASS — Design System
+   Inspiré du design Figma School Management (Community)
    ============================================================ */
 
+/* ---- Variables ---- */
 :root {
-  --klass-primary: #1a56db;
-  --klass-primary-dark: #1345b5;
-  --klass-sidebar-width: 220px;
-  --klass-navbar-height: 56px;
+  --klass-primary:      #4361EE;
+  --klass-primary-dark: #3451d1;
+  --klass-primary-rgb:  67, 97, 238;
+
+  --klass-sidebar-bg:    #1E2140;
+  --klass-sidebar-width: 240px;
+  --klass-navbar-height: 60px;
+
+  --klass-bg:         #F4F6F9;
+  --klass-card-bg:    #FFFFFF;
+  --klass-border:     #E8EDF5;
+
+  --klass-text-primary:   #1E2140;
+  --klass-text-secondary: #6B7280;
+  --klass-text-muted:     #9CA3AF;
+
+  --klass-green:   #22C55E;
+  --klass-red:     #EF4444;
+  --klass-yellow:  #F59E0B;
+  --klass-purple:  #8B5CF6;
+  --klass-teal:    #14B8A6;
+  --klass-orange:  #F97316;
+
+  --klass-radius-sm: 8px;
+  --klass-radius:    12px;
+  --klass-radius-lg: 16px;
+  --klass-shadow:    0 1px 4px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);
+  --klass-shadow-lg: 0 4px 20px rgba(0,0,0,0.10);
 }
 
-/* ---- Layout général ---- */
+/* ---- Reset & Base ---- */
+body {
+  background: var(--klass-bg);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--klass-text-primary);
+}
+
+/* ============================================================
+   NAVBAR (top bar — claire comme Figma)
+   ============================================================ */
+#klass-navbar {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid var(--klass-border) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+  height: var(--klass-navbar-height);
+}
+
+#klass-navbar .navbar-brand {
+  color: var(--klass-primary) !important;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+#klass-navbar .navbar-brand .brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--klass-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+#klass-navbar .nav-link {
+  color: var(--klass-text-secondary) !important;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--klass-radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+#klass-navbar .nav-link:hover {
+  background: var(--klass-bg);
+  color: var(--klass-text-primary) !important;
+}
+
+#klass-navbar .navbar-search {
+  background: var(--klass-bg);
+  border: 1px solid var(--klass-border);
+  border-radius: 24px;
+  padding: 0.35rem 1rem;
+  font-size: 0.875rem;
+  color: var(--klass-text-secondary);
+  min-width: 200px;
+}
+#klass-navbar .navbar-search:focus {
+  outline: none;
+  border-color: var(--klass-primary);
+  background: #fff;
+}
+
+#klass-navbar .nav-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--klass-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--klass-text-secondary);
+  background: #fff;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+#klass-navbar .nav-icon-btn:hover {
+  background: var(--klass-bg);
+  border-color: #cdd1de;
+  color: var(--klass-text-primary);
+}
+
+#klass-navbar .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--klass-primary), var(--klass-purple));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SIDEBAR (dark — comme Figma)
+   ============================================================ */
+#klass-sidebar {
+  background: var(--klass-sidebar-bg) !important;
+  min-width: var(--klass-sidebar-width);
+  max-width: var(--klass-sidebar-width);
+  min-height: calc(100vh - var(--klass-navbar-height));
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+#klass-sidebar .sidebar-brand {
+  padding: 1.25rem 1rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 0.5rem;
+}
+
+#klass-sidebar .sidebar-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  padding: 1rem 1rem 0.25rem;
+  margin: 0;
+}
+
+#klass-sidebar .nav-link {
+  color: rgba(255,255,255,0.65) !important;
+  border-radius: var(--klass-radius-sm);
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 1px 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+
+#klass-sidebar .nav-link i {
+  font-size: 1rem;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#klass-sidebar .nav-link:hover {
+  background: rgba(255,255,255,0.08) !important;
+  color: #fff !important;
+}
+
+#klass-sidebar .nav-link.active,
+#klass-sidebar .nav-link[aria-current="page"] {
+  background: var(--klass-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(67,97,238,0.35);
+}
+
+#klass-sidebar .sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
 #klass-main {
   min-height: calc(100vh - var(--klass-navbar-height));
-  background-color: #f8fafc;
+  background: var(--klass-bg);
+  padding: 1.5rem;
 }
 
-/* ---- Sidebar ---- */
-#klass-sidebar .nav-link {
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-  transition: background-color 0.15s ease;
-}
-
-#klass-sidebar .nav-link:hover,
-#klass-sidebar .nav-link.active {
-  background-color: rgba(26, 86, 219, 0.08);
-  color: var(--klass-primary) !important;
-}
-
-/* ---- Cards ---- */
+/* ============================================================
+   CARDS (style Figma)
+   ============================================================ */
 .card {
-  transition: box-shadow 0.2s ease;
+  background: var(--klass-card-bg);
+  border: 1px solid var(--klass-border) !important;
+  border-radius: var(--klass-radius) !important;
+  box-shadow: var(--klass-shadow) !important;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
-
 .card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--klass-shadow-lg) !important;
+}
+.card-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--klass-border) !important;
 }
 
-/* ---- Formulaires ---- */
+/* Stat card (icon + count + label) */
+.stat-card {
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.stat-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+.stat-card-icon.blue   { background: rgba(67,97,238,0.12);  color: var(--klass-primary); }
+.stat-card-icon.green  { background: rgba(34,197,94,0.12);  color: var(--klass-green); }
+.stat-card-icon.yellow { background: rgba(245,158,11,0.12); color: var(--klass-yellow); }
+.stat-card-icon.red    { background: rgba(239,68,68,0.12);  color: var(--klass-red); }
+.stat-card-icon.purple { background: rgba(139,92,246,0.12); color: var(--klass-purple); }
+.stat-card-icon.teal   { background: rgba(20,184,166,0.12); color: var(--klass-teal); }
+.stat-card-icon.orange { background: rgba(249,115,22,0.12); color: var(--klass-orange); }
+
+.stat-card-count {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--klass-text-primary);
+}
+.stat-card-label {
+  font-size: 0.8rem;
+  color: var(--klass-text-secondary);
+  margin-top: 2px;
+}
+
+/* Quick link tile */
+.quick-link-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: var(--klass-radius);
+  background: var(--klass-card-bg);
+  border: 1px solid var(--klass-border);
+  text-decoration: none;
+  transition: all 0.15s;
+  min-height: 90px;
+}
+.quick-link-tile:hover {
+  border-color: var(--klass-primary);
+  box-shadow: 0 4px 16px rgba(67,97,238,0.12);
+  transform: translateY(-2px);
+}
+.quick-link-tile .tile-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.quick-link-tile span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--klass-text-secondary);
+  text-align: center;
+}
+
+/* ============================================================
+   WELCOME BANNER (dark gradient — comme Figma)
+   ============================================================ */
+.klass-welcome-banner {
+  background: linear-gradient(135deg, #1E2140 0%, #2D3561 60%, #1a1d3a 100%);
+  border-radius: var(--klass-radius-lg);
+  padding: 1.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+.klass-welcome-banner::before,
+.klass-welcome-banner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+}
+.klass-welcome-banner::before {
+  width: 200px; height: 200px;
+  background: var(--klass-primary);
+  top: -60px; right: -40px;
+}
+.klass-welcome-banner::after {
+  width: 120px; height: 120px;
+  background: var(--klass-purple);
+  bottom: -40px; right: 120px;
+}
+.klass-welcome-banner .banner-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+  background: #fff;
+}
+
+.klass-success-banner {
+  background: linear-gradient(135deg, #1E2140 0%, #2D3561 60%, #1a1d3a 100%);
+  border-radius: var(--klass-radius-lg);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+.klass-success-banner::before {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: var(--klass-primary);
+  opacity: 0.1;
+  top: -80px; right: -60px;
+}
+.klass-success-banner::after {
+  content: '';
+  position: absolute;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: var(--klass-green);
+  opacity: 0.08;
+  bottom: -50px; right: 160px;
+}
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+.form-control,
+.form-select {
+  border-radius: var(--klass-radius-sm);
+  border: 1px solid var(--klass-border);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.85rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fff;
+}
 .form-control:focus,
 .form-select:focus {
   border-color: var(--klass-primary);
-  box-shadow: 0 0 0 0.2rem rgba(26, 86, 219, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--klass-primary-rgb), 0.12);
+  outline: none;
+}
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--klass-text-primary);
+  margin-bottom: 0.375rem;
+}
+.form-text {
+  font-size: 0.78rem;
+  color: var(--klass-text-muted);
 }
 
-/* ---- Badges rôles ---- */
-.badge-role-super_admin { background-color: #7c3aed; }
-.badge-role-school_admin { background-color: #1a56db; }
-.badge-role-secretary { background-color: #0891b2; }
-.badge-role-accountant { background-color: #059669; }
-.badge-role-teacher { background-color: #d97706; }
-.badge-role-parent { background-color: #9333ea; }
-.badge-role-student { background-color: #6366f1; }
-
-/* ---- Tables responsive ---- */
-.table th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6b7280;
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary {
+  background: var(--klass-primary);
+  border-color: var(--klass-primary);
+  font-weight: 600;
+  border-radius: var(--klass-radius-sm);
+  transition: all 0.15s;
+}
+.btn-primary:hover {
+  background: var(--klass-primary-dark);
+  border-color: var(--klass-primary-dark);
+  box-shadow: 0 4px 12px rgba(var(--klass-primary-rgb), 0.35);
+  transform: translateY(-1px);
+}
+.btn-outline-primary {
+  border-color: var(--klass-primary);
+  color: var(--klass-primary);
+  border-radius: var(--klass-radius-sm);
   font-weight: 600;
 }
+.btn-outline-primary:hover {
+  background: var(--klass-primary);
+  border-color: var(--klass-primary);
+  box-shadow: 0 4px 12px rgba(var(--klass-primary-rgb), 0.25);
+}
 
-/* ---- PWA install prompt ---- */
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--klass-text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--klass-border) !important;
+}
+.table td {
+  font-size: 0.875rem;
+  border-color: var(--klass-border) !important;
+  vertical-align: middle;
+}
+.table-hover > tbody > tr:hover > td {
+  background: rgba(var(--klass-primary-rgb), 0.04);
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge-role-super_admin { background: var(--klass-purple); }
+.badge-role-school_admin { background: var(--klass-primary); }
+.badge-role-secretary { background: var(--klass-teal); }
+.badge-role-accountant { background: var(--klass-green); }
+.badge-role-teacher { background: var(--klass-yellow); }
+.badge-role-parent { background: var(--klass-purple); }
+.badge-role-student { background: var(--klass-orange); }
+
+/* ============================================================
+   CREDENTIAL DISPLAY (page succès)
+   ============================================================ */
+.credential-row {
+  background: var(--klass-bg);
+  border: 1px solid var(--klass-border);
+  border-radius: var(--klass-radius-sm);
+  padding: 0.875rem 1rem;
+  transition: border-color 0.15s;
+}
+.credential-row:hover { border-color: #cdd1de; }
+
+.credential-row.password-row {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+}
+.credential-value {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--klass-text-primary);
+  word-break: break-all;
+}
+.copy-btn.copied {
+  background: #DCFCE7;
+  border-color: #86EFAC;
+  color: #166534;
+}
+
+/* Step badge */
+.step-badge {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: rgba(var(--klass-primary-rgb), 0.1);
+  color: var(--klass-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 991.98px) {
+  #klass-sidebar { display: none !important; }
+  #klass-main { padding: 1rem !important; }
+}
+
+/* ============================================================
+   PWA install prompt
+   ============================================================ */
 #pwa-install-banner {
   position: fixed;
   bottom: 1rem;
@@ -73,10 +511,4 @@
   z-index: 1050;
   max-width: 420px;
   width: calc(100% - 2rem);
-}
-
-/* ---- Responsive mobile ---- */
-@media (max-width: 991.98px) {
-  #klass-sidebar { display: none !important; }
-  #klass-main { padding: 1rem !important; }
 }

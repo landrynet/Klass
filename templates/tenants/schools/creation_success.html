@@ -3,233 +3,215 @@
 
 {% block title %}École créée avec succès{% endblock %}
 
-{% block extra_css %}
-<style>
-  .credential-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    transition: border-color 0.2s;
-  }
-  .credential-card:hover {
-    border-color: #cbd5e1;
-  }
-  .credential-value {
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1e293b;
-    letter-spacing: 0.02em;
-    word-break: break-all;
-  }
-  .copy-btn {
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-  .copy-btn.copied {
-    background-color: #dcfce7;
-    border-color: #86efac;
-    color: #166534;
-  }
-  .success-banner {
-    background: linear-gradient(135deg, #1a56db 0%, #1345b5 100%);
-    border-radius: 16px;
-  }
-  .warning-badge {
-    background: #fef3c7;
-    border: 1px solid #fcd34d;
-    border-radius: 10px;
-  }
-  .step-badge {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(26, 86, 219, 0.1);
-    color: #1a56db;
-    font-size: 0.8rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid" style="max-width:1140px;">
 
-  <!-- Bannière de succès -->
-  <div class="success-banner text-white p-4 p-md-5 mb-4">
-    <div class="d-flex align-items-start gap-4">
-      <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-           style="width:56px;height:56px;background:rgba(255,255,255,0.15);">
-        <i class="bi bi-building-check fs-3"></i>
+  <!-- Bannière de succès style Figma (dark navy avec shapes décoratives) -->
+  <div class="klass-success-banner mb-4">
+    <!-- Shapes décoratives supplémentaires -->
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:var(--klass-yellow);opacity:0.07;top:20px;left:40%;"></div>
+    <div style="position:absolute;width:50px;height:50px;border-radius:50%;background:var(--klass-teal);opacity:0.09;bottom:10px;left:20%;"></div>
+
+    <div class="d-flex align-items-start gap-4 position-relative">
+      <!-- Icône succès -->
+      <div style="width:60px;height:60px;border-radius:16px;background:rgba(34,197,94,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="bi bi-building-check" style="font-size:1.6rem;color:#4ade80;"></i>
       </div>
-      <div>
-        <h1 class="h4 fw-bold mb-1">École créée avec succès !</h1>
-        <p class="mb-0 opacity-75">
-          <strong>{{ credentials.school_name }}</strong> est prête. Les identifiants de l'Admin École sont affichés
-          <strong>une seule fois</strong> — notez-les et transmettez-les immédiatement.
+      <div class="flex-grow-1">
+        <h1 class="h4 fw-bold mb-1" style="color:#fff;">
+          École créée avec succès !
+        </h1>
+        <p class="mb-3" style="color:rgba(255,255,255,0.65);font-size:0.9rem;">
+          <strong style="color:rgba(255,255,255,0.9);">{{ credentials.school_name }}</strong>
+          est prête. Les identifiants ci-dessous sont affichés
+          <strong style="color:#FCD34D;">une seule fois</strong> — notez-les avant de quitter cette page.
         </p>
+        <!-- Mini stat pills style Figma -->
+        <div class="d-flex flex-wrap gap-2">
+          <span style="background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 14px;font-size:0.78rem;color:rgba(255,255,255,0.8);">
+            <i class="bi bi-building me-1"></i>{{ credentials.school_slug }}.klass.app
+          </span>
+          <span style="background:rgba(34,197,94,0.2);border-radius:20px;padding:4px 14px;font-size:0.78rem;color:#4ade80;">
+            <i class="bi bi-check2 me-1"></i>Tenant créé
+          </span>
+          <span style="background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 14px;font-size:0.78rem;color:rgba(255,255,255,0.8);">
+            <i class="bi bi-person-check me-1"></i>{{ credentials.admin_full_name }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Avertissement sécurité -->
-  <div class="warning-badge d-flex align-items-start gap-3 p-3 mb-4">
-    <i class="bi bi-shield-exclamation text-warning fs-5 flex-shrink-0 mt-1"></i>
+  <div class="d-flex align-items-start gap-3 p-3 mb-4 rounded-3"
+       style="background:#FFFBEB;border:1px solid #FCD34D;">
+    <i class="bi bi-shield-exclamation flex-shrink-0 mt-1" style="color:#D97706;font-size:1.1rem;"></i>
     <div>
-      <p class="fw-semibold text-warning-emphasis mb-1 small">Affichage unique — Sécurité</p>
-      <p class="text-muted small mb-0">
-        Ces informations ne seront plus accessibles une fois cette page quittée. Le mot de passe temporaire
-        n'est pas stocké en clair. Transmettez les identifiants par un canal sécurisé (message privé, appel téléphonique).
+      <p class="fw-semibold mb-1" style="font-size:0.85rem;color:#92400E;">Affichage unique — Sécurité</p>
+      <p class="mb-0" style="font-size:0.82rem;color:#78350F;">
+        Ces informations <strong>disparaîtront définitivement</strong> dès que vous quitterez cette page.
+        Le mot de passe n'est pas stocké en clair. Transmettez-le uniquement par canal sécurisé.
       </p>
     </div>
   </div>
 
   <div class="row g-4">
 
-    <!-- Identifiants principaux -->
+    <!-- Identifiants -->
     <div class="col-lg-8">
-      <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-          <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
-            <i class="bi bi-key text-primary"></i>
-            Informations d'accès — Admin École
-          </h2>
-          <p class="text-muted small mb-0 mt-1">À transmettre à <strong>{{ credentials.admin_full_name }}</strong></p>
+      <div class="card mb-4">
+        <div class="card-header px-4 pt-4 pb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-card-icon blue" style="width:40px;height:40px;border-radius:10px;font-size:1rem;">
+              <i class="bi bi-key-fill"></i>
+            </div>
+            <div>
+              <h2 class="h6 fw-bold mb-0">Informations d'accès — Admin École</h2>
+              <p class="mb-0" style="font-size:0.78rem;color:var(--klass-text-secondary);">
+                À transmettre à <strong>{{ credentials.admin_full_name }}</strong>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="card-body px-4 pb-4">
+        <div class="card-body p-4">
 
-          <!-- Email de connexion -->
-          <div class="credential-card p-3 mb-3">
-            <div class="text-muted small fw-semibold mb-2 d-flex align-items-center gap-1">
-              <i class="bi bi-envelope-fill" style="font-size:0.75rem;"></i>
-              Adresse email de connexion
+          <!-- Email -->
+          <div class="credential-row mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span style="font-size:0.75rem;font-weight:600;color:var(--klass-text-muted);text-transform:uppercase;letter-spacing:0.05em;">
+                <i class="bi bi-envelope-fill me-1"></i>Email de connexion
+              </span>
             </div>
             <div class="d-flex align-items-center gap-2">
               <div class="credential-value flex-grow-1" id="cred-email">{{ credentials.admin_email }}</div>
-              <button class="btn btn-sm btn-outline-secondary copy-btn"
-                      onclick="copyToClipboard('cred-email', this)"
-                      title="Copier l'email">
+              <button class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0"
+                      onclick="copyField('cred-email', this)"
+                      style="border-radius:8px;font-size:0.78rem;">
                 <i class="bi bi-copy me-1"></i>Copier
               </button>
             </div>
           </div>
 
-          <!-- Mot de passe temporaire -->
-          <div class="credential-card p-3 mb-3" style="border-color:#fcd34d;background:#fffbeb;">
-            <div class="text-muted small fw-semibold mb-2 d-flex align-items-center gap-1">
-              <i class="bi bi-lock-fill text-warning" style="font-size:0.75rem;"></i>
-              Mot de passe temporaire
-              <span class="badge bg-warning-subtle text-warning ms-1" style="font-size:0.7rem;font-weight:500;">
-                À changer à la première connexion
+          <!-- Mot de passe -->
+          <div class="credential-row password-row mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span style="font-size:0.75rem;font-weight:600;color:#92400E;text-transform:uppercase;letter-spacing:0.05em;">
+                <i class="bi bi-lock-fill me-1"></i>Mot de passe temporaire
+              </span>
+              <span class="badge" style="background:#FEF3C7;color:#92400E;font-size:0.68rem;font-weight:500;">
+                À changer à la 1ère connexion
               </span>
             </div>
             <div class="d-flex align-items-center gap-2">
               <div class="credential-value flex-grow-1" id="cred-password">{{ credentials.temp_password }}</div>
-              <button class="btn btn-sm btn-outline-warning copy-btn"
-                      onclick="copyToClipboard('cred-password', this)"
-                      title="Copier le mot de passe">
+              <button class="btn btn-sm copy-btn flex-shrink-0"
+                      onclick="copyField('cred-password', this)"
+                      style="border-radius:8px;font-size:0.78rem;border:1px solid #FCD34D;color:#92400E;background:#FFFBEB;">
                 <i class="bi bi-copy me-1"></i>Copier
               </button>
             </div>
           </div>
 
-          <!-- Lien de connexion -->
-          <div class="credential-card p-3">
-            <div class="text-muted small fw-semibold mb-2 d-flex align-items-center gap-1">
-              <i class="bi bi-link-45deg" style="font-size:0.75rem;"></i>
-              Lien de connexion personnalisé
+          <!-- Lien -->
+          <div class="credential-row mb-4">
+            <div class="d-flex align-items-center mb-1">
+              <span style="font-size:0.75rem;font-weight:600;color:var(--klass-text-muted);text-transform:uppercase;letter-spacing:0.05em;">
+                <i class="bi bi-link-45deg me-1"></i>Lien de connexion personnalisé
+              </span>
             </div>
             <div class="d-flex align-items-center gap-2">
               <div class="credential-value flex-grow-1" id="cred-url">{{ credentials.login_url }}</div>
-              <button class="btn btn-sm btn-outline-secondary copy-btn"
-                      onclick="copyToClipboard('cred-url', this)"
-                      title="Copier le lien">
+              <button class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0"
+                      onclick="copyField('cred-url', this)"
+                      style="border-radius:8px;font-size:0.78rem;">
                 <i class="bi bi-copy me-1"></i>Copier
               </button>
             </div>
           </div>
 
-          <!-- Bouton tout copier -->
-          <div class="mt-4 pt-2 border-top">
-            <button class="btn btn-primary w-100 fw-semibold" onclick="copyAll(this)">
-              <i class="bi bi-clipboard2-check me-2"></i>
-              Copier tous les identifiants
-            </button>
-          </div>
+          <!-- Bouton copier tout -->
+          <button class="btn btn-primary w-100 fw-semibold" id="copy-all-btn"
+                  onclick="copyAll(this)" style="height:44px;border-radius:10px;">
+            <i class="bi bi-clipboard2-check me-2"></i>Copier tous les identifiants
+          </button>
 
         </div>
       </div>
 
-      <!-- Prochaines étapes -->
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-          <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
-            <i class="bi bi-list-check text-primary"></i>
+      <!-- Prochaines étapes (style Quick Links Figma) -->
+      <div class="card">
+        <div class="card-body p-4">
+          <h2 class="h6 fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-list-check" style="color:var(--klass-primary);"></i>
             Prochaines étapes
           </h2>
-        </div>
-        <div class="card-body px-4 pb-4">
-          <div class="d-flex flex-column gap-3">
-            <div class="d-flex align-items-start gap-3">
-              <span class="step-badge mt-1">1</span>
-              <div>
-                <p class="fw-semibold mb-0 small">Transmettre les identifiants à l'Admin École</p>
-                <p class="text-muted small mb-0">Communiquez l'email, le mot de passe temporaire et le lien de connexion par un canal sécurisé.</p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div style="border-radius:12px;border:1px solid var(--klass-border);padding:1rem;text-align:center;height:100%;">
+                <div class="stat-card-icon blue mx-auto mb-2" style="width:44px;height:44px;">
+                  <i class="bi bi-send-fill" style="font-size:0.9rem;"></i>
+                </div>
+                <p class="fw-semibold mb-1" style="font-size:0.82rem;">Transmettre les identifiants</p>
+                <p class="mb-0" style="font-size:0.75rem;color:var(--klass-text-secondary);">Via canal sécurisé à l'Admin</p>
               </div>
             </div>
-            <div class="d-flex align-items-start gap-3">
-              <span class="step-badge mt-1">2</span>
-              <div>
-                <p class="fw-semibold mb-0 small">Première connexion de l'Admin École</p>
-                <p class="text-muted small mb-0">L'Admin doit se connecter et <strong>changer son mot de passe</strong> immédiatement.</p>
+            <div class="col-md-4">
+              <div style="border-radius:12px;border:1px solid var(--klass-border);padding:1rem;text-align:center;height:100%;">
+                <div class="stat-card-icon green mx-auto mb-2" style="width:44px;height:44px;">
+                  <i class="bi bi-person-check-fill" style="font-size:0.9rem;"></i>
+                </div>
+                <p class="fw-semibold mb-1" style="font-size:0.82rem;">Première connexion</p>
+                <p class="mb-0" style="font-size:0.75rem;color:var(--klass-text-secondary);">Changement obligatoire du mot de passe</p>
               </div>
             </div>
-            <div class="d-flex align-items-start gap-3">
-              <span class="step-badge mt-1">3</span>
-              <div>
-                <p class="fw-semibold mb-0 small">Assistant de configuration en 3 étapes</p>
-                <p class="text-muted small mb-0">L'Admin configure les informations de l'école, l'année scolaire et finalise l'activation.</p>
+            <div class="col-md-4">
+              <div style="border-radius:12px;border:1px solid var(--klass-border);padding:1rem;text-align:center;height:100%;">
+                <div class="stat-card-icon yellow mx-auto mb-2" style="width:44px;height:44px;">
+                  <i class="bi bi-gear-fill" style="font-size:0.9rem;"></i>
+                </div>
+                <p class="fw-semibold mb-1" style="font-size:0.82rem;">Configuration école</p>
+                <p class="mb-0" style="font-size:0.75rem;color:var(--klass-text-secondary);">Assistant 3 étapes</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Sidebar : infos école + actions -->
+    <!-- Sidebar info école + actions -->
     <div class="col-lg-4">
-      <!-- Résumé école -->
-      <div class="card border-0 shadow-sm rounded-4 mb-3">
+
+      <!-- Info école style stat card Figma -->
+      <div class="card mb-3">
         <div class="card-body p-4">
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="rounded-3 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:44px;height:44px;">
-              <i class="bi bi-building text-primary fs-5"></i>
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="stat-card-icon blue" style="width:52px;height:52px;border-radius:14px;font-size:1.2rem;">
+              <i class="bi bi-buildings-fill"></i>
             </div>
             <div>
-              <div class="fw-bold">{{ credentials.school_name }}</div>
-              <div class="text-muted small">
+              <div class="fw-bold" style="font-size:0.95rem;">{{ credentials.school_name }}</div>
+              <div style="font-size:0.78rem;color:var(--klass-text-secondary);">
                 <code>{{ credentials.school_slug }}.klass.app</code>
               </div>
             </div>
           </div>
-          <div class="d-flex flex-column gap-2">
-            <div class="d-flex justify-content-between small">
-              <span class="text-muted">Statut</span>
-              <span class="badge bg-warning-subtle text-warning">Configuration en attente</span>
+
+          <div style="border-top:1px solid var(--klass-border);padding-top:1rem;">
+            <div class="d-flex justify-content-between align-items-center py-1" style="font-size:0.82rem;">
+              <span style="color:var(--klass-text-secondary);">Statut</span>
+              <span class="badge" style="background:rgba(245,158,11,0.12);color:var(--klass-yellow);border-radius:20px;padding:4px 10px;">
+                ⏳ Config. en attente
+              </span>
             </div>
-            <div class="d-flex justify-content-between small">
-              <span class="text-muted">Admin</span>
+            <div class="d-flex justify-content-between align-items-center py-1" style="font-size:0.82rem;">
+              <span style="color:var(--klass-text-secondary);">Admin</span>
               <span class="fw-semibold">{{ credentials.admin_full_name }}</span>
             </div>
-            <div class="d-flex justify-content-between small">
-              <span class="text-muted">Schéma BD</span>
-              <code class="text-muted">school_{{ credentials.school_slug|cut:"-" }}</code>
+            <div class="d-flex justify-content-between align-items-center py-1" style="font-size:0.82rem;">
+              <span style="color:var(--klass-text-secondary);">Tenant créé</span>
+              <span style="color:var(--klass-green);">
+                <i class="bi bi-check-circle-fill me-1"></i>OK
+              </span>
             </div>
           </div>
         </div>
@@ -238,38 +220,34 @@
       <!-- Actions -->
       <div class="d-flex flex-column gap-2">
         <a href="{% url 'tenants:school_detail' credentials.school_pk %}"
-           class="btn btn-outline-primary rounded-3 fw-semibold">
-          <i class="bi bi-building me-2"></i>Voir la fiche de l'école
+           class="btn btn-primary fw-semibold" style="border-radius:10px;height:42px;">
+          <i class="bi bi-buildings me-2"></i>Voir la fiche de l'école
         </a>
         <a href="{% url 'tenants:school_create' %}"
-           class="btn btn-outline-secondary rounded-3">
+           class="btn btn-outline-secondary" style="border-radius:10px;height:42px;">
           <i class="bi bi-plus-circle me-2"></i>Créer une autre école
         </a>
         <a href="{% url 'tenants:super_admin_dashboard' %}"
-           class="btn btn-light rounded-3">
-          <i class="bi bi-grid me-2"></i>Retour au tableau de bord
+           class="btn btn-link text-decoration-none" style="height:42px;color:var(--klass-text-secondary);">
+          <i class="bi bi-grid me-2"></i>Tableau de bord
         </a>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  function copyToClipboard(elementId, btn) {
-    const text = document.getElementById(elementId).textContent.trim();
+  function copyField(id, btn) {
+    const text = document.getElementById(id).textContent.trim();
     navigator.clipboard.writeText(text).then(() => {
-      const original = btn.innerHTML;
+      const orig = btn.innerHTML;
       btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Copié !';
       btn.classList.add('copied');
-      setTimeout(() => {
-        btn.innerHTML = original;
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
     }).catch(() => {
-      // Fallback pour les navigateurs sans clipboard API
       const el = document.createElement('textarea');
       el.value = text;
       document.body.appendChild(el);
@@ -280,30 +258,28 @@
   }
 
   function copyAll(btn) {
-    const email = document.getElementById('cred-email').textContent.trim();
+    const email    = document.getElementById('cred-email').textContent.trim();
     const password = document.getElementById('cred-password').textContent.trim();
-    const url = document.getElementById('cred-url').textContent.trim();
-    const schoolName = "{{ credentials.school_name|escapejs }}";
-    const adminName = "{{ credentials.admin_full_name|escapejs }}";
+    const url      = document.getElementById('cred-url').textContent.trim();
 
     const text = [
-      `=== Identifiants KLASS — ${schoolName} ===`,
-      ``,
-      `Nom : ${adminName}`,
-      `Email : ${email}`,
-      `Mot de passe temporaire : ${password}`,
-      `Lien de connexion : ${url}`,
-      ``,
-      `⚠️ Ce mot de passe doit être changé dès la première connexion.`,
+      '=== Identifiants KLASS — {{ credentials.school_name|escapejs }} ===',
+      '',
+      'Nom : {{ credentials.admin_full_name|escapejs }}',
+      'Email : ' + email,
+      'Mot de passe temporaire : ' + password,
+      'Lien de connexion : ' + url,
+      '',
+      '⚠️ Ce mot de passe doit être changé dès la première connexion.',
     ].join('\n');
 
     navigator.clipboard.writeText(text).then(() => {
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Identifiants copiés dans le presse-papier !';
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="bi bi-check2-circle me-2"></i>Copié dans le presse-papier !';
       btn.classList.remove('btn-primary');
       btn.classList.add('btn-success');
       setTimeout(() => {
-        btn.innerHTML = original;
+        btn.innerHTML = orig;
         btn.classList.remove('btn-success');
         btn.classList.add('btn-primary');
       }, 3000);
