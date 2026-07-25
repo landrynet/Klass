@@ -1,0 +1,82 @@
+/* ============================================================
+   KLASS — Styles personnalisés
+   Base CSS pour la plateforme de gestion scolaire
+   ============================================================ */
+
+:root {
+  --klass-primary: #1a56db;
+  --klass-primary-dark: #1345b5;
+  --klass-sidebar-width: 220px;
+  --klass-navbar-height: 56px;
+}
+
+/* ---- Layout général ---- */
+#klass-main {
+  min-height: calc(100vh - var(--klass-navbar-height));
+  background-color: #f8fafc;
+}
+
+/* ---- Sidebar ---- */
+#klass-sidebar .nav-link {
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: background-color 0.15s ease;
+}
+
+#klass-sidebar .nav-link:hover,
+#klass-sidebar .nav-link.active {
+  background-color: rgba(26, 86, 219, 0.08);
+  color: var(--klass-primary) !important;
+}
+
+/* ---- Cards ---- */
+.card {
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ---- Formulaires ---- */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--klass-primary);
+  box-shadow: 0 0 0 0.2rem rgba(26, 86, 219, 0.15);
+}
+
+/* ---- Badges rôles ---- */
+.badge-role-super_admin { background-color: #7c3aed; }
+.badge-role-school_admin { background-color: #1a56db; }
+.badge-role-secretary { background-color: #0891b2; }
+.badge-role-accountant { background-color: #059669; }
+.badge-role-teacher { background-color: #d97706; }
+.badge-role-parent { background-color: #9333ea; }
+.badge-role-student { background-color: #6366f1; }
+
+/* ---- Tables responsive ---- */
+.table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* ---- PWA install prompt ---- */
+#pwa-install-banner {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  max-width: 420px;
+  width: calc(100% - 2rem);
+}
+
+/* ---- Responsive mobile ---- */
+@media (max-width: 991.98px) {
+  #klass-sidebar { display: none !important; }
+  #klass-main { padding: 1rem !important; }
+}

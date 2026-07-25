@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex align-items-center mb-4">
+    <i class="bi bi-house-door-fill text-primary fs-4 me-2"></i>
+    <h1 class="h4 fw-bold mb-0">Tableau de bord</h1>
+  </div>
+
+  <div class="alert alert-info d-flex align-items-center gap-2">
+    <i class="bi bi-info-circle-fill"></i>
+    Bienvenue dans KLASS, {{ user.get_full_name }} !
+    Le tableau de bord avec les statistiques sera développé en Phase 1.
+  </div>
+
+  <!-- Raccourcis rapides -->
+  <div class="row g-3 mt-2">
+    {% if is_school_admin or user.is_secretary %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'students:list' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-people fs-1 text-primary d-block mb-2"></i>
+          <span class="fw-semibold">Élèves</span>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+    {% if is_school_admin or user.is_accountant %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'finance:dashboard' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-cash-coin fs-1 text-success d-block mb-2"></i>
+          <span class="fw-semibold">Paiements</span>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+    {% if is_school_admin or user.is_teacher %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'scheduling:view' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-calendar3 fs-1 text-warning d-block mb-2"></i>
+          <span class="fw-semibold">Emploi du temps</span>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+    {% if is_school_admin or user.is_teacher %}
+    <div class="col-6 col-md-3">
+      <a href="{% url 'resources:list' %}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-folder2-open fs-1 text-info d-block mb-2"></i>
+          <span class="fw-semibold">Ressources</span>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

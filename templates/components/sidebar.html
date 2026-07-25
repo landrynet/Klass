@@ -1,0 +1,92 @@
+{% load static %}
+<nav class="sidebar bg-white border-end shadow-sm d-none d-lg-flex flex-column" id="klass-sidebar" style="min-width:220px;max-width:220px;min-height:calc(100vh - 56px)">
+  <div class="p-3 pt-4">
+
+    {% if is_super_admin %}
+    <!-- Super Admin Navigation — dashboards personnalisés (Django Admin désactivé) -->
+    <p class="text-muted text-uppercase small fw-semibold px-2 mb-1">Administration</p>
+    <ul class="nav flex-column">
+      {# TODO: remplacer par les URLs du dashboard super_admin une fois créé #}
+      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-grid me-2"></i>Dashboard (à venir)</a></li>
+      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-building me-2"></i>Écoles (à venir)</a></li>
+      <li class="nav-item"><a class="nav-link text-dark text-muted disabled" aria-disabled="true"><i class="bi bi-people me-2"></i>Utilisateurs (à venir)</a></li>
+    </ul>
+
+    {% else %}
+    <!-- Navigation École (Admin, Secrétariat, Comptable, Enseignant) -->
+    <p class="text-muted text-uppercase small fw-semibold px-2 mb-1">Navigation</p>
+    <ul class="nav flex-column mb-3">
+
+      <!-- Toujours visible -->
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'academics:dashboard' %}">
+          <i class="bi bi-house me-2"></i>Tableau de bord
+        </a>
+      </li>
+
+      <!-- Admin + Secrétariat -->
+      {% if is_school_admin or user.is_secretary %}
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'students:list' %}">
+          <i class="bi bi-people me-2"></i>Élèves
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- Admin + Comptable -->
+      {% if is_school_admin or user.is_accountant %}
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'finance:dashboard' %}">
+          <i class="bi bi-cash-coin me-2"></i>Paiements
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- Admin + Enseignant -->
+      {% if is_school_admin or user.is_teacher %}
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'scheduling:view' %}">
+          <i class="bi bi-calendar3 me-2"></i>Emploi du temps
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'resources:list' %}">
+          <i class="bi bi-folder2-open me-2"></i>Ressources
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- Admin uniquement -->
+      {% if is_school_admin %}
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'teachers:list' %}">
+          <i class="bi bi-person-badge me-2"></i>Enseignants
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'academics:classrooms' %}">
+          <i class="bi bi-diagram-3 me-2"></i>Structure académique
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'communications:list' %}">
+          <i class="bi bi-megaphone me-2"></i>Communications
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="{% url 'school_years:list' %}">
+          <i class="bi bi-calendar-event me-2"></i>Années scolaires
+        </a>
+      </li>
+      {% endif %}
+
+    </ul>
+    {% endif %}
+
+  </div>
+
+  <!-- Version en bas -->
+  <div class="mt-auto p-3 border-top">
+    <small class="text-muted">KLASS v1.0 — Socle</small>
+  </div>
+</nav>

@@ -1,0 +1,55 @@
+"""
+Settings pour les tests de KLASS.
+Base de données de test en mémoire, Celery synchrone, emails dans la console.
+"""
+from .base import *  # noqa
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+DEBUG = False
+
+# Utilise une base de données de test séparée
+DATABASES["default"]["TEST"] = {  # noqa
+    "NAME": "klass_test",
+}
+
+# ---------------------------------------------------------------------------
+# Celery — synchrone pour les tests (pas besoin d'un worker réel)
+# ---------------------------------------------------------------------------
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
+# ---------------------------------------------------------------------------
+# Email
+# ---------------------------------------------------------------------------
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# ---------------------------------------------------------------------------
+# Stockage
+# ---------------------------------------------------------------------------
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+USE_EXTERNAL_STORAGE = False
+
+# ---------------------------------------------------------------------------
+# Sécurité allégée pour les tests
+# ---------------------------------------------------------------------------
+SECRET_KEY = "test-insecure-key-not-for-production"
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.MD5PasswordHasher",  # Rapide pour les tests
+]
+
+# ---------------------------------------------------------------------------
+# Logging minimal en test
+# ---------------------------------------------------------------------------
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "handlers": {
+        "null": {"class": "logging.NullHandler"},
+    },
+    "root": {
+        "handlers": ["null"],
+        "level": "CRITICAL",
+    },
+}
