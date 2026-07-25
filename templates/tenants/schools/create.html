@@ -3,175 +3,395 @@
 
 {% block title %}Créer une école{% endblock %}
 
+{% block extra_css %}
+<style>
+  .form-section {
+    border-radius: 14px;
+    border: 1px solid #e8edf5;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .form-section-header {
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbff;
+  }
+  .form-section-body {
+    padding: 1.5rem;
+  }
+  .form-section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 86, 219, 0.1);
+    flex-shrink: 0;
+  }
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #d1d9e6;
+    font-size: 0.925rem;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #1a56db;
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+  }
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.375rem;
+  }
+  .form-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+  .info-panel {
+    border-radius: 14px;
+    border: 1px solid #e8edf5;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    overflow: hidden;
+    position: sticky;
+    top: 1rem;
+  }
+  .info-panel-section {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .info-panel-section:last-child {
+    border-bottom: none;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    color: #374151;
+    padding: 0.25rem 0;
+  }
+  .checklist-item .bi-check-circle-fill {
+    color: #22c55e;
+    font-size: 0.9rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .submit-btn {
+    height: 46px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    letter-spacing: 0.01em;
+  }
+  .page-header-back {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .page-header-back:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #374151;
+  }
+  .slug-preview {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-family: monospace;
+    font-size: 0.82rem;
+    color: #475569;
+    transition: all 0.2s;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid" style="max-width: 1140px;">
 
   <!-- En-tête -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-arrow-left me-1"></i>Retour
+    <a href="{% url 'tenants:super_admin_dashboard' %}" class="page-header-back">
+      <i class="bi bi-arrow-left"></i>
     </a>
     <div>
       <h1 class="h4 fw-bold mb-0">Créer une nouvelle école</h1>
-      <p class="text-muted small mb-0">Création du tenant, du schéma PostgreSQL et de l'Admin École</p>
+      <p class="text-muted small mb-0">Tenant PostgreSQL isolé + compte Admin École généré automatiquement</p>
     </div>
   </div>
 
   {% include "components/messages.html" %}
 
-  <div class="row g-4">
+  <div class="row g-4 align-items-start">
+
     <!-- Formulaire -->
     <div class="col-lg-8">
-      <form method="post" novalidate>
+      <form method="post" novalidate id="create-school-form">
         {% csrf_token %}
 
-        <!-- Section : Informations de l'établissement -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-          <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-            <h2 class="h6 fw-semibold mb-0">
-              <i class="bi bi-building me-2 text-primary"></i>Informations de l'établissement
-            </h2>
+        <!-- Section 1 : Établissement -->
+        <div class="form-section">
+          <div class="form-section-header d-flex align-items-center gap-3">
+            <span class="form-section-icon">
+              <i class="bi bi-building text-primary" style="font-size:1.1rem;"></i>
+            </span>
+            <div>
+              <h2 class="h6 fw-bold mb-0">Informations de l'établissement</h2>
+              <p class="text-muted small mb-0">Identité officielle et coordonnées de l'école</p>
+            </div>
           </div>
-          <div class="card-body px-4 pb-4">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">{{ form.name.label }} <span class="text-danger">*</span></label>
+          <div class="form-section-body">
+
+            <!-- Nom -->
+            <div class="mb-4">
+              <label class="form-label">{{ form.name.label }} <span class="text-danger">*</span></label>
               {{ form.name }}
               {% if form.name.errors %}
-              <div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>
+              <div class="text-danger small mt-1">{{ form.name.errors|join:", " }}</div>
               {% endif %}
-              <div class="form-text">Le slug et le sous-domaine seront générés automatiquement depuis ce nom.</div>
+              <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
+                <span class="text-muted" style="font-size:0.8rem;">Sous-domaine :</span>
+                <span class="slug-preview" id="slug-preview">exemple.klass.app</span>
+              </div>
             </div>
 
-            <div class="row g-3">
+            <!-- Email + Téléphone -->
+            <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.email.label }} <span class="text-danger">*</span></label>
+                <label class="form-label">{{ form.email.label }} <span class="text-danger">*</span></label>
                 {{ form.email }}
                 {% if form.email.errors %}
-                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.phone.label }}</label>
+                <label class="form-label">{{ form.phone.label }}</label>
                 {{ form.phone }}
                 {% if form.phone.errors %}
-                <div class="invalid-feedback d-block">{{ form.phone.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>
                 {% endif %}
               </div>
             </div>
 
-            <div class="mb-3 mt-3">
-              <label class="form-label fw-semibold">{{ form.address.label }}</label>
+            <!-- Adresse -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.address.label }}</label>
               {{ form.address }}
               {% if form.address.errors %}
-              <div class="invalid-feedback d-block">{{ form.address.errors|join:", " }}</div>
+              <div class="text-danger small mt-1">{{ form.address.errors|join:", " }}</div>
               {% endif %}
             </div>
 
+            <!-- Ville + Pays -->
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.city.label }}</label>
+                <label class="form-label">{{ form.city.label }}</label>
                 {{ form.city }}
                 {% if form.city.errors %}
-                <div class="invalid-feedback d-block">{{ form.city.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.city.errors|join:", " }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.country.label }}</label>
+                <label class="form-label">{{ form.country.label }}</label>
                 {{ form.country }}
                 {% if form.country.errors %}
-                <div class="invalid-feedback d-block">{{ form.country.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.country.errors|join:", " }}</div>
                 {% endif %}
               </div>
             </div>
+
           </div>
         </div>
 
-        <!-- Section : Admin École -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-          <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-            <h2 class="h6 fw-semibold mb-0">
-              <i class="bi bi-person-badge me-2 text-primary"></i>Compte Admin École
-            </h2>
-            <p class="text-muted small mb-0 mt-1">
-              Un compte Admin École sera créé automatiquement avec un mot de passe temporaire.
-            </p>
+        <!-- Section 2 : Admin École -->
+        <div class="form-section">
+          <div class="form-section-header d-flex align-items-center gap-3">
+            <span class="form-section-icon">
+              <i class="bi bi-person-badge text-primary" style="font-size:1.1rem;"></i>
+            </span>
+            <div>
+              <h2 class="h6 fw-bold mb-0">Compte Admin École</h2>
+              <p class="text-muted small mb-0">Un mot de passe temporaire sera généré automatiquement</p>
+            </div>
           </div>
-          <div class="card-body px-4 pb-4">
-            <div class="row g-3">
+          <div class="form-section-body">
+
+            <!-- Prénom + Nom -->
+            <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.admin_first_name.label }} <span class="text-danger">*</span></label>
+                <label class="form-label">{{ form.admin_first_name.label }} <span class="text-danger">*</span></label>
                 {{ form.admin_first_name }}
                 {% if form.admin_first_name.errors %}
-                <div class="invalid-feedback d-block">{{ form.admin_first_name.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.admin_first_name.errors|join:", " }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold">{{ form.admin_last_name.label }} <span class="text-danger">*</span></label>
+                <label class="form-label">{{ form.admin_last_name.label }} <span class="text-danger">*</span></label>
                 {{ form.admin_last_name }}
                 {% if form.admin_last_name.errors %}
-                <div class="invalid-feedback d-block">{{ form.admin_last_name.errors|join:", " }}</div>
+                <div class="text-danger small mt-1">{{ form.admin_last_name.errors|join:", " }}</div>
                 {% endif %}
               </div>
             </div>
-            <div class="mt-3">
-              <label class="form-label fw-semibold">{{ form.admin_email.label }} <span class="text-danger">*</span></label>
+
+            <!-- Email admin -->
+            <div>
+              <label class="form-label">{{ form.admin_email.label }} <span class="text-danger">*</span></label>
               {{ form.admin_email }}
               {% if form.admin_email.errors %}
-              <div class="invalid-feedback d-block">{{ form.admin_email.errors|join:", " }}</div>
+              <div class="text-danger small mt-1">{{ form.admin_email.errors|join:", " }}</div>
               {% endif %}
-              <div class="form-text">{{ form.admin_email.help_text }}</div>
+              {% if form.admin_email.help_text %}
+              <div class="form-text mt-1">{{ form.admin_email.help_text }}</div>
+              {% endif %}
             </div>
+
           </div>
         </div>
 
-        <!-- Non-field errors -->
+        <!-- Erreurs globales -->
         {% if form.non_field_errors %}
-        <div class="alert alert-danger d-flex gap-2 align-items-start">
+        <div class="alert alert-danger rounded-3 d-flex gap-2 align-items-start mb-3">
           <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
           <div>{{ form.non_field_errors|join:"<br>" }}</div>
         </div>
         {% endif %}
 
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary px-4 fw-semibold">
+        <!-- Actions -->
+        <div class="d-flex align-items-center gap-3">
+          <button type="submit" class="btn btn-primary submit-btn px-5" id="submit-btn">
             <i class="bi bi-building-check me-2"></i>Créer l'école
           </button>
-          <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-outline-secondary">
+          <a href="{% url 'tenants:super_admin_dashboard' %}" class="btn btn-link text-muted text-decoration-none">
             Annuler
           </a>
         </div>
+
       </form>
     </div>
 
-    <!-- Aide contextuelle -->
+    <!-- Panneau d'information -->
     <div class="col-lg-4">
-      <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-5 border-primary border-opacity-10">
-        <div class="card-body p-4">
-          <h3 class="h6 fw-semibold mb-3">
-            <i class="bi bi-info-circle me-2 text-primary"></i>Ce qui sera créé
+      <div class="info-panel">
+
+        <!-- Ce qui sera créé -->
+        <div class="info-panel-section">
+          <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-layers text-primary"></i>
+            Ce qui sera créé
           </h3>
-          <ul class="list-unstyled text-muted small mb-0">
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>tenant PostgreSQL</strong> isolé pour l'école</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>schéma PostgreSQL</strong> dédié</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>domaine</strong> (<em>slug</em>.klass.app)</li>
-            <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Un <strong>compte Admin École</strong> avec mot de passe temporaire</li>
-            <li><i class="bi bi-check2 text-success me-2"></i>Un <strong>accès immédiat</strong> pour l'Admin à configurer son établissement</li>
-          </ul>
+          <div class="d-flex flex-column gap-1">
+            <div class="checklist-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Un <strong>schéma PostgreSQL</strong> isolé pour l'école</span>
+            </div>
+            <div class="checklist-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Un <strong>sous-domaine</strong> dédié (<em>slug</em>.klass.app)</span>
+            </div>
+            <div class="checklist-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Un <strong>compte Admin École</strong> avec mot de passe temporaire</span>
+            </div>
+            <div class="checklist-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Un accès immédiat à l'assistant de configuration</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="card border-0 shadow-sm rounded-4 mt-3">
-        <div class="card-body p-4">
-          <h3 class="h6 fw-semibold mb-2">
-            <i class="bi bi-shield-lock me-2 text-warning"></i>Identifiants temporaires
+
+        <!-- Sécurité -->
+        <div class="info-panel-section">
+          <h3 class="h6 fw-bold mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-warning"></i>
+            Sécurité des identifiants
           </h3>
           <p class="text-muted small mb-0">
-            Un mot de passe temporaire sera généré pour l'Admin École.
-            Transmettez les identifiants uniquement par un canal sécurisé.
+            Le mot de passe temporaire vous sera affiché <strong>une seule fois</strong> après la création.
+            Il ne sera pas stocké en clair. L'Admin École devra le changer dès sa première connexion.
           </p>
         </div>
+
+        <!-- Flux -->
+        <div class="info-panel-section">
+          <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-signpost-2 text-primary"></i>
+            Flux après création
+          </h3>
+          <div class="d-flex flex-column gap-2">
+            {% for step in "123"|make_list %}
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:22px;height:22px;background:rgba(26,86,219,0.1);color:#1a56db;font-size:0.72rem;font-weight:700;">
+                {{ step }}
+              </div>
+              <span class="small text-muted">
+                {% if step == "1" %}Identifiants affichés au Super Admin{% endif %}
+                {% if step == "2" %}Admin se connecte, change son mot de passe{% endif %}
+                {% if step == "3" %}Assistant de configuration en 3 étapes{% endif %}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Prévisualisation du slug en temps réel
+  const nameInput = document.getElementById('{{ form.name.auto_id }}');
+  const slugPreview = document.getElementById('slug-preview');
+
+  function toSlug(str) {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // accents
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .slice(0, 50) || 'exemple';
+  }
+
+  if (nameInput && slugPreview) {
+    function updateSlug() {
+      const slug = toSlug(nameInput.value);
+      slugPreview.textContent = slug + '.klass.app';
+    }
+    nameInput.addEventListener('input', updateSlug);
+    updateSlug();
+  }
+
+  // Désactiver le bouton pendant la soumission
+  const form = document.getElementById('create-school-form');
+  const submitBtn = document.getElementById('submit-btn');
+  if (form && submitBtn) {
+    form.addEventListener('submit', function () {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Création en cours…';
+    });
+  }
+</script>
 {% endblock %}

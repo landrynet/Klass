@@ -180,11 +180,16 @@ Super Admin
     ↓  /super-admin/
 Dashboard Super Admin (liste des écoles)
     ↓  /super-admin/schools/create/
-Création de l'école + tenant + Admin École
+Création de l'école + tenant PostgreSQL + Admin École
+    ↓  /super-admin/schools/creation-success/
+Page de confirmation (affichage unique des identifiants)
+  → Email, mot de passe temporaire, lien de connexion
+  → Boutons de copie (individuel + global)
+  → Effacés de la session dès la première lecture
     ↓
-Admin École reçoit ses identifiants temporaires
+Super Admin transmet les identifiants à l'Admin École
     ↓  /auth/login/
-Première connexion → changement du mot de passe
+Première connexion → changement obligatoire du mot de passe
     ↓  /super-admin/setup/school-info/
 Assistant de configuration :
   1. Informations de l'école

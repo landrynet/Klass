@@ -14,6 +14,7 @@ urlpatterns = [
     # --- Super Admin ---
     path("", views.SuperAdminDashboardView.as_view(), name="super_admin_dashboard"),
     path("schools/create/", views.SchoolCreateView.as_view(), name="school_create"),
+    path("schools/creation-success/", views.SchoolCreationSuccessView.as_view(), name="school_creation_success"),
     path("schools/<int:pk>/", views.SchoolDetailView.as_view(), name="school_detail"),
 
     # --- Assistant de configuration initiale (Admin École) ---

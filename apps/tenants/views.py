@@ -129,17 +129,22 @@ class SchoolCreateView(View):
                     admin_email=data["admin_email"],
                     created_by=request.user,
                 )
-                messages.success(
-                    request,
-                    f"École « {school.name} » créée avec succès. "
-                    f"Le compte Admin École ({admin_user.email}) a été créé. "
-                    "Transmettez ses identifiants par un canal sécurisé."
-                )
                 logger.info(
                     "École créée : %s (slug=%s)",
                     school.name, school.slug,
                 )
-                return redirect("tenants:school_detail", pk=school.pk)
+                # Stocker les identifiants en session pour affichage unique.
+                # Le mot de passe n'est jamais re-affiché après cette étape.
+                request.session["school_creation_credentials"] = {
+                    "school_name": school.name,
+                    "school_pk": school.pk,
+                    "school_slug": school.slug,
+                    "admin_email": admin_user.email,
+                    "admin_full_name": admin_user.get_full_name(),
+                    "temp_password": temp_password,
+                    "login_url": f"https://{school.slug}.klass.app/auth/login/",
+                }
+                return redirect("tenants:school_creation_success")
 
             except Exception as exc:
                 logger.exception("Erreur lors de la création de l'école : %s", exc)
@@ -150,6 +155,35 @@ class SchoolCreateView(View):
                 )
 
         return render(request, self.template_name, {"form": form})
+
+
+@method_decorator([login_required], name="dispatch")
+class SchoolCreationSuccessView(View):
+    """
+    Page de confirmation après création d'une école.
+    Affiche une seule fois les informations d'accès de l'Admin École,
+    lues depuis la session puis immédiatement effacées.
+    """
+    template_name = "tenants/schools/creation_success.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("accounts:login")
+        if request.user.role != Roles.SUPER_ADMIN:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        # Lire et supprimer immédiatement les identifiants de la session (affichage unique)
+        credentials = request.session.pop("school_creation_credentials", None)
+        if not credentials:
+            messages.info(
+                request,
+                "Les informations d'accès ne sont disponibles qu'une seule fois, "
+                "immédiatement après la création. Consultez la fiche de l'école si nécessaire."
+            )
+            return redirect("tenants:super_admin_dashboard")
+        return render(request, self.template_name, {"credentials": credentials})
 
 
 @method_decorator([login_required], name="dispatch")

@@ -1,0 +1,85 @@
+## AJUSTEMENT PHASE 1 — INFORMATIONS D'ACCÈS DE L'ADMIN ÉCOLE + DESIGN
+
+Effectue cet ajustement sans casser les fonctionnalités existantes de la Phase 1.
+
+Lorsqu'un Super Admin crée une nouvelle école, le système crée automatiquement l'Admin École avec ses informations d'accès temporaires.
+
+Après la création réussie de l'école, le Super Admin doit voir une page ou une étape de confirmation claire contenant les informations nécessaires à transmettre à l'Admin de l'école.
+
+Afficher notamment :
+
+* le nom de l'école ;
+* l'identifiant ou email de connexion de l'Admin École ;
+* le lien personnalisé de connexion de l'école ;
+* le lien d'accès à l'espace de connexion ;
+* le mot de passe temporaire généré, uniquement au moment approprié et selon les règles de sécurité prévues.
+
+Le Super Admin doit pouvoir copier facilement les informations nécessaires ou utiliser une action permettant de les transmettre.
+
+IMPORTANT :
+
+Le Super Admin ne doit pas avoir accès aux mots de passe après leur affichage initial ou leur transmission sécurisée.
+
+Ne jamais stocker ou afficher inutilement les mots de passe en clair.
+
+L'objectif est que le Super Admin puisse réellement transmettre à l'Admin École toutes les informations nécessaires pour sa première connexion.
+
+Flux attendu :
+
+Super Admin crée l'école
+↓
+École créée avec succès
+↓
+Création de l'Admin École
+↓
+Génération des informations d'accès temporaires
+↓
+Page de confirmation
+↓
+Informations d'accès affichées clairement
+↓
+Transmission à l'Admin École
+↓
+Première connexion
+↓
+Changement obligatoire du mot de passe
+
+---
+
+## ADAPTATION DU DESIGN
+
+J'ai fourni un lien de référence de design.
+
+Analyse ce lien et adapte l'interface existante de KLASS en t'en inspirant.
+
+Ne copie pas aveuglément le design.
+
+Utilise-le comme référence pour améliorer :
+
+* la page de création d'école ;
+* la page de confirmation après création ;
+* l'affichage des informations d'accès ;
+* la hiérarchie visuelle ;
+* les boutons ;
+* les cartes ;
+* les espacements ;
+* la typographie ;
+* la responsivité ;
+* l'expérience globale.
+
+Le design final doit rester cohérent avec l'identité de KLASS et avec l'architecture existante.
+
+Ne modifie pas inutilement les fonctionnalités déjà validées.
+
+Après les modifications, effectuer les tests de régression de la Phase 1 et vérifier que :
+
+* la création d'école fonctionne ;
+* l'Admin École est correctement créé ;
+* les informations d'accès sont correctement affichées ;
+* le lien personnalisé est correct ;
+* le mot de passe temporaire fonctionne ;
+* la première connexion fonctionne ;
+* le changement obligatoire du mot de passe fonctionne ;
+* aucune information sensible n'est exposée inutilement.
+
+Documenter cet ajustement dans `docs/` et mettre à jour le `README.md` si nécessaire.

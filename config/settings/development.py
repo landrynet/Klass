@@ -10,6 +10,18 @@ from .base import *  # noqa
 DEBUG = True
 ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1", ".localhost"]
 
+# Replit preview support — autoriser tous les sous-domaines replit.dev en développement
+import os as _os_dev
+_replit_dev = _os_dev.environ.get("REPLIT_DEV_DOMAIN", "")
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.replit.dev",
+    "https://*.repl.co",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+]
+if _replit_dev:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_replit_dev}")
+
 # Domaine de fallback pour le tenant en développement
 # Permet d'accéder à localhost:8000 sans sous-domaine configuré
 SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
