@@ -87,3 +87,8 @@ python manage.py shell
 ... )
 >>> print(f"Admin: {admin.email} / Mot de passe: {pwd}")
 ```
+
+Cette commande est réservée au développement local. Ne jamais afficher ni
+journaliser le mot de passe temporaire dans une interface, une URL ou un
+service de production. En production, la transmission des identifiants doit
+passer par un canal sécurisé configuré par l'administrateur.

@@ -28,14 +28,16 @@ User = get_user_model()
 
 def make_school(name="École Test Alpha", email="alpha@test.cd", **kwargs):
     """Crée une école complète avec Admin pour les tests."""
+    admin_first_name = kwargs.pop("admin_first_name", "Admin")
+    admin_last_name = kwargs.pop("admin_last_name", "Alpha")
     return create_school_with_tenant(
         name=name,
         email=email,
         phone="+243 000 000 001",
         city="Lubumbashi",
         country="Congo (RDC)",
-        admin_first_name="Admin",
-        admin_last_name="Alpha",
+        admin_first_name=admin_first_name,
+        admin_last_name=admin_last_name,
         admin_email=kwargs.pop("admin_email", "admin.alpha@test.cd"),
         **kwargs,
     )
@@ -274,6 +276,23 @@ class TestSuperAdminViews(TestCase):
         url = reverse("tenants:school_create")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_creation_ne_revele_pas_le_mot_de_passe_temporaire(self):
+        """La réponse de création ne doit jamais exposer le mot de passe."""
+        response = self.client.post(reverse("tenants:school_create"), {
+            "name": "École Sécurité",
+            "email": "security-school@test.cd",
+            "phone": "+243 000 000 010",
+            "address": "Avenue Test",
+            "city": "Lubumbashi",
+            "country": "Congo (RDC)",
+            "admin_first_name": "Admin",
+            "admin_last_name": "Sécurité",
+            "admin_email": "admin.security@test.cd",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertNotContains(response, "Mot de passe temporaire", status_code=302)
+        self.assertNotContains(response, "password", status_code=302)
 
     def test_school_admin_ne_peut_pas_acceder_super_admin(self):
         """Un Admin École ne peut pas accéder au dashboard Super Admin."""

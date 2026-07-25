@@ -132,11 +132,12 @@ class SchoolCreateView(View):
                 messages.success(
                     request,
                     f"École « {school.name} » créée avec succès. "
-                    f"Admin: {admin_user.email} — Mot de passe temporaire: {temp_password}"
+                    f"Le compte Admin École ({admin_user.email}) a été créé. "
+                    "Transmettez ses identifiants par un canal sécurisé."
                 )
                 logger.info(
-                    "École créée : %s (slug=%s) par %s",
-                    school.name, school.slug, request.user.email
+                    "École créée : %s (slug=%s)",
+                    school.name, school.slug,
                 )
                 return redirect("tenants:school_detail", pk=school.pk)
 

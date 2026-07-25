@@ -41,7 +41,7 @@
 - Templates de base (Bootstrap 5 + HTMX + Alpine.js)
 
 ### Phase 1 — Fondation de l'école
-**Statut : ⏳ EN COURS (implémentée, tests à valider)**
+**Statut : ✅ TERMINÉE ET VALIDÉE**
 
 Documentation : `docs/modules/phase-1-fondation-ecole.md`
 
@@ -62,9 +62,31 @@ Documentation : `docs/modules/phase-1-fondation-ecole.md`
 - ✅ Dashboard Admin École (tableau de bord personnalisé)
 - ✅ Tests automatisés (isolation, permissions, flux)
 
-**Ce qui reste :**
-- Exécution et validation des tests
-- Envoi des identifiants par email (nécessite SMTP)
+**Stabilisation :**
+
+- Audit du code, des migrations, des routes, des formulaires, des templates et
+  des tests réalisé
+- Contrôles Django et migrations validés
+- Suite de tests Phase 1 validée : 83 tests réussis
+- Permissions de base et isolation des écoles vérifiées côté backend
+- Messages de création nettoyés : aucun mot de passe temporaire dans un
+  message de redirection
+
+**Améliorations UX/UI :**
+
+- Connexion responsive avec erreurs explicites et message non révélateur
+- Assistant en 3 étapes avec progression visible, validation serveur et reprise
+  possible
+- Interfaces Bootstrap cohérentes sur ordinateur et mobile
+
+**Documentation :**
+
+- Rapport de stabilisation : `docs/phase-1-stabilisation.md`
+- Architecture, multi-tenant, permissions et lancement documentés dans `docs/`
+
+**Ce qui reste hors Phase 1 :**
+
+- Envoi automatisé des identifiants par email (nécessite SMTP)
 - Interface de gestion des abonnements
 
 ### Phase 2 — Inscription & Dossier Élève
@@ -196,3 +218,4 @@ Dashboard de l'école (opérationnelle)
 - [Permissions](docs/permissions.md)
 - [Développement](docs/development.md)
 - [**Phase 1 — Fondation de l'école**](docs/modules/phase-1-fondation-ecole.md) ← Nouveau
+- [**Stabilisation Phase 1**](docs/phase-1-stabilisation.md)

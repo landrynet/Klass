@@ -52,9 +52,8 @@ def create_school_with_tenant(
     effective_admin_last_name = admin_last_name or name[:50]
 
     logger.info(
-        "Création de l'école '%s' (slug=%s, schema=%s) par %s",
+        "Création de l'école '%s' (slug=%s, schema=%s)",
         name, slug, schema_name,
-        created_by.email if created_by else "système",
     )
 
     with transaction.atomic():
@@ -91,8 +90,8 @@ def create_school_with_tenant(
         )
 
     logger.info(
-        "École '%s' créée avec succès. Admin: %s",
-        school.name, admin_user.email,
+        "École '%s' créée avec succès.",
+        school.name,
     )
 
     return school, admin_user, temp_password

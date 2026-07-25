@@ -39,7 +39,7 @@ def seed():
     print("\n1. Création de l'école de démonstration...")
     try:
         from apps.tenants.services import create_school_with_tenant
-        school, admin_user, temp_password = create_school_with_tenant(
+        school, admin_user, _ = create_school_with_tenant(
             name="École Démo KLASS [SEED]",
             email="admin@demo-klass.app",
             phone="+243 000 000 000",
@@ -49,8 +49,8 @@ def seed():
         )
         print(f"   ✅ École créée : {school.name}")
         print(f"   ✅ Schéma     : {school.schema_name}")
-        print(f"   ✅ Admin      : {admin_user.email}")
-        print(f"   ✅ Mot de passe temporaire : {temp_password}")
+        print("   ✅ Compte Admin École créé")
+        print("   ✅ Identifiants temporaires générés (non affichés)")
 
     except Exception as e:
         if "already exists" in str(e).lower() or "unique" in str(e).lower():
@@ -131,6 +131,7 @@ def seed():
         ]
 
         print("\n3. Création des utilisateurs de test...")
+        seed_password = os.environ.get("SEED_DEMO_PASSWORD")
         for email, role, first_name, last_name in test_users:
             user, created = User.objects.get_or_create(
                 email=email,
@@ -141,10 +142,10 @@ def seed():
                 }
             )
             if created:
-                user.set_password("KlassDemo2026!")
+                user.set_password(seed_password or generate_temp_password())
                 user.save()
             action = "créé" if created else "existant"
-            print(f"   ✅ [{role}] {email} ({action}) — Mot de passe: KlassDemo2026!")
+            print(f"   ✅ Compte de test [{role}] ({action}) — identifiants non affichés")
 
         # Élève de test
         from apps.students.models import Student, StudentEnrollment

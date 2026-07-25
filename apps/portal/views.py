@@ -58,11 +58,12 @@ def manifest(request):
         "theme_color": "#1a56db",
         "orientation": "portrait-primary",
         "icons": [
-            {"src": "/static/pwa/icons/icon-72.png", "sizes": "72x72", "type": "image/png"},
-            {"src": "/static/pwa/icons/icon-96.png", "sizes": "96x96", "type": "image/png"},
-            {"src": "/static/pwa/icons/icon-128.png", "sizes": "128x128", "type": "image/png"},
-            {"src": "/static/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-            {"src": "/static/pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+            {
+                "src": "/static/pwa/icons/icon.svg",
+                "sizes": "any",
+                "type": "image/svg+xml",
+                "purpose": "any maskable",
+            },
         ],
         "categories": ["education"],
         "lang": "fr",
@@ -83,10 +84,8 @@ def service_worker(request):
 // KLASS Service Worker — Cache Offline
 const CACHE_NAME = 'klass-portal-v1';
 const URLS_TO_CACHE = [
-  '/portal/',
-  '/static/css/portal.css',
-  '/static/js/portal.js',
-  '/static/pwa/icons/icon-192.png',
+  '/static/css/klass.css',
+  '/static/js/klass.js',
 ];
 
 self.addEventListener('install', (event) => {

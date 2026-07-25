@@ -14,6 +14,7 @@ class LoginForm(AuthenticationForm):
             "class": "form-control",
             "placeholder": "votre@email.com",
             "autofocus": True,
+            "autocomplete": "email",
         })
     )
     password = forms.CharField(
@@ -21,6 +22,7 @@ class LoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
             "placeholder": "Mot de passe",
+            "autocomplete": "current-password",
         })
     )
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>KLASS</title>
+  <rect width="512" height="512" rx="96" fill="#1a56db"/>
+  <path fill="#fff" d="M96 184 256 112l160 72-160 72L96 184Zm48 48v80c0 20 50 56 112 56s112-36 112-56v-80l-112 50-112-50Z"/>
+  <path fill="#fff" d="M400 202h24v126h-24z"/>
+  <circle cx="412" cy="350" r="16" fill="#fff"/>
+</svg>

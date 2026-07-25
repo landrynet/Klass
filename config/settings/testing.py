@@ -9,6 +9,11 @@ from .base import *  # noqa
 # ---------------------------------------------------------------------------
 DEBUG = False
 
+# Les tests des vues publiques et du Super Admin utilisent `testserver`
+# sans sous-domaine d'école. Comme en développement, laisser
+# django-tenants servir le schéma public dans ce cas.
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+
 # Désactiver Debug Toolbar (incompatible avec les tests)
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != "debug_toolbar"]  # noqa
 MIDDLEWARE = [m for m in MIDDLEWARE if "debug_toolbar" not in m.lower()]  # noqa
