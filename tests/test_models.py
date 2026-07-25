@@ -9,16 +9,16 @@ class TestSchoolYearModel(SimpleTestCase):
     """Tests du modèle SchoolYear."""
 
     def test_str_with_active(self):
-        """__str__ inclut [ACTIVE] si l'année est active."""
+        """__str__ inclut le statut 'Active' si l'année est active."""
         from apps.school_years.models import SchoolYear
         sy = SchoolYear(name="2025-2026", is_active=True, is_closed=False)
-        self.assertIn("ACTIVE", str(sy))
+        self.assertIn("Active", str(sy))
 
     def test_str_with_closed(self):
-        """__str__ inclut [CLÔTURÉE] si l'année est clôturée."""
+        """__str__ inclut le statut 'Terminée' si l'année est clôturée."""
         from apps.school_years.models import SchoolYear
         sy = SchoolYear(name="2024-2025", is_active=False, is_closed=True)
-        self.assertIn("CLÔTURÉE", str(sy))
+        self.assertIn("Terminée", str(sy))
 
     def test_str_with_regular(self):
         """__str__ d'une année normale n'a pas de tag."""

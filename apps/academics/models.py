@@ -147,6 +147,16 @@ class Classroom(TenantAwareModel):
         related_name="main_classrooms",
         verbose_name="Salle principale"
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active",
+        help_text="Une classe inactive n'accepte plus de nouvelles inscriptions."
+    )
+    is_archived = models.BooleanField(
+        default=False,
+        verbose_name="Archivée",
+        help_text="Une classe archivée est en lecture seule et ne peut plus être modifiée."
+    )
 
     class Meta:
         verbose_name = "Classe"
@@ -161,6 +171,22 @@ class Classroom(TenantAwareModel):
     def full_name(self):
         return f"{self.option.level.name} {self.option.name} {self.name}"
 
+    @property
+    def status_display(self):
+        if self.is_archived:
+            return "Archivée"
+        if self.is_active:
+            return "Active"
+        return "Inactive"
+
+    @property
+    def status_badge_class(self):
+        if self.is_archived:
+            return "bg-danger-subtle text-danger"
+        if self.is_active:
+            return "bg-success-subtle text-success"
+        return "bg-secondary-subtle text-secondary"
+
 
 class Room(TenantAwareModel):
     """
@@ -173,10 +199,12 @@ class Room(TenantAwareModel):
         ("computer_lab", "Salle informatique"),
         ("library", "Bibliothèque"),
         ("gymnasium", "Gymnase"),
+        ("polyvalent", "Salle polyvalente"),
         ("other", "Autre"),
     ]
 
     name = models.CharField(max_length=100, verbose_name="Nom / Numéro de salle")
+    code = models.CharField(max_length=20, blank=True, verbose_name="Code")
     room_type = models.CharField(
         max_length=20,
         choices=ROOM_TYPES,
@@ -199,6 +227,11 @@ class Room(TenantAwareModel):
         verbose_name="Disponible",
         help_text="Décochez si la salle est temporairement hors service."
     )
+    is_archived = models.BooleanField(
+        default=False,
+        verbose_name="Archivée",
+        help_text="Une salle archivée ne peut plus être utilisée."
+    )
     floor = models.CharField(max_length=20, blank=True, verbose_name="Étage / Bâtiment")
     notes = models.TextField(blank=True, verbose_name="Notes")
 
@@ -209,3 +242,19 @@ class Room(TenantAwareModel):
 
     def __str__(self):
         return f"{self.name} ({self.get_room_type_display()}, {self.capacity} places)"
+
+    @property
+    def status_display(self):
+        if self.is_archived:
+            return "Archivée"
+        if self.is_available:
+            return "Disponible"
+        return "Indisponible"
+
+    @property
+    def status_badge_class(self):
+        if self.is_archived:
+            return "bg-danger-subtle text-danger"
+        if self.is_available:
+            return "bg-success-subtle text-success"
+        return "bg-warning-subtle text-warning"

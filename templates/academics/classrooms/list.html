@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- En-tête -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-0">Classes</h1>
+      <p class="text-muted mb-0" style="font-size:0.85rem;">Gérez les classes de votre établissement.</p>
+    </div>
+    {% if user.is_school_admin %}
+    <a href="{% url 'academics:classroom_create' %}{% if selected_year %}?year_id={{ selected_year.pk }}{% endif %}"
+       class="btn btn-primary fw-semibold" style="border-radius:10px;height:40px;display:flex;align-items:center;gap:6px;">
+      <i class="bi bi-plus-lg"></i>Nouvelle classe
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Filtres par année -->
+  {% if years %}
+  <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+    <span class="text-muted" style="font-size:0.82rem;white-space:nowrap;"><i class="bi bi-funnel me-1"></i>Année :</span>
+    {% for year in years %}
+    <a href="{% url 'academics:classrooms' %}?year_id={{ year.pk }}"
+       class="btn btn-sm {% if selected_year and selected_year.pk == year.pk %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">
+      {{ year.name }}
+      {% if year.is_active %}<i class="bi bi-circle-fill ms-1" style="font-size:0.5rem;vertical-align:middle;"></i>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not selected_year %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    Aucune année scolaire disponible. <a href="{% url 'school_years:create' %}" class="alert-link">Créer une année scolaire</a>.
+  </div>
+
+  {% else %}
+
+  <!-- Filtres par niveau et option -->
+  {% if levels %}
+  <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+    <span class="text-muted" style="font-size:0.82rem;white-space:nowrap;"><i class="bi bi-bookmark me-1"></i>Niveau :</span>
+    <a href="{% url 'academics:classrooms' %}?year_id={{ selected_year.pk }}&status={{ status_filter }}"
+       class="btn btn-sm {% if not selected_level %}btn-info text-white{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">Tous</a>
+    {% for level in levels %}
+    <a href="{% url 'academics:classrooms' %}?year_id={{ selected_year.pk }}&level_id={{ level.pk }}&status={{ status_filter }}"
+       class="btn btn-sm {% if selected_level and selected_level.pk == level.pk %}btn-info text-white{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">
+      {{ level.name }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if selected_level and options %}
+  <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+    <span class="text-muted" style="font-size:0.82rem;white-space:nowrap;"><i class="bi bi-diagram-2 me-1"></i>Option :</span>
+    <a href="{% url 'academics:classrooms' %}?year_id={{ selected_year.pk }}&level_id={{ selected_level.pk }}&status={{ status_filter }}"
+       class="btn btn-sm {% if not selected_option %}btn-secondary text-white{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">Toutes</a>
+    {% for option in options %}
+    <a href="{% url 'academics:classrooms' %}?year_id={{ selected_year.pk }}&level_id={{ selected_level.pk }}&option_id={{ option.pk }}&status={{ status_filter }}"
+       class="btn btn-sm {% if selected_option and selected_option.pk == option.pk %}btn-secondary text-white{% else %}btn-outline-secondary{% endif %}"
+       style="border-radius:20px;font-size:0.8rem;">
+      {{ option.name }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Filtre statut + recherche -->
+  <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <div class="d-flex gap-1">
+      {% for sval, slabel in status_choices|default:"" %}{% endfor %}
+      <a href="?year_id={{ selected_year.pk }}{% if selected_level %}&level_id={{ selected_level.pk }}{% endif %}{% if selected_option %}&option_id={{ selected_option.pk }}{% endif %}&status=active"
+         class="btn btn-sm {% if status_filter == 'active' %}btn-success{% else %}btn-outline-secondary{% endif %}"
+         style="border-radius:20px;font-size:0.8rem;">Actives</a>
+      <a href="?year_id={{ selected_year.pk }}{% if selected_level %}&level_id={{ selected_level.pk }}{% endif %}{% if selected_option %}&option_id={{ selected_option.pk }}{% endif %}&status=inactive"
+         class="btn btn-sm {% if status_filter == 'inactive' %}btn-secondary{% else %}btn-outline-secondary{% endif %}"
+         style="border-radius:20px;font-size:0.8rem;">Inactives</a>
+      <a href="?year_id={{ selected_year.pk }}{% if selected_level %}&level_id={{ selected_level.pk }}{% endif %}{% if selected_option %}&option_id={{ selected_option.pk }}{% endif %}&status=archived"
+         class="btn btn-sm {% if status_filter == 'archived' %}btn-danger{% else %}btn-outline-secondary{% endif %}"
+         style="border-radius:20px;font-size:0.8rem;">Archivées</a>
+    </div>
+    <!-- Recherche rapide -->
+    <form method="get" class="d-flex gap-2" style="flex:1;max-width:300px;">
+      <input type="hidden" name="year_id" value="{{ selected_year.pk }}">
+      {% if selected_level %}<input type="hidden" name="level_id" value="{{ selected_level.pk }}">{% endif %}
+      {% if selected_option %}<input type="hidden" name="option_id" value="{{ selected_option.pk }}">{% endif %}
+      <input type="hidden" name="status" value="{{ status_filter }}">
+      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+             placeholder="Rechercher…" style="border-radius:8px;">
+      <button type="submit" class="btn btn-sm btn-outline-primary" style="border-radius:8px;white-space:nowrap;">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+  </div>
+
+  {% if not classrooms %}
+  <div class="card text-center py-5">
+    <div class="card-body">
+      <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:16px;background:var(--klass-bg-secondary);display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-people" style="font-size:1.8rem;color:var(--klass-text-muted);"></i>
+      </div>
+      <h5 class="fw-semibold mb-1">Aucune classe trouvée</h5>
+      <p class="text-muted mb-4" style="font-size:0.88rem;">
+        {% if q %}Aucune classe ne correspond à « {{ q }} ».
+        {% elif status_filter == 'archived' %}Aucune classe archivée.
+        {% elif status_filter == 'inactive' %}Aucune classe inactive.
+        {% else %}Ajoutez les classes de votre établissement (ex: 6ème Scientifique A).{% endif %}
+      </p>
+      {% if user.is_school_admin and not q and status_filter == 'active' %}
+      <a href="{% url 'academics:classroom_create' %}?year_id={{ selected_year.pk }}"
+         class="btn btn-primary" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-2"></i>Créer la première classe
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Table des classes -->
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead style="background:var(--klass-bg-secondary);border-bottom:1px solid var(--klass-border);">
+          <tr>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Classe</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Niveau · Option</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Capacité</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Salle</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Statut</th>
+            {% if user.is_school_admin %}<th style="padding:0.9rem 1.25rem;"></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for classroom in classrooms %}
+          <tr style="{% if classroom.is_archived %}opacity:0.55;{% elif not classroom.is_active %}opacity:0.75;{% endif %}">
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="stat-card-icon blue" style="width:36px;height:36px;border-radius:9px;font-size:0.85rem;flex-shrink:0;">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <span class="fw-semibold">{{ classroom.full_name }}</span>
+              </div>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <div style="font-size:0.82rem;">
+                <span class="fw-semibold" style="color:var(--klass-text-secondary);">{{ classroom.option.level.name }}</span>
+                <span class="text-muted mx-1">·</span>
+                <span>{{ classroom.option.name }}</span>
+              </div>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size:0.75rem;">
+                <i class="bi bi-people me-1"></i>{{ classroom.capacity }}
+              </span>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              {% if classroom.main_room %}
+              <span style="font-size:0.82rem;color:var(--klass-text-secondary);">
+                <i class="bi bi-door-closed me-1"></i>{{ classroom.main_room.name }}
+              </span>
+              {% else %}
+              <span class="text-muted" style="font-size:0.82rem;">—</span>
+              {% endif %}
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span class="badge {{ classroom.status_badge_class }} rounded-pill" style="font-size:0.75rem;">
+                {{ classroom.status_display }}
+              </span>
+            </td>
+            {% if user.is_school_admin %}
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;text-align:right;">
+              <div class="d-flex align-items-center gap-1 justify-content-end">
+                {% if not classroom.is_archived %}
+                <a href="{% url 'academics:classroom_edit' classroom.pk %}"
+                   class="btn btn-sm btn-outline-secondary" style="border-radius:7px;" title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form method="post" action="{% url 'academics:classroom_toggle' classroom.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm {% if classroom.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                          style="border-radius:7px;"
+                          title="{% if classroom.is_active %}Désactiver{% else %}Activer{% endif %}"
+                          onclick="return confirm('{% if classroom.is_active %}Désactiver la classe {{ classroom.full_name|escapejs }} ?{% else %}Activer la classe {{ classroom.full_name|escapejs }} ?{% endif %}');">
+                    <i class="bi bi-{% if classroom.is_active %}pause{% else %}play{% endif %}"></i>
+                  </button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'academics:classroom_archive' classroom.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm {% if classroom.is_archived %}btn-outline-secondary{% else %}btn-outline-danger{% endif %}"
+                          style="border-radius:7px;"
+                          title="{% if classroom.is_archived %}Désarchiver{% else %}Archiver{% endif %}"
+                          onclick="return confirm('{% if classroom.is_archived %}Désarchiver la classe {{ classroom.full_name|escapejs }} ?{% else %}Archiver la classe {{ classroom.full_name|escapejs }} ? Cette action est réversible.{% endif %}');">
+                    <i class="bi bi-{% if classroom.is_archived %}arrow-counterclockwise{% else %}archive{% endif %}"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-muted mt-2" style="font-size:0.78rem;">
+    <i class="bi bi-info-circle me-1"></i>{{ classrooms|length }} classe{{ classrooms|length|pluralize }} affichée{{ classrooms|length|pluralize }}.
+  </p>
+  {% endif %}
+
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,837 @@
+# PROMPT — PHASE 2.1 : GESTION DES CLASSES ET DES SALLES
+
+## CONTEXTE
+
+La Phase 1 a été développée, stabilisée et validée.
+
+La Phase 2.0 a également été développée et validée.
+
+L'architecture académique existante comprend maintenant :
+
+```text id="4w7s2p"
+École
+    ↓
+Année scolaire
+    ↓
+Niveau d'étude
+    ↓
+Option / Filière
+```
+
+La Phase 2.1 doit construire la suite logique :
+
+```text id="5r8q1m"
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Salle
+```
+
+Cette phase concerne exclusivement la gestion des **classes** et des **salles**.
+
+Ne pas développer complètement dans cette phase :
+
+* élèves ;
+* inscriptions ;
+* enseignants ;
+* matières ;
+* emploi du temps ;
+* évaluations ;
+* paiements.
+
+---
+
+# 1. DOCUMENTATION OBLIGATOIRE
+
+Avant toute modification :
+
+Lire :
+
+```text
+docs/Klass_Document_Projet.docx
+```
+
+Lire toute la documentation dans :
+
+```text
+docs/
+```
+
+Lire :
+
+```text
+README.md
+```
+
+Lire particulièrement la documentation des phases précédentes :
+
+```text
+docs/modules/
+```
+
+Analyser l'architecture réellement existante avant de créer ou modifier des fichiers.
+
+Réutiliser les modèles, services, composants UI, permissions et conventions existants.
+
+Ne pas créer une architecture parallèle.
+
+---
+
+# 2. RÈGLE ABSOLUE : RESPECTER LES PHASES PRÉCÉDENTES
+
+Ne pas recréer :
+
+* l'école ;
+* le tenant ;
+* l'année scolaire ;
+* les niveaux ;
+* les options/filières ;
+* le système de permissions ;
+* le système d'isolation multi-tenant.
+
+Réutiliser les fonctionnalités déjà développées.
+
+Avant de modifier un modèle ou une relation existante :
+
+1. identifier son utilisation actuelle ;
+2. vérifier ses relations ;
+3. vérifier les migrations ;
+4. vérifier les tests existants ;
+5. préserver la compatibilité avec les phases précédentes.
+
+---
+
+# 3. GESTION DES CLASSES
+
+Créer une gestion complète des classes.
+
+Une classe doit être liée à :
+
+* une école ;
+* un tenant ;
+* une année scolaire ;
+* un niveau ;
+* une option/filière lorsque cela est applicable ;
+* une salle lorsque cela est applicable.
+
+Exemples :
+
+```text
+6ème Scientifique A
+6ème Scientifique B
+5ème Commerciale A
+4ème Littéraire A
+```
+
+Prévoir au minimum :
+
+* nom de la classe ;
+* code éventuel ;
+* école ;
+* tenant ;
+* année scolaire ;
+* niveau ;
+* option/filière ;
+* salle ;
+* capacité maximale si nécessaire ;
+* statut.
+
+---
+
+# 4. MODÈLE ET RELATIONS DES CLASSES
+
+La structure doit être cohérente avec les phases précédentes :
+
+```text
+School
+    ↓
+AcademicYear
+    ↓
+Level
+    ↓
+Track / Option
+    ↓
+Class
+```
+
+Une classe ne doit jamais pouvoir être associée à :
+
+* une année scolaire d'une autre école ;
+* un niveau d'une autre école ;
+* une option d'une autre école ;
+* une salle d'une autre école.
+
+Toutes les relations doivent être vérifiées côté backend.
+
+Ne jamais se limiter à des restrictions dans l'interface.
+
+---
+
+# 5. RÈGLES MÉTIER DES CLASSES
+
+Mettre en place des validations cohérentes.
+
+Une classe doit respecter les relations de son école.
+
+Éviter les doublons incohérents.
+
+Par exemple, selon les règles métier définies par l'architecture :
+
+```text
+Même école
++
+Même année scolaire
++
+Même niveau
++
+Même option
++
+Même nom
+```
+
+ne doit pas créer deux classes identiques.
+
+Les règles doivent être adaptées au modèle réel du projet.
+
+Ne pas imposer une règle qui empêcherait une école de créer plusieurs sections d'un même niveau.
+
+Exemple valide :
+
+```text
+6ème Scientifique A
+6ème Scientifique B
+6ème Scientifique C
+```
+
+---
+
+# 6. STATUT DES CLASSES
+
+Prévoir une gestion cohérente des statuts.
+
+Par exemple :
+
+```text
+Active
+Inactive
+Archivée
+```
+
+Ne pas supprimer aveuglément une classe qui pourrait être utilisée par de futurs modules.
+
+Prévoir plutôt :
+
+* désactivation ;
+* archivage ;
+* suppression uniquement si aucune dépendance importante n'existe.
+
+Préparer la structure pour les futurs modules :
+
+* élèves ;
+* inscriptions ;
+* enseignants ;
+* emploi du temps ;
+* évaluations.
+
+---
+
+# 7. GESTION DES SALLES
+
+Créer une gestion complète des salles.
+
+Une salle doit appartenir à une école et à son tenant.
+
+Prévoir notamment :
+
+* nom ou numéro ;
+* code éventuel ;
+* capacité ;
+* type de salle ;
+* statut ;
+* école ;
+* tenant.
+
+Exemples :
+
+```text
+Salle 01
+Salle 02
+Laboratoire
+Salle Informatique
+Salle Polyvalente
+```
+
+Prévoir des types suffisamment flexibles pour s'adapter aux établissements.
+
+---
+
+# 8. CAPACITÉ DES SALLES
+
+Une salle peut avoir une capacité maximale.
+
+Exemple :
+
+```text
+Salle 01
+Capacité : 50 élèves
+```
+
+Prévoir les validations nécessaires.
+
+La capacité d'une salle ne doit pas être incohérente.
+
+Si une classe possède une capacité maximale, le système doit pouvoir vérifier les incohérences éventuelles.
+
+Ne pas développer encore la gestion des élèves ou des inscriptions.
+
+Préparer uniquement l'architecture nécessaire pour les futures validations.
+
+---
+
+# 9. ASSOCIATION CLASSE / SALLE
+
+Permettre l'association d'une classe à une salle.
+
+Exemple :
+
+```text
+6ème Scientifique A
+        ↓
+Salle 01
+```
+
+Vérifier :
+
+* que la classe et la salle appartiennent à la même école ;
+* que les deux appartiennent au même tenant ;
+* que l'association est cohérente avec l'année scolaire si le modèle le prévoit.
+
+Préparer l'architecture pour les futurs emplois du temps.
+
+Ne pas développer le module complet d'emploi du temps dans cette phase.
+
+---
+
+# 10. GESTION DES CONFLITS
+
+Prévoir une architecture extensible pour les conflits futurs.
+
+Par exemple, une salle pourrait être utilisée par plusieurs classes selon différents horaires.
+
+Ne pas bloquer inutilement cette possibilité.
+
+La gestion complète des conflits horaires sera réalisée dans le futur module d'emploi du temps.
+
+La Phase 2.1 doit uniquement éviter les associations clairement incohérentes.
+
+---
+
+# 11. INTERFACE UTILISATEUR — CLASSES
+
+Créer une interface personnalisée KLASS.
+
+Ne pas utiliser Django Admin.
+
+Prévoir :
+
+* liste des classes ;
+* création ;
+* modification ;
+* consultation ;
+* activation ;
+* désactivation ;
+* archivage selon les règles métier.
+
+Afficher clairement les informations importantes :
+
+* nom ;
+* année scolaire ;
+* niveau ;
+* option/filière ;
+* salle ;
+* statut.
+
+---
+
+# 12. INTERFACE UTILISATEUR — SALLES
+
+Créer une interface personnalisée KLASS.
+
+Prévoir :
+
+* liste des salles ;
+* création ;
+* modification ;
+* consultation ;
+* activation ;
+* désactivation ;
+* archivage selon les règles métier.
+
+Afficher clairement :
+
+* nom ;
+* type ;
+* capacité ;
+* classe associée si applicable ;
+* statut.
+
+---
+
+# 13. RECHERCHE ET FILTRES
+
+## Classes
+
+Prévoir des filtres par :
+
+* année scolaire ;
+* niveau ;
+* option/filière ;
+* salle ;
+* statut.
+
+Prévoir une recherche dynamique par :
+
+* nom ;
+* code.
+
+## Salles
+
+Prévoir une recherche par :
+
+* nom ;
+* numéro ;
+* code.
+
+Prévoir des filtres par :
+
+* type ;
+* capacité ;
+* statut.
+
+Tous les résultats doivent être strictement limités à l'école et au tenant courants.
+
+---
+
+# 14. PERMISSIONS ET SÉCURITÉ
+
+Respecter le système de rôles existant.
+
+Un utilisateur ne doit jamais pouvoir :
+
+* consulter une classe d'une autre école ;
+* modifier une classe d'une autre école ;
+* supprimer une classe d'une autre école ;
+* consulter une salle d'une autre école ;
+* modifier une salle d'une autre école ;
+* associer une classe à une salle d'une autre école.
+
+Tester également les accès directs aux URLs.
+
+Tester la modification manuelle des identifiants dans les requêtes.
+
+La sécurité doit être assurée côté backend.
+
+---
+
+# 15. DONNÉES DE TEST DE LA PHASE 2.1
+
+Le projet possède déjà un système de données de test.
+
+Analyser le système existant et le mettre à jour.
+
+Ne pas créer un système concurrent.
+
+Le système doit être idempotent.
+
+Ajouter les données de test nécessaires.
+
+## Salles
+
+Créer notamment :
+
+```text
+Salle 01
+Salle 02
+Laboratoire
+Salle Informatique
+Salle Polyvalente
+```
+
+avec des capacités réalistes.
+
+## Classes
+
+Créer notamment :
+
+```text
+6ème Scientifique A
+6ème Scientifique B
+5ème Commerciale A
+4ème Littéraire A
+```
+
+Chaque classe doit être correctement associée à :
+
+* une école ;
+* un tenant ;
+* une année scolaire ;
+* un niveau ;
+* une option/filière lorsque nécessaire ;
+* une salle lorsque nécessaire.
+
+Exécuter le script plusieurs fois.
+
+Vérifier :
+
+```text
+1ère exécution
+    ↓
+Création des données
+    ↓
+2ème exécution
+    ↓
+Aucun doublon
+```
+
+Vérifier également que les données de l'École A et de l'École B restent totalement isolées.
+
+---
+
+# 16. TESTS OBLIGATOIRES — CLASSES
+
+Tester :
+
+* création d'une classe ;
+* consultation ;
+* modification ;
+* changement de statut ;
+* archivage ;
+* association à une année scolaire ;
+* association à un niveau ;
+* association à une option ;
+* association à une salle ;
+* recherche ;
+* filtres ;
+* validation des doublons ;
+* isolation multi-tenant.
+
+---
+
+# 17. TESTS OBLIGATOIRES — SALLES
+
+Tester :
+
+* création ;
+* consultation ;
+* modification ;
+* capacité ;
+* type ;
+* statut ;
+* archivage ;
+* recherche ;
+* filtres ;
+* association avec une classe ;
+* isolation multi-tenant.
+
+---
+
+# 18. TESTS DE SÉCURITÉ MULTI-TENANT
+
+Tester explicitement :
+
+```text
+École A ≠ École B
+```
+
+Vérifier qu'un utilisateur de l'École A ne peut jamais :
+
+* lire les classes de l'École B ;
+* modifier les classes de l'École B ;
+* supprimer les classes de l'École B ;
+* lire les salles de l'École B ;
+* modifier les salles de l'École B ;
+* associer une classe de l'École A à une salle de l'École B.
+
+Tester :
+
+* URLs directes ;
+* identifiants modifiés ;
+* requêtes POST ;
+* formulaires ;
+* services ;
+* API éventuelle.
+
+---
+
+# 19. TESTS DE RÉGRESSION
+
+Après le développement, exécuter les tests de :
+
+## Phase 1
+
+Vérifier :
+
+* Super Admin ;
+* création d'école ;
+* tenant ;
+* domaine ;
+* Admin École ;
+* première connexion ;
+* changement de mot de passe ;
+* assistant ;
+* année scolaire initiale ;
+* dashboard ;
+* permissions ;
+* isolation.
+
+## Phase 2.0
+
+Vérifier :
+
+* années scolaires ;
+* niveaux ;
+* options/filières ;
+* relations ;
+* permissions ;
+* données de test.
+
+Aucune fonctionnalité validée précédemment ne doit être cassée.
+
+---
+
+# 20. VÉRIFICATIONS TECHNIQUES
+
+Exécuter les vérifications adaptées au projet :
+
+```bash
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si le projet utilise pytest, exécuter également :
+
+```bash
+pytest
+```
+
+selon la configuration réelle du projet.
+
+Vérifier :
+
+* migrations ;
+* imports ;
+* routes ;
+* templates ;
+* formulaires ;
+* permissions ;
+* requêtes ;
+* tests ;
+* composants UI.
+
+Corriger les erreurs réelles.
+
+Ne pas masquer les erreurs.
+
+Ne pas désactiver les tests pour obtenir un résultat positif.
+
+---
+
+# 21. DOCUMENTATION
+
+Créer ou mettre à jour :
+
+```text
+docs/modules/phase-2-1-classes-et-salles.md
+```
+
+Documenter :
+
+* objectif ;
+* fonctionnalités ;
+* modèles ;
+* relations ;
+* règles métier ;
+* permissions ;
+* sécurité ;
+* isolation multi-tenant ;
+* routes ;
+* interfaces ;
+* recherche ;
+* filtres ;
+* données de test ;
+* tests ;
+* dépendances ;
+* problèmes connus ;
+* préparation des futurs modules.
+
+La documentation doit refléter exactement le code réellement développé.
+
+---
+
+# 22. MISE À JOUR DU README.md
+
+Pendant le développement :
+
+```text
+Phase 2.1 — Classes et salles
+Statut : ⏳ EN COURS
+```
+
+Après validation complète :
+
+```text
+Phase 2.1 — Classes et salles
+Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Mettre également à jour la liste des modules terminés.
+
+Pour chaque module terminé, indiquer :
+
+* son statut ;
+* son objectif ;
+* ses fonctionnalités principales ;
+* ses tests ;
+* sa documentation.
+
+---
+
+# 23. RAPPORT FINAL
+
+À la fin, fournir un rapport clair contenant :
+
+## Classes
+
+* fonctionnalités développées ;
+* modèles ;
+* relations ;
+* règles métier ;
+* permissions ;
+* tests.
+
+## Salles
+
+* fonctionnalités développées ;
+* modèles ;
+* relations ;
+* capacité ;
+* statuts ;
+* tests.
+
+## Sécurité
+
+* isolation multi-tenant ;
+* permissions ;
+* accès directs ;
+* tests de sécurité.
+
+## Données de test
+
+* données créées ;
+* idempotence ;
+* relations vérifiées ;
+* isolation vérifiée.
+
+## Régression
+
+Résultats des tests de :
+
+* Phase 1 ;
+* Phase 2.0 ;
+* Phase 2.1.
+
+## Documentation
+
+Fichiers créés ou mis à jour.
+
+## Préparation de la suite
+
+Indiquer ce qui est prêt pour les futurs modules :
+
+```text
+Élèves
+    ↓
+Inscriptions
+    ↓
+Enseignants
+    ↓
+Matières
+    ↓
+Emploi du temps
+    ↓
+Évaluations
+```
+
+---
+
+# 24. STATUT FINAL
+
+Si tout est réellement terminé :
+
+```text
+PHASE 2.1 — CLASSES ET SALLES
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text
+PHASE 2.1 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+La Phase 2.1 doit :
+
+1. réutiliser l'architecture de la Phase 1 ;
+2. réutiliser les années scolaires de la Phase 2.0 ;
+3. réutiliser les niveaux de la Phase 2.0 ;
+4. réutiliser les options/filières de la Phase 2.0 ;
+5. construire proprement les classes ;
+6. construire proprement les salles ;
+7. gérer les relations entre ces éléments ;
+8. respecter totalement l'isolation multi-tenant ;
+9. mettre à jour les données de test ;
+10. exécuter les tests de régression ;
+11. documenter tout le travail.
+
+Ne pas développer dans cette phase les modules complets :
+
+* élèves ;
+* inscriptions ;
+* enseignants ;
+* matières ;
+* emploi du temps ;
+* évaluations ;
+* paiements.
+
+La structure finale attendue est :
+
+```text
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Salle
+```
+
+Ne déclarer la Phase 2.1 terminée que si elle est réellement stable, testée, sécurisée, documentée et compatible avec toutes les phases précédentes.

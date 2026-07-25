@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Script de données de démonstration pour KLASS — Phase 2.0.
-Crée une école de test avec des données pour les Phases 1 et 2.0.
+Script de données de démonstration pour KLASS — Phase 2.1.
+Crée une école de test avec des données pour les Phases 1, 2.0 et 2.1.
 
 Usage:
     python scripts/seed_data.py
@@ -26,9 +26,9 @@ from apps.core.utils import generate_temp_password
 
 
 def seed():
-    """Créer les données de démonstration — Phases 1 & 2.0."""
+    """Créer les données de démonstration — Phases 1, 2.0 & 2.1."""
     print("=" * 60)
-    print("KLASS — Données de démonstration [SEED] — Phase 2.0")
+    print("KLASS — Données de démonstration [SEED] — Phase 2.1")
     print("=" * 60)
 
     # ---- Vérifier l'environnement ----
@@ -145,36 +145,69 @@ def seed():
                     print(f"   ✅ {option} (créée)")
         print(f"   ℹ️  {len(options_data) * len(niveaux)} options vérifiées/créées")
 
-        # ---- 5. Salle (Phase 1) ----
-        print("\n5. Infrastructure physique...")
-        room, _ = Room.objects.get_or_create(
-            name="Salle A101 [SEED]",
-            defaults={"capacity": 40, "room_type": "classroom"}
-        )
-        print(f"   ✅ {room}")
+        # ---- 5. Salles (Phase 2.1) ----
+        print("\n5. Salles...")
+        rooms_data = [
+            ("Salle 01 [SEED]",      "S01", "classroom",    50, "RDC"),
+            ("Salle 02 [SEED]",      "S02", "classroom",    50, "RDC"),
+            ("Laboratoire [SEED]",   "LAB", "laboratory",   30, "1er étage"),
+            ("Salle Informatique [SEED]", "INFO", "computer_lab", 25, "1er étage"),
+            ("Salle Polyvalente [SEED]",  "POLY", "polyvalent",   80, "RDC"),
+        ]
 
-        # ---- 6. Classe de démonstration (Phase 1) ----
-        # Utiliser 4ème secondaire + Scientifique pour la classe démo
-        demo_level = niveaux.get("4ème secondaire")
-        demo_option = options_par_niveau.get("4ème secondaire", {}).get("Scientifique")
-        if demo_level and demo_option:
-            classroom, _ = Classroom.objects.get_or_create(
-                school_year=year_2526,
-                option=demo_option,
-                name="A",
-                defaults={"capacity": 35, "main_room": room}
+        rooms = {}
+        for name, code, rtype, cap, floor in rooms_data:
+            room, created = Room.objects.get_or_create(
+                name=name,
+                defaults={
+                    "code": code,
+                    "room_type": rtype,
+                    "capacity": cap,
+                    "floor": floor,
+                    "is_available": True,
+                }
             )
-            print(f"   ✅ Classe : {classroom}")
+            rooms[name] = room
+            print(f"   ✅ {room.name} — {room.get_room_type_display()}, {room.capacity} places ({'créée' if created else 'existante'})")
+
+        # ---- 6. Classes (Phase 2.1) ----
+        print("\n6. Classes...")
+        classes_data = [
+            # (nom_niveau, nom_option, identifiant, capacité, nom_salle)
+            ("6ème secondaire", "Scientifique", "A", 40, "Salle 01 [SEED]"),
+            ("6ème secondaire", "Scientifique", "B", 40, "Salle 02 [SEED]"),
+            ("5ème secondaire", "Commerciale",  "A", 38, "Salle 01 [SEED]"),
+            ("4ème secondaire", "Littéraire",   "A", 35, "Salle 02 [SEED]"),
+        ]
+
+        for nom_niveau, nom_option, section, capacite, nom_salle in classes_data:
+            level = niveaux.get(nom_niveau)
+            option = options_par_niveau.get(nom_niveau, {}).get(nom_option)
+            room = rooms.get(nom_salle)
+            if not level or not option:
+                print(f"   ⚠️  Niveau ou option introuvable pour {nom_niveau} / {nom_option}")
+                continue
+            classroom, created = Classroom.objects.get_or_create(
+                school_year=year_2526,
+                option=option,
+                name=section,
+                defaults={
+                    "capacity": capacite,
+                    "main_room": room,
+                    "is_active": True,
+                }
+            )
+            print(f"   ✅ {classroom.full_name} — {classroom.capacity} élèves ({'créée' if created else 'existante'})")
 
         # ---- 7. Matière ----
         subject, _ = Subject.objects.get_or_create(
             name="Mathématiques [SEED]",
             defaults={"code": "MATH"}
         )
-        print(f"   ✅ Matière : {subject}")
+        print(f"\n7. Matière : {subject}")
 
         # ---- 8. Utilisateurs de test ----
-        print("\n6. Utilisateurs de test...")
+        print("\n8. Utilisateurs de test...")
         from apps.accounts.models import User
         test_users = [
             ("secretary@demo-klass.app", Roles.SECRETARY, "Secrétaire", "Démo"),
@@ -200,7 +233,7 @@ def seed():
             print(f"   ✅ [{role}] {email} ({'créé' if created else 'existant'})")
 
         # ---- 9. Élève de test ----
-        print("\n7. Élève de test...")
+        print("\n9. Élève de test...")
         from apps.students.models import Student, StudentEnrollment
         student, created = Student.objects.get_or_create(
             first_name="Jean",
@@ -211,16 +244,22 @@ def seed():
                 "nationality": "Congolaise",
             }
         )
-        if created and demo_option:
+        # Chercher la classe 6ème Scientifique A pour l'enrollment
+        demo_classroom = Classroom.objects.filter(
+            school_year=year_2526,
+            option__name__contains="Scientifique",
+            name="A"
+        ).first()
+        if created and demo_classroom:
             StudentEnrollment.objects.get_or_create(
                 student=student,
                 school_year=year_2526,
-                defaults={"classroom": classroom if 'classroom' in dir() else None}
+                defaults={"classroom": demo_classroom}
             )
         print(f"   ✅ Élève : {student} — Matricule: {student.matricule}")
 
     print("\n" + "=" * 60)
-    print("SEED TERMINÉ — Données Phase 2.0 créées/vérifiées")
+    print("SEED TERMINÉ — Données Phase 2.1 créées/vérifiées")
     print("=" * 60)
     print(f"""
 Récapitulatif :
@@ -229,6 +268,8 @@ Récapitulatif :
   Années   : 2025-2026 (active), 2026-2027 (planifiée)
   Niveaux  : 6 niveaux (1ère → 6ème secondaire)
   Options  : 3 options par niveau (Scientifique, Littéraire, Commerciale)
+  Salles   : 5 salles (Salle 01, Salle 02, Labo, Info, Polyvalente)
+  Classes  : 4 classes (6ème Sci A/B, 5ème Com A, 4ème Lit A)
 
 ⚠️  Ces données sont identifiées par le tag [SEED]
     Pour les supprimer, lancez: python scripts/seed_data.py --delete

@@ -29,6 +29,27 @@
 
 ## État d'avancement du projet
 
+### Phase 2.1 — Classes et salles
+**Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
+
+Documentation : `docs/modules/phase-2-1-classes-et-salles.md`
+
+**Fonctionnalités implémentées :**
+
+- ✅ Gestion complète des salles (CRUD, types, capacité, disponibilité, archivage)
+- ✅ Gestion complète des classes (CRUD, activation/désactivation, archivage)
+- ✅ Association Classe → Salle (FK nullable, vérifiée dans le même schéma tenant)
+- ✅ Statuts : Active / Inactive / Archivée (classes) · Disponible / Indisponible / Archivée (salles)
+- ✅ Filtres multi-niveaux : année → niveau → option → statut + recherche texte
+- ✅ Isolation multi-tenant complète (schema_context sur toutes les requêtes)
+- ✅ Permissions backend (school_admin écriture, staff lecture)
+- ✅ Validations serveur (unicité, relations inter-école bloquées, archivage protégé)
+- ✅ Données de test Phase 2.1 (seed_data.py idempotent — 5 salles, 4 classes)
+- ✅ 143 tests — 0 échec (Phase 1, 2.0, 2.1 + régression)
+- ✅ Sidebar mise à jour (liens Classes et Salles)
+
+---
+
 ### Phase 2.0 — Fondations de la structure académique
 **Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE**
 

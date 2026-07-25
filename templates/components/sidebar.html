@@ -127,6 +127,18 @@
           <i class="bi bi-diagram-2-fill"></i>Options / Filières
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'classroom' in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'academics:classrooms' %}">
+          <i class="bi bi-people-fill"></i>Classes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if 'room' in request.resolver_match.url_name|default:'' and 'classroom' not in request.resolver_match.url_name|default:'' %}active{% endif %}"
+           href="{% url 'academics:rooms' %}">
+          <i class="bi bi-door-closed-fill"></i>Salles
+        </a>
+      </li>
     </ul>
 
     <p class="sidebar-section-title">Communication</p>

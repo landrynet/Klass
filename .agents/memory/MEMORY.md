@@ -1,3 +1,4 @@
 - [Multi-tenant query pattern](multi-tenant-queries.md) — toutes les requêtes tenant doivent utiliser schema_context explicite sur Replit (le middleware ne set pas le schéma en dev localhost)
 - [SchoolYear lifecycle](school-year-lifecycle.md) — 4 états (planned/active/ended/archived) via is_active + is_closed + is_archived ; transitions via méthodes activate/end/archive
 - [Phase 2.0 models](phase2-models.md) — Level et Option ont is_active (migration 0003/0002) ; SchoolYear a is_archived (migration 0002)
+- [Phase 2.1 Classes et Salles](phase21-classroom-room.md) — Classroom (is_active+is_archived) ; Room (is_available+is_archived) ; querysets tenant-isolés dans forms

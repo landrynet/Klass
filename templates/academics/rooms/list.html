@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Salles{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- En-tête -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-0">Salles</h1>
+      <p class="text-muted mb-0" style="font-size:0.85rem;">Gérez les salles physiques de votre établissement.</p>
+    </div>
+    {% if user.is_school_admin %}
+    <a href="{% url 'academics:room_create' %}"
+       class="btn btn-primary fw-semibold" style="border-radius:10px;height:40px;display:flex;align-items:center;gap:6px;">
+      <i class="bi bi-plus-lg"></i>Nouvelle salle
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Filtres -->
+  <div class="card mb-4">
+    <div class="card-body py-3">
+      <form method="get" class="row g-2 align-items-end">
+        <!-- Recherche -->
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Recherche</label>
+          <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+                 placeholder="Nom ou code..." style="border-radius:8px;">
+        </div>
+        <!-- Type -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Type</label>
+          <select name="type" class="form-select form-select-sm" style="border-radius:8px;">
+            <option value="">Tous les types</option>
+            {% for value, label in room_types %}
+            <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Statut -->
+        <div class="col-md-3">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Statut</label>
+          <select name="status" class="form-select form-select-sm" style="border-radius:8px;">
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Disponibles</option>
+            <option value="unavailable" {% if status_filter == 'unavailable' %}selected{% endif %}>Indisponibles</option>
+            <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archivées</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-outline-primary btn-sm w-100" style="border-radius:8px;">
+            <i class="bi bi-search me-1"></i>Filtrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if not rooms %}
+  <!-- État vide -->
+  <div class="card text-center py-5">
+    <div class="card-body">
+      <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:16px;background:var(--klass-bg-secondary);display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-door-open" style="font-size:1.8rem;color:var(--klass-text-muted);"></i>
+      </div>
+      <h5 class="fw-semibold mb-1">Aucune salle trouvée</h5>
+      <p class="text-muted mb-4" style="font-size:0.88rem;">
+        {% if q or type_filter %}Modifiez vos critères de recherche.{% else %}Ajoutez vos salles (Salle 01, Laboratoire, Salle informatique…).{% endif %}
+      </p>
+      {% if user.is_school_admin and not q and not type_filter %}
+      <a href="{% url 'academics:room_create' %}" class="btn btn-primary" style="border-radius:10px;">
+        <i class="bi bi-plus-lg me-2"></i>Créer la première salle
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Table des salles -->
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead style="background:var(--klass-bg-secondary);border-bottom:1px solid var(--klass-border);">
+          <tr>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Salle</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Type</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Capacité</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Étage</th>
+            <th style="padding:0.9rem 1.25rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--klass-text-muted);">Statut</th>
+            {% if user.is_school_admin %}<th style="padding:0.9rem 1.25rem;"></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for room in rooms %}
+          <tr style="{% if room.is_archived %}opacity:0.55;{% elif not room.is_available %}opacity:0.75;{% endif %}">
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="stat-card-icon
+                  {% if room.room_type == 'laboratory' %}green
+                  {% elif room.room_type == 'computer_lab' %}blue
+                  {% elif room.room_type == 'polyvalent' %}yellow
+                  {% else %}blue{% endif %}"
+                  style="width:36px;height:36px;border-radius:9px;font-size:0.85rem;flex-shrink:0;">
+                  <i class="bi bi-{% if room.room_type == 'laboratory' %}flask{% elif room.room_type == 'computer_lab' %}pc-display{% elif room.room_type == 'library' %}book{% elif room.room_type == 'gymnasium' %}trophy{% elif room.room_type == 'polyvalent' %}grid{% else %}door-closed{% endif %}"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ room.name }}</div>
+                  {% if room.code %}<code style="font-size:0.75rem;background:var(--klass-bg-secondary);padding:2px 6px;border-radius:4px;">{{ room.code }}</code>{% endif %}
+                </div>
+              </div>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span style="font-size:0.85rem;">{{ room.get_room_type_display }}</span>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size:0.75rem;">
+                <i class="bi bi-people me-1"></i>{{ room.capacity }}
+              </span>
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              {% if room.floor %}
+              <span style="font-size:0.82rem;color:var(--klass-text-secondary);">{{ room.floor }}</span>
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;">
+              <span class="badge {{ room.status_badge_class }} rounded-pill" style="font-size:0.75rem;">
+                {{ room.status_display }}
+              </span>
+            </td>
+            {% if user.is_school_admin %}
+            <td style="padding:0.9rem 1.25rem;vertical-align:middle;text-align:right;">
+              <div class="d-flex align-items-center gap-1 justify-content-end">
+                {% if not room.is_archived %}
+                <a href="{% url 'academics:room_edit' room.pk %}"
+                   class="btn btn-sm btn-outline-secondary" style="border-radius:7px;" title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form method="post" action="{% url 'academics:room_toggle' room.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm {% if room.is_available %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                          style="border-radius:7px;"
+                          title="{% if room.is_available %}Marquer indisponible{% else %}Marquer disponible{% endif %}"
+                          onclick="return confirm('{% if room.is_available %}Marquer la salle {{ room.name|escapejs }} indisponible ?{% else %}Marquer la salle {{ room.name|escapejs }} disponible ?{% endif %}');">
+                    <i class="bi bi-{% if room.is_available %}pause{% else %}play{% endif %}"></i>
+                  </button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'academics:room_archive' room.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-sm {% if room.is_archived %}btn-outline-secondary{% else %}btn-outline-danger{% endif %}"
+                          style="border-radius:7px;"
+                          title="{% if room.is_archived %}Désarchiver{% else %}Archiver{% endif %}"
+                          onclick="return confirm('{% if room.is_archived %}Désarchiver la salle {{ room.name|escapejs }} ?{% else %}Archiver la salle {{ room.name|escapejs }} ? Cette action est réversible.{% endif %}');">
+                    <i class="bi bi-{% if room.is_archived %}arrow-counterclockwise{% else %}archive{% endif %}"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-muted mt-2" style="font-size:0.78rem;">
+    <i class="bi bi-info-circle me-1"></i>{{ rooms|length }} salle{{ rooms|length|pluralize }} affichée{{ rooms|length|pluralize }} — {{ total_count }} salle{{ total_count|pluralize }} au total (hors archivées).
+  </p>
+  {% endif %}
+
+</div>
+{% endblock %}
