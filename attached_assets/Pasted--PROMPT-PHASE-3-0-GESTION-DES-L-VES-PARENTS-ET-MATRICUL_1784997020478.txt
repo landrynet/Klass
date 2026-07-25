@@ -1,0 +1,949 @@
+# PROMPT — PHASE 3.0 : GESTION DES ÉLÈVES, PARENTS ET MATRICULES
+
+## CONTEXTE
+
+Les phases précédentes ont été développées, stabilisées, testées et validées.
+
+### Phase 1 ✅
+
+Fondations du système :
+
+* Super Admin ;
+* écoles ;
+* tenants ;
+* domaines ;
+* Admin École ;
+* première connexion ;
+* assistant de configuration ;
+* année scolaire initiale ;
+* permissions ;
+* isolation multi-tenant.
+
+### Phase 2 ✅
+
+Structure académique :
+
+```text id="7r3qph"
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Salle
+```
+
+La Phase 3.0 doit maintenant introduire les personnes qui intégreront cette structure :
+
+```text id="zhv4bq"
+École
+    ↓
+Parent / Tuteur
+    ↓
+Élève
+    ↓
+Matricule automatique
+```
+
+La gestion complète des inscriptions et de l'affectation d'un élève à une classe sera développée dans une phase ultérieure.
+
+---
+
+# RÈGLE ABSOLUE : RESPECTER L'ARCHITECTURE EXISTANTE
+
+Avant toute modification :
+
+1. Lire la documentation du projet.
+2. Lire la documentation des Phases 1 et 2.
+3. Analyser les modèles existants.
+4. Analyser les relations existantes.
+5. Analyser les permissions.
+6. Analyser le système multi-tenant.
+7. Analyser le système de données de test.
+8. Réutiliser les composants et conventions existants.
+
+Ne pas créer une architecture parallèle.
+
+Ne pas recréer :
+
+* les écoles ;
+* les tenants ;
+* les années scolaires ;
+* les niveaux ;
+* les options/filières ;
+* les classes ;
+* les salles ;
+* les permissions existantes.
+
+---
+
+# 1. DOCUMENTATION OBLIGATOIRE
+
+Lire :
+
+```text id="h5pl1m"
+docs/Klass_Document_Projet.docx
+```
+
+Lire toute la documentation existante dans :
+
+```text id="c6i6ti"
+docs/
+```
+
+Lire notamment les documentations des phases précédentes :
+
+```text id="q4t0h1"
+docs/modules/
+```
+
+Lire :
+
+```text id="q4t0h2"
+README.md
+```
+
+Avant de coder, comprendre précisément l'architecture réelle du projet.
+
+La documentation dans `docs/` reste la référence officielle du développement.
+
+---
+
+# 2. OBJECTIF DE LA PHASE 3.0
+
+Créer une base complète pour la gestion :
+
+* des élèves ;
+* des parents ;
+* des tuteurs principaux ;
+* des matricules automatiques.
+
+La structure attendue est :
+
+```text id="q4t0h3"
+École
+    ↓
+Parent / Tuteur
+    ↓
+Élève
+    ↓
+Matricule unique
+```
+
+Cette phase ne doit pas encore développer la gestion complète des inscriptions.
+
+---
+
+# 3. RELATION PARENT / ÉLÈVE
+
+La règle métier principale est :
+
+```text id="q4t0h4"
+1 Élève
+    ↓
+1 seul Parent / Tuteur principal
+```
+
+Et :
+
+```text id="q4t0h5"
+1 Parent / Tuteur
+    ↓
+1 ou plusieurs Élèves
+```
+
+Exemple :
+
+```text id="q4t0h6"
+Parent : Jean KABILA
+    ├── Élève : David KABILA
+    ├── Élève : Sarah KABILA
+    └── Élève : Grâce KABILA
+```
+
+Un élève doit obligatoirement avoir un parent ou tuteur principal selon les règles métier définies pour cette phase.
+
+Un parent peut être associé à plusieurs élèves.
+
+La relation doit être correctement modélisée et validée côté backend.
+
+---
+
+# 4. GESTION DES PARENTS / TUTEURS
+
+Créer la gestion des parents ou tuteurs.
+
+Prévoir au minimum :
+
+* nom ;
+* prénom ;
+* téléphone ;
+* email si disponible ;
+* adresse si nécessaire ;
+* profession si prévue par la documentation ;
+* statut ;
+* école ;
+* tenant.
+
+Les champs exacts doivent être déterminés en fonction de la documentation du projet et de l'architecture existante.
+
+Ne pas créer des champs inutiles simplement pour augmenter le modèle.
+
+---
+
+# 5. RECHERCHE D'UN PARENT EXISTANT
+
+Lors de la création d'un élève, le système doit permettre de rechercher un parent existant avant d'en créer un nouveau.
+
+Flux attendu :
+
+```text id="q4t0h7"
+Création d'un élève
+        ↓
+Recherche d'un parent existant
+        ↓
+Parent trouvé ?
+    ├── Oui
+    │    ↓
+    │  Sélectionner le parent
+    │
+    └── Non
+         ↓
+       Créer un nouveau parent
+```
+
+La recherche doit pouvoir utiliser les informations disponibles, notamment :
+
+* nom ;
+* prénom ;
+* téléphone ;
+* email.
+
+La recherche doit être dynamique et limitée à l'école ou au tenant courant.
+
+Un utilisateur ne doit jamais pouvoir sélectionner un parent appartenant à une autre école.
+
+---
+
+# 6. RÈGLE CONTRE LES DOUBLONS DE PARENTS
+
+Avant de créer un nouveau parent, le système doit encourager la recherche d'un parent existant.
+
+Éviter les doublons évidents.
+
+Selon les données disponibles, vérifier notamment :
+
+* téléphone ;
+* email ;
+* nom ;
+* prénom.
+
+Ne pas bloquer abusivement deux personnes qui pourraient réellement avoir les mêmes noms.
+
+Si un doublon potentiel est détecté, afficher une confirmation ou une alerte claire.
+
+Le système doit permettre à l'utilisateur de vérifier si le parent existe déjà avant de créer une nouvelle fiche.
+
+---
+
+# 7. GESTION DES ÉLÈVES
+
+Créer une gestion complète des élèves.
+
+Prévoir les informations nécessaires à l'identification de l'élève, selon la documentation du projet.
+
+Au minimum, prévoir les informations essentielles telles que :
+
+* nom ;
+* prénom ;
+* date de naissance si nécessaire ;
+* sexe si prévu par la documentation ;
+* photo si prévue ;
+* adresse si nécessaire ;
+* parent/tuteur principal ;
+* matricule ;
+* école ;
+* tenant ;
+* statut.
+
+Les champs doivent être cohérents avec le document de projet.
+
+Ne pas inventer des informations inutiles.
+
+---
+
+# 8. MATRICULE AUTOMATIQUE
+
+Le matricule de l'élève doit être généré automatiquement par le système.
+
+L'utilisateur ne doit pas saisir manuellement le matricule lors de la création.
+
+Flux attendu :
+
+```text id="q4t0h8"
+Création de l'élève
+        ↓
+Validation des données
+        ↓
+Génération automatique du matricule
+        ↓
+Matricule unique
+        ↓
+Enregistrement de l'élève
+```
+
+Le matricule doit être :
+
+* généré côté backend ;
+* unique ;
+* stable ;
+* non modifiable manuellement par l'utilisateur ;
+* lié à l'école selon la configuration ;
+* protégé contre les doublons.
+
+Le système doit garantir l'unicité même en cas de créations simultanées.
+
+Utiliser les mécanismes appropriés de base de données et de transaction.
+
+---
+
+# 9. FORMAT DU MATRICULE CONFIGURABLE
+
+L'Admin École doit pouvoir configurer le format du matricule selon les besoins de son établissement.
+
+Le système doit permettre une configuration suffisamment flexible.
+
+Exemple :
+
+```text id="q4t0h9"
+Préfixe : KLS
+Inclure l'année : Oui
+Nombre de chiffres : 4
+```
+
+Résultat :
+
+```text id="q4t0h10"
+KLS-2026-0001
+KLS-2026-0002
+KLS-2026-0003
+```
+
+Autre exemple :
+
+```text id="q4t0h11"
+Préfixe : ELV
+Année : Non
+Nombre de chiffres : 6
+```
+
+Résultat :
+
+```text id="q4t0h12"
+ELV-000001
+ELV-000002
+```
+
+La configuration doit pouvoir prévoir, selon l'architecture retenue :
+
+* préfixe ;
+* inclusion de l'année ;
+* séparateur ;
+* nombre de chiffres ;
+* numéro de départ ;
+* éventuellement un format configurable.
+
+Le format exact doit être défini de manière claire et validée.
+
+---
+
+# 10. RÈGLES DE MATRICULE
+
+Le matricule doit être unique dans le périmètre défini par le projet.
+
+Par défaut, il doit être unique pour une école.
+
+Le système ne doit jamais réutiliser un matricule déjà attribué.
+
+Même si un élève est désactivé ou archivé, son matricule ne doit pas être réattribué à un autre élève.
+
+Le matricule doit rester stable pendant toute la durée de vie de l'élève.
+
+Le matricule ne doit pas dépendre de la classe actuelle de l'élève.
+
+La classe et l'inscription seront gérées dans une phase ultérieure.
+
+---
+
+# 11. CONFIGURATION DU MATRICULE
+
+Créer une interface permettant à l'Admin École de configurer le système de matricules.
+
+L'interface doit permettre de :
+
+* consulter la configuration ;
+* modifier les paramètres autorisés ;
+* prévisualiser un exemple de matricule ;
+* sauvegarder la configuration.
+
+Exemple de prévisualisation :
+
+```text id="q4t0h13"
+Configuration actuelle :
+KLS-{YEAR}-{NUMBER}
+
+Exemple :
+KLS-2026-0001
+```
+
+Les modifications de configuration ne doivent pas modifier les matricules déjà attribués.
+
+Un changement de configuration doit uniquement affecter les futurs élèves.
+
+---
+
+# 12. INTERFACE DE GESTION DES ÉLÈVES
+
+Créer une interface personnalisée KLASS.
+
+Ne pas utiliser Django Admin.
+
+Prévoir :
+
+* liste des élèves ;
+* création ;
+* consultation ;
+* modification des informations autorisées ;
+* recherche ;
+* filtres ;
+* consultation du parent principal ;
+* affichage du matricule.
+
+La liste doit afficher clairement les informations importantes :
+
+* matricule ;
+* nom ;
+* prénom ;
+* parent/tuteur ;
+* statut.
+
+Le matricule doit être affiché comme une information générée par le système.
+
+Ne pas présenter un champ de saisie libre pour le matricule lors de la création.
+
+---
+
+# 13. INTERFACE DE GESTION DES PARENTS
+
+Créer une interface personnalisée KLASS.
+
+Prévoir :
+
+* liste des parents ;
+* création ;
+* consultation ;
+* modification ;
+* recherche ;
+* liste des élèves associés.
+
+Lorsqu'un parent est consulté, afficher les élèves qui lui sont associés.
+
+Exemple :
+
+```text id="q4t0h14"
+Jean KABILA
+    ↓
+Élèves associés :
+    - David KABILA
+    - Sarah KABILA
+    - Grâce KABILA
+```
+
+---
+
+# 14. RECHERCHE ET FILTRES
+
+## Élèves
+
+Prévoir une recherche dynamique par :
+
+* matricule ;
+* nom ;
+* prénom.
+
+Prévoir des filtres par :
+
+* statut ;
+* parent/tuteur si nécessaire.
+
+## Parents
+
+Prévoir une recherche dynamique par :
+
+* nom ;
+* prénom ;
+* téléphone ;
+* email.
+
+Tous les résultats doivent être strictement limités à l'école et au tenant courants.
+
+---
+
+# 15. PERMISSIONS ET SÉCURITÉ
+
+Respecter le système de permissions existant.
+
+Un utilisateur ne doit jamais pouvoir :
+
+* consulter un élève d'une autre école ;
+* modifier un élève d'une autre école ;
+* supprimer un élève d'une autre école ;
+* consulter un parent d'une autre école ;
+* modifier un parent d'une autre école ;
+* associer un élève à un parent d'une autre école ;
+* utiliser un matricule appartenant à une autre école dans un contexte incorrect.
+
+Tester également :
+
+* accès direct aux URLs ;
+* modification manuelle des identifiants ;
+* requêtes POST ;
+* formulaires ;
+* services ;
+* API éventuelle.
+
+La sécurité doit être garantie côté backend.
+
+---
+
+# 16. MULTI-TENANT
+
+Toutes les données doivent respecter l'isolation multi-tenant existante.
+
+Tester explicitement :
+
+```text id="q4t0h15"
+École A ≠ École B
+```
+
+Vérifier qu'un utilisateur de l'École A ne peut jamais :
+
+* voir les élèves de l'École B ;
+* voir les parents de l'École B ;
+* modifier les élèves de l'École B ;
+* modifier les parents de l'École B ;
+* associer un élève de l'École A à un parent de l'École B ;
+* utiliser les configurations de matricule de l'École B.
+
+---
+
+# 17. DONNÉES DE TEST DE LA PHASE 3.0
+
+Le projet possède déjà un système de données de test.
+
+Analyser et mettre à jour ce système.
+
+Ne pas créer un système concurrent.
+
+Le système doit rester idempotent.
+
+Ajouter les données de test nécessaires.
+
+## Parents
+
+Créer plusieurs parents de test.
+
+Exemple :
+
+```text id="q4t0h16"
+Jean KABILA
+Marie MUKENDI
+Paul KASONGO
+```
+
+## Élèves
+
+Créer plusieurs élèves de test.
+
+Chaque élève doit :
+
+* avoir un matricule automatiquement généré ;
+* être associé à un parent/tuteur principal ;
+* appartenir à une école de test ;
+* respecter l'isolation multi-tenant.
+
+Créer également un parent associé à plusieurs élèves afin de tester la relation :
+
+```text id="q4t0h17"
+Parent A
+    ├── Élève 1
+    ├── Élève 2
+    └── Élève 3
+```
+
+## Configuration du matricule
+
+Créer une configuration de test réaliste.
+
+Par exemple :
+
+```text id="q4t0h18"
+Préfixe : KLS
+Année : Oui
+Chiffres : 4
+```
+
+Vérifier que les matricules sont correctement générés.
+
+Exécuter les données de test plusieurs fois et vérifier qu'aucun doublon n'est créé.
+
+---
+
+# 18. TESTS OBLIGATOIRES — PARENTS
+
+Tester :
+
+* création d'un parent ;
+* consultation ;
+* modification ;
+* recherche ;
+* association à un élève ;
+* association à plusieurs élèves ;
+* détection des doublons potentiels ;
+* isolation multi-tenant.
+
+---
+
+# 19. TESTS OBLIGATOIRES — ÉLÈVES
+
+Tester :
+
+* création ;
+* consultation ;
+* modification ;
+* recherche par nom ;
+* recherche par matricule ;
+* filtres ;
+* statut ;
+* association à un parent ;
+* unicité du matricule ;
+* stabilité du matricule.
+
+---
+
+# 20. TESTS OBLIGATOIRES — MATRICULES
+
+Tester :
+
+* génération automatique ;
+* format configuré ;
+* préfixe ;
+* année ;
+* compteur ;
+* padding avec zéros ;
+* unicité ;
+* créations simultanées ;
+* changement de configuration ;
+* conservation des anciens matricules ;
+* non-réutilisation d'un ancien matricule.
+
+Tester également un scénario de concurrence afin de vérifier que deux élèves ne reçoivent jamais le même matricule.
+
+---
+
+# 21. TESTS DE RÉGRESSION
+
+Après le développement, exécuter tous les tests des phases précédentes.
+
+## Phase 1
+
+Vérifier :
+
+* Super Admin ;
+* création d'école ;
+* tenant ;
+* domaine ;
+* Admin École ;
+* première connexion ;
+* changement de mot de passe ;
+* assistant ;
+* année scolaire ;
+* dashboard ;
+* permissions ;
+* isolation.
+
+## Phase 2
+
+Vérifier :
+
+* années scolaires ;
+* niveaux ;
+* options/filières ;
+* classes ;
+* salles ;
+* relations ;
+* permissions ;
+* données de test.
+
+Aucune fonctionnalité validée précédemment ne doit être cassée.
+
+---
+
+# 22. VÉRIFICATIONS TECHNIQUES
+
+Exécuter les vérifications adaptées au projet :
+
+```bash id="q4t0h19"
+python manage.py check
+python manage.py makemigrations --check
+python manage.py migrate
+python manage.py test
+```
+
+Si le projet utilise pytest, exécuter également :
+
+```bash id="q4t0h20"
+pytest
+```
+
+selon la configuration réelle du projet.
+
+Vérifier :
+
+* migrations ;
+* imports ;
+* modèles ;
+* contraintes ;
+* routes ;
+* templates ;
+* formulaires ;
+* permissions ;
+* requêtes ;
+* transactions ;
+* tests.
+
+Corriger les erreurs réelles.
+
+Ne pas masquer les erreurs.
+
+Ne pas désactiver les tests pour obtenir un résultat positif.
+
+---
+
+# 23. DOCUMENTATION
+
+Créer ou mettre à jour :
+
+```text id="q4t0h21"
+docs/modules/phase-3-0-eleves-parents-matricules.md
+```
+
+Documenter :
+
+* objectif ;
+* fonctionnalités ;
+* modèles ;
+* relations ;
+* règle un élève / un parent principal ;
+* règle un parent / plusieurs élèves ;
+* système de matricule ;
+* configuration du format ;
+* génération automatique ;
+* sécurité ;
+* isolation multi-tenant ;
+* permissions ;
+* routes ;
+* interfaces ;
+* recherche ;
+* filtres ;
+* données de test ;
+* tests ;
+* problèmes connus ;
+* préparation de la Phase 3.1.
+
+La documentation doit refléter exactement le code réellement développé.
+
+---
+
+# 24. MISE À JOUR DU README.md
+
+Pendant le développement :
+
+```text id="q4t0h22"
+Phase 3.0 — Élèves, parents et matricules
+Statut : ⏳ EN COURS
+```
+
+Après validation complète :
+
+```text id="q4t0h23"
+Phase 3.0 — Élèves, parents et matricules
+Statut : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Mettre à jour la liste des modules terminés.
+
+Indiquer :
+
+* objectif ;
+* fonctionnalités principales ;
+* tests ;
+* documentation.
+
+---
+
+# 25. RAPPORT FINAL
+
+À la fin, fournir un rapport clair contenant :
+
+## Élèves
+
+* fonctionnalités développées ;
+* informations gérées ;
+* recherche ;
+* filtres ;
+* statuts.
+
+## Parents
+
+* fonctionnalités développées ;
+* recherche ;
+* association à plusieurs élèves.
+
+## Matricules
+
+* format ;
+* configuration ;
+* génération ;
+* unicité ;
+* concurrence ;
+* stabilité.
+
+## Sécurité
+
+* permissions ;
+* isolation multi-tenant ;
+* tests d'accès interdits.
+
+## Données de test
+
+* parents ;
+* élèves ;
+* relations ;
+* configurations ;
+* idempotence.
+
+## Régression
+
+Résultats des tests de :
+
+* Phase 1 ;
+* Phase 2 ;
+* Phase 3.0.
+
+## Documentation
+
+Fichiers créés ou mis à jour.
+
+## Préparation de la Phase 3.1
+
+Préparer l'architecture pour :
+
+```text id="q4t0h24"
+Élève
+    ↓
+Inscription
+    ↓
+Année scolaire
+    ↓
+Classe
+```
+
+Ne pas développer complètement l'inscription dans cette phase.
+
+---
+
+# 26. STATUT FINAL
+
+Si tout est réellement terminé :
+
+```text id="q4t0h25"
+PHASE 3.0 — ÉLÈVES, PARENTS ET MATRICULES
+STATUT : ✅ TERMINÉE, STABILISÉE ET VALIDÉE
+```
+
+Sinon :
+
+```text id="q4t0h26"
+PHASE 3.0 — NON VALIDÉE
+```
+
+avec la liste précise des problèmes restants.
+
+---
+
+# RÈGLE FINALE
+
+La Phase 3.0 doit :
+
+1. réutiliser l'architecture des Phases 1 et 2 ;
+2. créer la gestion des parents ;
+3. créer la gestion des élèves ;
+4. respecter la règle : un élève = un seul parent/tuteur principal ;
+5. permettre à un parent d'avoir plusieurs élèves ;
+6. générer automatiquement les matricules ;
+7. permettre à l'Admin École de configurer le format des matricules ;
+8. garantir l'unicité et la stabilité des matricules ;
+9. mettre à jour les données de test ;
+10. tester réellement toutes les fonctionnalités ;
+11. vérifier l'isolation multi-tenant ;
+12. documenter tout le travail.
+
+Ne pas développer dans cette phase :
+
+* inscriptions complètes ;
+* affectation définitive à une classe ;
+* historique scolaire complet ;
+* emploi du temps ;
+* évaluations ;
+* paiements.
+
+La structure finale attendue est :
+
+```text id="q4t0h27"
+École
+    ↓
+Année scolaire
+    ↓
+Niveau
+    ↓
+Option / Filière
+    ↓
+Classe
+    ↓
+Élève
+    ↓
+Parent / Tuteur principal
+```
+
+avec la relation :
+
+```text id="q4t0h28"
+1 Parent
+    ↓
+1 ou plusieurs Élèves
+```
+
+et :
+
+```text id="q4t0h29"
+1 Élève
+    ↓
+1 seul Parent / Tuteur principal
+```
+
+Ne déclarer la Phase 3.0 terminée que si elle est réellement stable, testée, sécurisée, documentée et compatible avec toutes les phases précédentes.
