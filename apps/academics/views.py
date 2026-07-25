@@ -66,18 +66,55 @@ class DashboardView(View):
     def get(self, request):
         school = getattr(request.user, "school", None) or getattr(request, "current_school", None)
         active_year = None
+        dashboard = {
+            "student_count": 0,
+            "enrollment_count": 0,
+            "classroom_count": 0,
+            "staff_count": 0,
+            "recent_students": [],
+            "recent_enrollments": [],
+        }
 
         if school and school.schema_name:
             try:
                 from apps.school_years.models import SchoolYear
+                from apps.students.models import Student, StudentEnrollment
+                from apps.teachers.models import Personnel
+                from apps.academics.models import Classroom
+                from apps.core.constants import EnrollmentStatus, StaffStatus
+
                 with schema_context(school.schema_name):
                     active_year = SchoolYear.get_active()
+                    active_students = Student.objects.filter(status="active")
+                    dashboard["student_count"] = active_students.count()
+                    dashboard["recent_students"] = list(
+                        active_students.order_by("-created_at")[:5]
+                    )
+                    if active_year:
+                        active_enrollments = StudentEnrollment.objects.filter(
+                            school_year=active_year,
+                            status__in=EnrollmentStatus.ACTIVE_STATUSES,
+                        )
+                        dashboard["enrollment_count"] = active_enrollments.count()
+                        dashboard["recent_enrollments"] = list(
+                            active_enrollments.select_related("student", "classroom")
+                            .order_by("-created_at")[:5]
+                        )
+                        dashboard["classroom_count"] = Classroom.objects.filter(
+                            school_year=active_year,
+                            is_active=True,
+                            is_archived=False,
+                        ).count()
+                    dashboard["staff_count"] = Personnel.objects.filter(
+                        status=StaffStatus.ACTIVE
+                    ).count()
             except Exception as exc:
                 logger.warning("Impossible de récupérer l'année active : %s", exc)
 
         return render(request, self.template_name, {
             "school": school,
             "active_year": active_year,
+            "dashboard": dashboard,
         })
 
 
